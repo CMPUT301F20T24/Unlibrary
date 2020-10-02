@@ -33,7 +33,7 @@ jobs:
 
       # Step 3: Check the code with Android linter
       - name: Run Android Linter
-        run: ./gradlew lintStagingDebug
+        run: ./gradlew lint
 
       # Step 4: Yun your unit tests
       - name: Run Unit Tests
