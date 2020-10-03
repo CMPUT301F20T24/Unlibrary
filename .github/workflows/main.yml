@@ -1,4 +1,4 @@
-name: Android Tests
+name: Android
 
 # Step 1: Choose the branch or branches you want to run this workflow
 on:
@@ -41,11 +41,11 @@ jobs:
 
       # Step 4: Assemble debug apk to send to firebase test lab
       - name: Assemble Debug APK
-        run: ./gradlew assembleStagingDebug
+        run: ./gradlew assemble
 
       # Step 4: Assemble debug test apk to send to firebase test lab
       - name: Assemble Debug Test APK
-        run: ./gradlew assembleStagingDebugAndroidTest
+        run: ./gradlew assembleAndroidTest
 
       # TODO add this back when we start using Firebase
       # Step 4: Run instrumented tests on firebase test lab
