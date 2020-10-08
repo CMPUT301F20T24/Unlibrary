@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.unlibrary.R;
-import com.example.unlibrary.library.dummy.DummyContent;
 
 /**
  * A fragment representing a list of Items.
@@ -24,6 +24,8 @@ public class LibraryBooksFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 2;
+
+    private LibraryViewModel mViewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -45,6 +47,7 @@ public class LibraryBooksFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -65,7 +68,8 @@ public class LibraryBooksFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(DummyContent.ITEMS));
+            
+            recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(model.getBooks()));
         }
         return view;
     }
