@@ -1,64 +1,44 @@
 package com.example.unlibrary.library;
 
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.example.unlibrary.R;
-import com.example.unlibrary.library.dummy.DummyContent.DummyItem;
+import com.example.unlibrary.databinding.FragmentLibraryBookBinding;
+import com.example.unlibrary.models.Book;
+import com.example.unlibrary.util.BookViewHolder;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem}.
+ * {@link RecyclerView.Adapter} that can display a {@link Book}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<LibraryBooksRecyclerViewAdapter.ViewHolder> {
+public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentLibraryBookBinding>> {
 
-    private final List<DummyItem> mValues;
+    private final List<Book> mValues;
 
-    public LibraryBooksRecyclerViewAdapter(List<DummyItem> items) {
+    public LibraryBooksRecyclerViewAdapter(List<Book> items) {
         mValues = items;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_library_book, parent, false);
-        return new ViewHolder(view);
+    public BookViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflaytor = LayoutInflater.from(parent.getContext());
+        FragmentLibraryBookBinding libraryBookBinding = FragmentLibraryBookBinding.inflate(layoutInflaytor, parent,false);
+        return new BookViewHolder<>(libraryBookBinding);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+    public void onBindViewHolder(final BookViewHolder<FragmentLibraryBookBinding> holder, int position) {
+        Book book = mValues.get(position);
+        holder.bind(book);
     }
 
     @Override
     public int getItemCount() {
         return mValues.size();
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
-
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
     }
 }
