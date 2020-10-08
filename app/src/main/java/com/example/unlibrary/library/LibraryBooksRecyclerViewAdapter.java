@@ -24,10 +24,11 @@ public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookVi
         mValues = items;
     }
 
+    @NonNull
     @Override
-    public BookViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflaytor = LayoutInflater.from(parent.getContext());
-        FragmentLibraryBookBinding libraryBookBinding = FragmentLibraryBookBinding.inflate(layoutInflaytor, parent,false);
+    public BookViewHolder<FragmentLibraryBookBinding> onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        FragmentLibraryBookBinding libraryBookBinding = FragmentLibraryBookBinding.inflate(layoutInflater, parent,false);
         return new BookViewHolder<>(libraryBookBinding);
     }
 
