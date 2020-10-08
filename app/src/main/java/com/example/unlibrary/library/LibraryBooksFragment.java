@@ -69,7 +69,7 @@ public class LibraryBooksFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             
-            recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(model.getBooks()));
+            recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(mViewModel.getBooks()));
         }
         return view;
     }
