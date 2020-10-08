@@ -12,7 +12,7 @@
         <activity android:name=".ProfileActivity"></activity>
         <activity android:name=".ExchangeActivity" />
         <activity android:name=".UnlibraryActivity" />
-        <activity android:name=".LibraryActivity" />
+        <activity android:name=".library.LibraryActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
