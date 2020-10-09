@@ -15,6 +15,11 @@ public class Book {
     String title;
     String author;
 
+    public Book(String isbn, String title) {
+        this.isbn = isbn;
+        this.title = title;
+    }
+
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
@@ -57,11 +62,6 @@ public class Book {
 
     ArrayList<String> photos;
     Status status;
-
-    public Book(String isbn, String title) {
-        this.isbn = isbn;
-        this.title = title;
-    }
 
     public String getIsbn() {
         return this.isbn;
