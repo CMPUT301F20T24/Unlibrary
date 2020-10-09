@@ -19,10 +19,7 @@ import com.example.unlibrary.R;
  */
 public class LibraryBooksFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Remove parameter
-    private int mColumnCount = 1;
 
     private LibraryViewModel mViewModel;
 
@@ -47,10 +44,6 @@ public class LibraryBooksFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
-
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
     }
 
     @Override
@@ -62,12 +55,7 @@ public class LibraryBooksFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(mViewModel.getBooks()));
         }
         return view;
