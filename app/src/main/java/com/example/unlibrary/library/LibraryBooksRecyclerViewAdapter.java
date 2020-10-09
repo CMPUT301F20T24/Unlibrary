@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Book}.
- * TODO: Replace the implementation with code for your data type.
+ * TODO: Generalize this
  */
 public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentLibraryBookBinding>> {
 
