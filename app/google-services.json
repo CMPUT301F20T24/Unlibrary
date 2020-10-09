@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "9750112753",
+    "firebase_url": "https://unlibrary-firebase.firebaseio.com",
+    "project_id": "unlibrary-firebase",
+    "storage_bucket": "unlibrary-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:9750112753:android:1cfddf84b16e19abf63c50",
+        "android_client_info": {
+          "package_name": "com.example.unlibrary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "9750112753-pqj14e0g2lbmcqssfcitir9lhcu345ij.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0j_oi7PbIYJIqbVfizytKRic9sYmo4PU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "9750112753-pqj14e0g2lbmcqssfcitir9lhcu345ij.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
