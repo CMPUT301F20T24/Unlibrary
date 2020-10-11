@@ -1,12 +1,15 @@
 @startuml
-class Dummy {
-  String data
-  void methods()
+class ProfileActivity {
+  #void onCreate()
 }
 
-class Flight {
-   flightNumber : Integer
-   departureTime : Date
+class ProfileViewModel {
+  +LibraryViewModel()
 }
+
+class ProfileRepository {
+}
+
+ProfileActivity o-- ProfileViewModel
+ProfileViewModel o-- ProfileRepository
 @enduml
-
