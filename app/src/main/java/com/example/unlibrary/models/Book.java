@@ -10,64 +10,64 @@ public class Book {
         BORROWED
     }
 
-    String isbn;
-    String description;
-    String title;
-    String author;
+    private String mIsbn;
+    private String mDescription;
+    private String mTitle;
+    private String mAuthor;
+
+    private ArrayList<String> mPhotos;
+    private Status mStatus;
 
     public Book(String isbn, String title) {
-        this.isbn = isbn;
-        this.title = title;
+        this.mIsbn = isbn;
+        this.mTitle = title;
     }
 
     public void setIsbn(String isbn) {
-        this.isbn = isbn;
+        this.mIsbn = isbn;
     }
 
     public String getDescription() {
-        return description;
+        return mDescription;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.mDescription = description;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.mTitle = title;
     }
 
     public String getAuthor() {
-        return author;
+        return mAuthor;
     }
 
     public void setAuthor(String author) {
-        this.author = author;
+        this.mAuthor = author;
     }
 
     public ArrayList<String> getPhotos() {
-        return photos;
+        return mPhotos;
     }
 
     public void setPhotos(ArrayList<String> photos) {
-        this.photos = photos;
+        mPhotos = photos;
     }
 
     public Status getStatus() {
-        return status;
+        return mStatus;
     }
 
     public void setStatus(Status status) {
-        this.status = status;
+        mStatus = status;
     }
 
-    ArrayList<String> photos;
-    Status status;
-
     public String getIsbn() {
-        return this.isbn;
+        return this.mIsbn;
     }
 
     public String getTitle() {
-        return this.title;
+        return this.mTitle;
     }
 }
