@@ -1,14 +1,16 @@
-package com.example.unlibrary;
+package com.example.unlibrary.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-public class ExchangeActivity extends AppCompatActivity {
+import com.example.unlibrary.R;
+
+public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_exchange);
+        setContentView(R.layout.activity_login);
     }
 }

@@ -1,8 +1,10 @@
-package com.example.unlibrary;
+package com.example.unlibrary.profile;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.unlibrary.R;
 
 public class ProfileActivity extends AppCompatActivity {
 
