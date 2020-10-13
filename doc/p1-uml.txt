@@ -4,7 +4,7 @@ class ProfileActivity {
 }
 
 class ProfileViewModel {
-  +LibraryViewModel()
+  +ProfileViewModel()
 }
 
 class ProfileRepository {
