@@ -1,4 +1,26 @@
 @startuml
+class ExchangeActivity{
+    #void onCreate()
+}
+
+class BorrowActivity{
+    -acceptRequest()
+    -declineRequest()
+    -notifyAcceptedRequest()
+    -updateStatus()
+}
+
+class ReturnActivity{
+    -updateStatus()
+}
+
+class FilterLibrary{
+}
+
+class SearchMarketPlace{
+    -ArrayList<Book> mBooks   
+}
+
 class ProfileActivity {
   #void onCreate()
 }
@@ -80,4 +102,13 @@ GoogleMapsFragment o-- GoogleMapService
 ProfileFragment o-- ProfileFragmentViewModel
 ProfileFragmentViewModel --> LibraryViewModel
 ProfileFragment o-- BookRequestService
+
+FilterLibrary --> LibraryViewModel
+SearchMarketPlace --o FilterLibrary
+SearchMarketPlace o-- LibraryViewModel
+BorrowActivity --> ExchangeActivity
+BorrowActivity --o CameraService
+BorrowActivity --o BookRequestService
+ReturnActivity --> ExchangeActivity
+ReturnActivity --o CameraService
 @enduml
