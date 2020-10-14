@@ -10,6 +10,70 @@ class ProfileViewModel {
 class ProfileRepository {
 }
 
+class LibraryActivity {
+- LibraryViewModel mViewModel
+#void onCreate()
+}
+
+class LibraryViewModel {
+-ArrayList<Book> mBooks
++LibraryViewModel()
+}
+
+class LibraryRepository {
+}
+
+class GoogleMapsFragment{
+- GoogleMapAddress mMeetingLocation
+}
+
+class GoogleMapService {
+}
+
+class BookFragment {
+- BookFragmentViewModel mViewModel
+}
+
+class CameraService {
+}
+
+class ProfileFragment{
+- ProfileViewModel mViewModel
+}
+
+class HandOffService {
+}
+
+class BookFragmentViewModel {
+- Book mOpenedBook
+- Boolean isEditing
++ void setTitle(String title)
++ void setDescription(String description)
++ void setISBN(String ISBN)
+- ArrayList<Profile> mRequests
++ void takePictures()
+}
+
+class ProfileFragmentViewModel {
+- Profile mProfile
++ void sendApproval()
++ void sendDecline()
+}
+
+
 ProfileActivity o-- ProfileViewModel
 ProfileViewModel o-- ProfileRepository
+
+BookFragment o-- HandOffService
+BookFragment o-- GoogleMapsFragment : On Select or Edit Meeting Location
+BookFragment o-- BookFragmentViewModel
+BookFragment o-- CameraService
+BookFragmentViewModel ..> LibraryViewModel
+LibraryViewModel o-- LibraryRepository
+LibraryActivity o-- BookFragment
+LibraryActivity o-- LibraryViewModel
+LibraryActivity o-- ProfileFragment
+GoogleMapsFragment o-- GoogleMapService
+ProfileFragment o-- ProfileFragmentViewModel
+ProfileFragmentViewModel ..> LibraryViewModel
 @enduml
