@@ -60,6 +60,9 @@ class ProfileFragmentViewModel {
 + void sendDecline()
 }
 
+class BookRequestService {
++ Boolean isAccepted
+}
 
 ProfileActivity o-- ProfileViewModel
 ProfileViewModel o-- ProfileRepository
@@ -68,12 +71,13 @@ BookFragment o-- HandOffService
 BookFragment o-- GoogleMapsFragment : On Select or Edit Meeting Location
 BookFragment o-- BookFragmentViewModel
 BookFragment o-- CameraService
-BookFragmentViewModel ..> LibraryViewModel
+BookFragmentViewModel --> LibraryViewModel
 LibraryViewModel o-- LibraryRepository
 LibraryActivity o-- BookFragment
 LibraryActivity o-- LibraryViewModel
 LibraryActivity o-- ProfileFragment
 GoogleMapsFragment o-- GoogleMapService
 ProfileFragment o-- ProfileFragmentViewModel
-ProfileFragmentViewModel ..> LibraryViewModel
+ProfileFragmentViewModel --> LibraryViewModel
+ProfileFragment o-- BookRequestService
 @enduml
