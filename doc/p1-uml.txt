@@ -3,6 +3,7 @@
 class ExchangeActivity{
     #void onCreate()
 }
+
 class BorrowActivity{
     -acceptRequest()
     -declineRequest()
@@ -22,6 +23,7 @@ class SearchMarketPlace{
     -ArrayList<Book> mBooks
     
 }
+
 class ProfileActivity {
   #void onCreate()
 }
