@@ -94,8 +94,8 @@ ProfileFragment o-- ProfileFragmentViewModel
 ProfileFragmentViewModel --> LibraryViewModel
 ProfileFragment o-- BookRequestService
 
-ExchangeActivity --o ExchangeViewModel
-ExchangeViewModel --o ExchangeRepository
-ExchangeActivity --o BookFragment
+ExchangeViewModel --o ExchangeActivity 
+ExchangeRepository --o ExchangeViewModel  
+BookFragment --o ExchangeActivity 
 
 @enduml
