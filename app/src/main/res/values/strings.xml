@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Unlibrary</string>
+    <string name="auth_background_content_description">Man reading book</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sign_in_title">Sign In</string>
+    <string name="sign_in_button">Sign In</string>
+    <string name="sign_up_button">Sign Up</string>
 </resources>
