@@ -189,13 +189,6 @@ class UnlibraryActivity{
 +returnRequest()
 }
 
-
-UnlibraryViewModel o-- UnlibraryRepository
-UnlibraryActivity o-- UnlibraryViewModel
-UnlibraryActivity o-- BookFragment 
-
-
-
 UnlibraryViewModel ..> UnlibraryRepository: <<uses>>
 UnlibraryActivity ..> UnlibraryViewModel: <<uses>>
 UnlibraryActivity ..> BookFragment: <<launches>> 
