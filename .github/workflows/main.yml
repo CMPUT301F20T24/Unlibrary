@@ -53,3 +53,4 @@ jobs:
           arg-spec: '.github/test-lab-config.yml:android-pixel-4'
         env:
           SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+        continue-on-error: true
