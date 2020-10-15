@@ -47,7 +47,7 @@ class Book {
     +timestamp getCreatedAt()
  }
 
- class requests {
+ class Request {
     -int id
     -User requester
     -Book book
