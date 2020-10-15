@@ -136,8 +136,8 @@ class LibraryViewModel {
 + void takePictures()
 + void sendApproval()
 + void sendDecline()
-+ perfromBorrowHandoff(Book book)
-+ performReturnHandoff(Book book)
++ initiateBorrowHandoff(Book book)
++ completeReturnHandoff(Book book)
 }
 
 class LibraryRepository {
@@ -178,8 +178,8 @@ class UnlibraryRepository {
 class UnlibraryViewModel {
 + UnlibraryViewModel()
 + void deleteBook(Book toDelete)
-+ perfromBorrowHandoff(Book book)
-+ performReturnHandoff(Book book)
++ completeBorrowHandoff(Book book)
++ initiateReturnHandoff(Book book)
 }
 
 class UnlibraryActivity{
@@ -194,33 +194,39 @@ UnlibraryActivity o-- UnlibraryViewModel
 UnlibraryActivity o-- BookFragment 
 
 
-ProfileActivity o-- ProfileViewModel
-ProfileViewModel o-- ProfileRepository
+
+UnlibraryViewModel ..> UnlibraryRepository: <<uses>>
+UnlibraryActivity ..> UnlibraryViewModel: <<uses>>
+UnlibraryActivity ..> BookFragment: <<launches>> 
+
+
+ProfileActivity ..> ProfileViewModel: <<uses>>
+ProfileViewModel ..> ProfileRepository: <<uses>>
 
 BookFragment o-- GoogleMapsFragment
-BookFragment o-- CameraService
-LibraryViewModel o-- LibraryRepository
-LibraryActivity o-- BookFragment
-LibraryActivity o-- LibraryViewModel
-BookFragment o-- ProfileFragment
-GoogleMapsFragment o-- GoogleMapService
+BookFragment ..> CameraService: <<uses>>
+LibraryViewModel ..> LibraryRepository: <<uses>>
+LibraryActivity ..> LibraryViewModel: <<uses>>
+LibraryActivity ..> BookFragment: <<launches>>
+BookFragment ..> ProfileFragment: <<launches>>
+GoogleMapsFragment ..> GoogleMapService
 
-ExchangeViewModel --o ExchangeActivity 
-ExchangeRepository --o ExchangeViewModel  
-BookFragment --o ExchangeActivity 
-LoginActivity o-- LoginViewModel
-LoginViewModel o-- LoginRepository
+ExchangeViewModel ..> ExchangeRepository: <<uses>>
+ExchangeActivity ..> ExchangeViewModel: <<uses>>
+BookFragment <.. ExchangeActivity: <<launches>>
 
-ProfileRepository --> Firestore
-LibraryRepository --> Firestore
-ExchangeRepository --> Firestore
-LoginRepository --> Firestore
+ProfileFragment --o ProfileActivity
+
+LoginViewModel ..> LoginRepository: <<uses>>
+LoginActivity ..> LoginViewModel: <<uses>>
+
+ProfileRepository ..> Firestore: <<uses>>
+LibraryRepository ..> Firestore: <<uses>>
+ExchangeRepository ..> Firestore: <<uses>>
+LoginRepository ..> Firestore: <<uses>>
 
 ProfileRepository o-- User
 LibraryRepository o-- Book
 ExchangeRepository o-- Request
 LoginRepository o-- User
-
-@enduml
-BookFragment --o ExchangeActivity
 @enduml
