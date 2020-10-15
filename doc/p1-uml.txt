@@ -84,12 +84,12 @@ class LoginRepository {
 }
 class ExchangeActivity{
 #void onCreate()
--bookRequest()
 }
 
 class ExchangeViewModel{
 -ExchangeRepository exchangeRepository
 +ExchangeViewModel(ExchangeRepository exchangeRepository)
++bookRequest()
 }
 
 class ExchangeRepository{
@@ -101,12 +101,17 @@ class ExchangeRepository{
 }
 
 class ProfileActivity {
+-ProfileViewModel mProfileViewModel
 #void onCreate()
 }
 
 class ProfileViewModel {
 -ProfileRepository profileRepository
 +ProfileViewModel(ProfileRepository profileRepository)
++ProfileViewModel()
++setName(String newName)
++setPhone(String newPhone)
++setEmail(String newEmail)
 }
 
 class ProfileRepository {
@@ -118,13 +123,21 @@ class ProfileRepository {
 }
 
 class LibraryActivity {
-- LibraryViewModel mViewModel
-#void onCreate()
+- LibraryViewModel mUnlibraryViewModel
+# void onCreate()
 }
 
 class LibraryViewModel {
 -LibraryRepository libraryRepository
 +LibraryViewModel(LibraryRepository libraryRepository)
++ void setTitle(String newTitle)
++ void setDescription(String newDescription)
++ void setISBN(String newISBN)
++ void takePictures()
++ void sendApproval()
++ void sendDecline()
++ perfromBorrowHandoff(Book book)
++ performReturnHandoff(Book book)
 }
 
 class LibraryRepository {
@@ -143,55 +156,54 @@ class GoogleMapService {
 }
 
 class BookFragment {
-- BookFragmentViewModel mViewModel
+- LiveData<Book> mOpenedBook
+- Boolean isEditing
 }
 
 class CameraService {
 }
 
 class ProfileFragment{
-- ProfileViewModel mViewModel
+- LiveData<User> mProfile
 }
 
-class HandOffService {
+class UnlibraryRepository {
+-FirebaseFirestore  UnlibraryRepository
+-LiveData<ArrayList<Book>> booksData
++LiveData<ArrayList<Book>> getStoreUnlibraryData()
++LiveData<ArrayList<Book>> getUnlibraryData()
++void updateUnlibrary(Book book)
 }
 
-class BookFragmentViewModel {
-- Book mOpenedBook
-- Boolean isEditing
-+ void setTitle(String title)
-+ void setDescription(String description)
-+ void setISBN(String ISBN)
-- ArrayList<User> mRequests
-+ void takePictures()
+class UnlibraryViewModel {
++ UnlibraryViewModel()
++ void deleteBook(Book toDelete)
++ perfromBorrowHandoff(Book book)
++ performReturnHandoff(Book book)
 }
 
-class ProfileFragmentViewModel {
-- User mProfile
-+ void sendApproval()
-+ void sendDecline()
+class UnlibraryActivity{
+- UnlibraryViewModel mLibraryViewModel
+# void onCreate()
++ returnRequest()
 }
 
-class BookRequestService {
-+ Boolean isAccepted
-}
+
+UnlibraryViewModel o-- UnlibraryRepository
+UnlibraryActivity o-- UnlibraryViewModel
+UnlibraryActivity o-- BookFragment 
+
 
 ProfileActivity o-- ProfileViewModel
 ProfileViewModel o-- ProfileRepository
 
-BookFragment o-- HandOffService
-BookFragment o-- GoogleMapsFragment : On Select or Edit Meeting Location
-BookFragment o-- BookFragmentViewModel
+BookFragment o-- GoogleMapsFragment
 BookFragment o-- CameraService
-BookFragmentViewModel --> LibraryViewModel
 LibraryViewModel o-- LibraryRepository
 LibraryActivity o-- BookFragment
 LibraryActivity o-- LibraryViewModel
-LibraryActivity o-- ProfileFragment
+BookFragment o-- ProfileFragment
 GoogleMapsFragment o-- GoogleMapService
-ProfileFragment o-- ProfileFragmentViewModel
-ProfileFragmentViewModel --> LibraryViewModel
-ProfileFragment o-- BookRequestService
 
 ExchangeViewModel --o ExchangeActivity 
 ExchangeRepository --o ExchangeViewModel  
@@ -209,4 +221,6 @@ LibraryRepository o-- Book
 ExchangeRepository o-- Request
 LoginRepository o-- User
 
+@enduml
+BookFragment --o ExchangeActivity
 @enduml
