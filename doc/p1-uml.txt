@@ -1,26 +1,120 @@
 @startuml
+package Firestore {
+}
 
+class User {
+    -int id
+    -string name
+    -string username
+    -string phone
+    -timestamp createdAt
+    +void setId(int id)
+    +void setName(string name)
+    +void setUsername (string username)
+    +void setPhone(string name)
+    +void setCreatedAt (timestamp createdAt)
+    +int getId()
+    +string gettName()
+    +string getUsername ()
+    +string getPhone()
+    +timestamp getCreatedAt ()
+}
+
+class Book {
+    -int id
+    -string title
+    -string author
+    -string isbn
+    -string status
+    -Image photo
+    -User owner
+    -timestamp createdAt
+    +void setId(int id)
+    +void setTitle(string title)
+    +void setAuthor (string author)
+    +void setIsbn (string isbn)
+    +void setStatus(string status)
+    +void setPhoto(Image photo)
+    +void setOwner (User owner)
+    +void setCreatedAt(timestamp createdAt)
+    +int getId ()
+    +string getTitle ()
+    +string getAuthor ()
+    +string getIsbn ()
+    +string getStatus ()
+    +Image getPhoto ()
+    +User getOwner ()
+    +timestamp getCreatedAt()
+ }
+
+ class requests {
+    -int id
+    -User requester
+    -Book book
+    -string state
+    -geopoint location
+    -timestamp createdAt
+    +void setId(int id)
+    +void setRequester(User requester)
+    +void setBook(Book book)
+    +void setState(string state)
+    +void setLocation (geopoint location)
+    +void setCreatedAt (timestamp createdAt)
+    +int getId()
+    +User getRequester()
+    +Book getBook()
+    +string getState()
+    +geopoint getLocation()
+    +timestamp getCreatedAt()
+ }
+
+class LoginActivity {
+#void onCreate()
+}
+
+class LoginViewModel {
+-LoginRepository loginRepository
++LoginViewModel(LoginRepository loginRepository)
+}
+
+class LoginRepository {
+-FirebaseFirestore  loginRepository
++LiveData<User> getUserData()
++void createUser()
+}
 class ExchangeActivity{
-    #void onCreate()
-    -bookRequest()
+#void onCreate()
+-bookRequest()
 }
 
 class ExchangeViewModel{
-    +ExchangeViewModel()
+-ExchangeRepository exchangeRepository
++ExchangeViewModel(ExchangeRepository exchangeRepository)
 }
 
 class ExchangeRepository{
+-FirebaseFirestore  exchangeRepository
+- LiveData<ArrayList<Request>> requestData
++LiveData<ArrayList<Request>> getStoreExchangeData()
++LiveData<ArrayList<Request>> getExchangeData()
++void updateExchangeData()
 }
 
 class ProfileActivity {
-  #void onCreate()
+#void onCreate()
 }
 
 class ProfileViewModel {
-  +ProfileViewModel()
+-ProfileRepository profileRepository
++ProfileViewModel(ProfileRepository profileRepository)
 }
 
 class ProfileRepository {
+-FirebaseFirestore  profileRepository
+-LiveData<User> userData
++LiveData<User> getStoreProfileData()
++LiveData<User> getProfileData()
++void updateProfile(User profile)
 }
 
 class LibraryActivity {
@@ -29,11 +123,16 @@ class LibraryActivity {
 }
 
 class LibraryViewModel {
--ArrayList<Book> mBooks
-+LibraryViewModel()
+-LibraryRepository libraryRepository
++LibraryViewModel(LibraryRepository libraryRepository)
 }
 
 class LibraryRepository {
+-FirebaseFirestore  LibraryRepository
+-LiveData<ArrayList<Book>> booksData
++LiveData<ArrayList<Book>> getStoreLibraryData()
++LiveData<ArrayList<Book>> getLibraryData()
++void updateLibrary(Book book)
 }
 
 class GoogleMapsFragment{
@@ -63,12 +162,12 @@ class BookFragmentViewModel {
 + void setTitle(String title)
 + void setDescription(String description)
 + void setISBN(String ISBN)
-- ArrayList<Profile> mRequests
+- ArrayList<User> mRequests
 + void takePictures()
 }
 
 class ProfileFragmentViewModel {
-- Profile mProfile
+- User mProfile
 + void sendApproval()
 + void sendDecline()
 }
@@ -97,5 +196,17 @@ ProfileFragment o-- BookRequestService
 ExchangeViewModel --o ExchangeActivity 
 ExchangeRepository --o ExchangeViewModel  
 BookFragment --o ExchangeActivity 
+LoginActivity o-- LoginViewModel
+LoginViewModel o-- LoginRepository
+
+ProfileRepository --> Firestore
+LibraryRepository --> Firestore
+ExchangeRepository --> Firestore
+LoginRepository --> Firestore
+
+ProfileRepository o-- User
+LibraryRepository o-- Book
+ExchangeRepository o-- Request
+LoginRepository o-- User
 
 @enduml
