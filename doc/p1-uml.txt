@@ -1,4 +1,17 @@
 @startuml
+
+class ExchangeActivity{
+    #void onCreate()
+    -bookRequest()
+}
+
+class ExchangeViewModel{
+    +ExchangeViewModel()
+}
+
+class ExchangeRepository{
+}
+
 class ProfileActivity {
   #void onCreate()
 }
@@ -80,4 +93,9 @@ GoogleMapsFragment o-- GoogleMapService
 ProfileFragment o-- ProfileFragmentViewModel
 ProfileFragmentViewModel --> LibraryViewModel
 ProfileFragment o-- BookRequestService
+
+ExchangeViewModel --o ExchangeActivity 
+ExchangeRepository --o ExchangeViewModel  
+BookFragment --o ExchangeActivity 
+
 @enduml
