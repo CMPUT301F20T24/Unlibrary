@@ -183,7 +183,7 @@ class UnlibraryViewModel {
 +initiateReturnHandoff(Book book)
 }
 
-class UnlibraryActivity{
+class UnlibraryActivity {
 -UnlibraryViewModel mLibraryViewModel
 #void onCreate()
 +returnRequest()
@@ -223,4 +223,16 @@ ProfileRepository o-- User
 LibraryRepository o-- Book
 ExchangeRepository o-- Request
 LoginRepository o-- User
+
+note "We are following the Model-View-ViewModel (MVVM) design pattern.\n\nComments are attached to one example (UnLibrary related classes) to explain MVVM usage." as Overview
+
+note right of UnlibraryViewModel: Hold logic for updating and accessing the data models for the UnLibrary Activity.
+note right of UnlibraryRepository: Holds LiveData of Book objects from Firestore.
+note right of UnlibraryActivity: Holds List of books that the user has requested to borrow.
+note right of BookFragment: Displays information on a selected book like\nTitle, ISBN, Photos, Requests (if in Library Activity) and status.\nGets data from activity level ViewModel.
+note right of Book: Models the book objects. Data is stored in Firestore.
+note right of User: Models the individual users of the application.\nThe owner and borrowers are represented by this object.
+note right of Request: Models the relationship between a book and a user that is requesting to borrow it.
+note right of Firestore: Holds data on books, users, and requests for books.\nCurrently a blackbox, further sprints will better encapsulate the associated classes for Firestore.
+note right of GoogleMapsFragment: Initial idea is to use Google Maps API to handle picking a pick-up location.\nFurther iterations will better encapsulate the associated classes for this feature.
 @enduml
