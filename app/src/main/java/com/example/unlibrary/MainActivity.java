@@ -6,7 +6,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.unlibrary.library.LibraryActivity;
-import com.example.unlibrary.login.LoginActivity;
+import com.example.unlibrary.auth.AuthActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,8 +17,9 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO: Context switch between logged in or logged out
         boolean loggedIn = true;
+        loggedIn = false;
         Intent intent = new Intent(this,
-                loggedIn ? LibraryActivity.class : LoginActivity.class);
+                loggedIn ? LibraryActivity.class : AuthActivity.class);
         startActivity(intent);
     }
 }

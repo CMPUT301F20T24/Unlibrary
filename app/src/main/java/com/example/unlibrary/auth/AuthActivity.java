@@ -1,4 +1,4 @@
-package com.example.unlibrary.login;
+package com.example.unlibrary.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 import com.example.unlibrary.R;
 
-public class LoginActivity extends AppCompatActivity {
+public class AuthActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_auth);
     }
 }
