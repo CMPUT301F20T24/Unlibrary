@@ -1,36 +1,49 @@
 @startuml
-
 class ExchangeActivity{
-    #void onCreate()
-    -bookRequest()
+# void onCreate()
+    
 }
 
 class ExchangeViewModel{
-    +ExchangeViewModel()
++ ExchangeViewModel()
++ bookRequest()
 }
 
 class ExchangeRepository{
 }
 
 class ProfileActivity {
-  #void onCreate()
+- ProfileViewModel mProfileViewModel
+# void onCreate()
 }
 
 class ProfileViewModel {
-  +ProfileViewModel()
++ ProfileViewModel()
++ setName(String newName)
++ setPhone(String newPhone)
++ setEmail(String newEmail)
+  
 }
 
 class ProfileRepository {
 }
 
 class LibraryActivity {
-- LibraryViewModel mViewModel
-#void onCreate()
+- LibraryViewModel mUnlibraryViewModel
+# void onCreate()
 }
 
 class LibraryViewModel {
--ArrayList<Book> mBooks
-+LibraryViewModel()
+- ArrayList<Book> mBooks
++ LibraryViewModel()
++ void setTitle(String newTitle)
++ void setDescription(String newDescription)
++ void setISBN(String newISBN)
++ void takePictures()
++ void sendApproval()
++ void sendDecline()
++ initiateBorrowHandoff(Book book)
++ completeReturnHandoff(Book book)
 }
 
 class LibraryRepository {
@@ -44,58 +57,55 @@ class GoogleMapService {
 }
 
 class BookFragment {
-- BookFragmentViewModel mViewModel
+- Book mOpenedBook
+- Boolean isEditing
 }
 
 class CameraService {
 }
 
 class ProfileFragment{
-- ProfileViewModel mViewModel
+- User user
 }
 
-class HandOffService {
+
+class UnlibraryRepository {
 }
 
-class BookFragmentViewModel {
-- Book mOpenedBook
-- Boolean isEditing
-+ void setTitle(String title)
-+ void setDescription(String description)
-+ void setISBN(String ISBN)
-- ArrayList<Profile> mRequests
-+ void takePictures()
+class UnlibraryViewModel {
+- ArrayList<Book> oBooks
++ UnlibraryViewModel()
++ void deleteBook(Book toDelete)
++ completeBorrowHandoff(Book book)
++ initiateReturnHandoff(Book book)
 }
 
-class ProfileFragmentViewModel {
-- Profile mProfile
-+ void sendApproval()
-+ void sendDecline()
+class UnlibraryActivity{
+- UnlibraryViewModel mLibraryViewModel
+# void onCreate()
++ returnRequest()
 }
 
-class BookRequestService {
-+ Boolean isAccepted
-}
 
-ProfileActivity o-- ProfileViewModel
-ProfileViewModel o-- ProfileRepository
+UnlibraryViewModel ..> UnlibraryRepository: <<uses>>
+UnlibraryActivity ..> UnlibraryViewModel: <<uses>>
+UnlibraryActivity ..> BookFragment: <<launches>> 
 
-BookFragment o-- HandOffService
-BookFragment o-- GoogleMapsFragment : On Select or Edit Meeting Location
-BookFragment o-- BookFragmentViewModel
-BookFragment o-- CameraService
-BookFragmentViewModel --> LibraryViewModel
-LibraryViewModel o-- LibraryRepository
-LibraryActivity o-- BookFragment
-LibraryActivity o-- LibraryViewModel
-LibraryActivity o-- ProfileFragment
-GoogleMapsFragment o-- GoogleMapService
-ProfileFragment o-- ProfileFragmentViewModel
-ProfileFragmentViewModel --> LibraryViewModel
-ProfileFragment o-- BookRequestService
 
-ExchangeViewModel --o ExchangeActivity 
-ExchangeRepository --o ExchangeViewModel  
-BookFragment --o ExchangeActivity 
+ProfileActivity ..> ProfileViewModel: <<uses>>
+ProfileViewModel ..> ProfileRepository: <<uses>>
 
+BookFragment o-- GoogleMapsFragment
+BookFragment ..> CameraService: <<uses>>
+LibraryViewModel ..> LibraryRepository: <<uses>>
+LibraryActivity ..> LibraryViewModel: <<uses>>
+LibraryActivity ..> BookFragment: <<launches>>
+BookFragment ..> ProfileFragment: <<launches>>
+GoogleMapsFragment ..> GoogleMapService
+
+ExchangeViewModel ..> ExchangeRepository: <<uses>>
+ExchangeActivity ..> ExchangeViewModel: <<uses>>
+BookFragment <.. ExchangeActivity: <<launches>>
+
+ProfileFragment --o ProfileActivity
 @enduml
