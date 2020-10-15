@@ -94,7 +94,7 @@ class ExchangeViewModel{
 
 class ExchangeRepository{
 -FirebaseFirestore  exchangeRepository
-- LiveData<ArrayList<Request>> requestData
+-LiveData<ArrayList<Request>> requestData
 +LiveData<ArrayList<Request>> getStoreExchangeData()
 +LiveData<ArrayList<Request>> getExchangeData()
 +void updateExchangeData()
