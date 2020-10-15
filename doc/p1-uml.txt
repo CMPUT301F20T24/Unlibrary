@@ -42,8 +42,8 @@ class LibraryViewModel {
 + void takePictures()
 + void sendApproval()
 + void sendDecline()
-+ perfromBorrowHandoff(Book book)
-+ performReturnHandoff(Book book)
++ initiateBorrowHandoff(Book book)
++ completeReturnHandoff(Book book)
 }
 
 class LibraryRepository {
@@ -65,8 +65,7 @@ class CameraService {
 }
 
 class ProfileFragment{
-- Profile mProfile
-
+- User user
 }
 
 
@@ -77,8 +76,8 @@ class UnlibraryViewModel {
 - ArrayList<Book> oBooks
 + UnlibraryViewModel()
 + void deleteBook(Book toDelete)
-+ perfromBorrowHandoff(Book book)
-+ performReturnHandoff(Book book)
++ completeBorrowHandoff(Book book)
++ initiateReturnHandoff(Book book)
 }
 
 class UnlibraryActivity{
@@ -88,23 +87,25 @@ class UnlibraryActivity{
 }
 
 
-UnlibraryViewModel o-- UnlibraryRepository
-UnlibraryActivity o-- UnlibraryViewModel
-UnlibraryActivity o-- BookFragment 
+UnlibraryViewModel ..> UnlibraryRepository: <<uses>>
+UnlibraryActivity ..> UnlibraryViewModel: <<uses>>
+UnlibraryActivity ..> BookFragment: <<launches>> 
 
 
-ProfileActivity o-- ProfileViewModel
-ProfileViewModel o-- ProfileRepository
+ProfileActivity ..> ProfileViewModel: <<uses>>
+ProfileViewModel ..> ProfileRepository: <<uses>>
 
 BookFragment o-- GoogleMapsFragment
-BookFragment o-- CameraService
-LibraryViewModel o-- LibraryRepository
-LibraryActivity o-- BookFragment
-LibraryActivity o-- LibraryViewModel
-BookFragment o-- ProfileFragment
-GoogleMapsFragment o-- GoogleMapService
+BookFragment ..> CameraService: <<uses>>
+LibraryViewModel ..> LibraryRepository: <<uses>>
+LibraryActivity ..> LibraryViewModel: <<uses>>
+LibraryActivity ..> BookFragment: <<launches>>
+BookFragment ..> ProfileFragment: <<launches>>
+GoogleMapsFragment ..> GoogleMapService
 
-ExchangeViewModel --o ExchangeActivity 
-ExchangeRepository --o ExchangeViewModel  
-BookFragment --o ExchangeActivity
+ExchangeViewModel ..> ExchangeRepository: <<uses>>
+ExchangeActivity ..> ExchangeViewModel: <<uses>>
+BookFragment <.. ExchangeActivity: <<launches>>
+
+ProfileFragment --o ProfileActivity
 @enduml
