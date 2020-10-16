@@ -213,6 +213,7 @@ ProfileFragment --o ProfileActivity
 
 LoginViewModel ..> LoginRepository: <<uses>>
 LoginActivity ..> LoginViewModel: <<uses>>
+LoginActivity ..> LibraryActivity: <<launches>>
 
 ProfileRepository ..> Firestore: <<uses>>
 LibraryRepository ..> Firestore: <<uses>>
@@ -228,7 +229,7 @@ note "We are following the Model-View-ViewModel (MVVM) design pattern.\n\nCommen
 
 note right of UnlibraryViewModel: Hold logic for updating and accessing the data models for the UnLibrary Activity.
 note right of UnlibraryRepository: Holds LiveData of Book objects from Firestore.
-note right of UnlibraryActivity: Holds List of books that the user has requested to borrow.
+note right of UnlibraryActivity: Displays List of books that the user has requested to borrow.
 note right of BookFragment: Displays information on a selected book like\nTitle, ISBN, Photos, Requests (if in Library Activity) and status.\nGets data from activity level ViewModel.
 note right of Book: Models the book objects. Data is stored in Firestore.
 note right of User: Models the individual users of the application.\nThe owner and borrowers are represented by this object.
