@@ -1,12 +1,11 @@
 package com.example.unlibrary.unlibrary;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
 import com.example.unlibrary.R;
+import com.example.unlibrary.util.AuthenticatedActivity;
 
-public class UnlibraryActivity extends AppCompatActivity {
+public class UnlibraryActivity extends AuthenticatedActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

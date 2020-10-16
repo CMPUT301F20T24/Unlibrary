@@ -72,14 +72,6 @@ public class AuthViewModel extends ViewModel {
     }
 
     public void login() {
-        // Check if user is already logged in
-        initFirebaseAuth();
-        FirebaseUser u = mAuth.getCurrentUser();
-        if (u != null) {
-            mAuthenticatedEvent.call();
-            return;
-        }
-
         // Validate data
         if (mEmail.getValue() == null || mEmail.getValue().isEmpty()) {
             mFailureMsgEvent.setValue("Missing email.");
@@ -89,7 +81,9 @@ public class AuthViewModel extends ViewModel {
             return;
         }
 
+        // TODO extract to repository
         // Try to authenticate the user
+        initFirebaseAuth();
         mAuth.signInWithEmailAndPassword(mEmail.getValue(), mPassword.getValue())
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -127,6 +121,7 @@ public class AuthViewModel extends ViewModel {
             return;
         }
 
+        // TODO extract to repository
         // Try to register new user
         initFirebaseAuth();
         mAuth.createUserWithEmailAndPassword(mEmail.getValue(), mPassword.getValue())
