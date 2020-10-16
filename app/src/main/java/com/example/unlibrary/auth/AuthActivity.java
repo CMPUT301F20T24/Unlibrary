@@ -6,11 +6,14 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.R;
+import com.example.unlibrary.library.LibraryActivity;
 
 public class AuthActivity extends AppCompatActivity {
 
@@ -24,10 +27,11 @@ public class AuthActivity extends AppCompatActivity {
         mViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
         mViewModel.getFailureMsgEvent().observe(this, this::showToast);
         mViewModel.getAuthenticatedEvent().observe(this, (s) -> {
-            // TODO
-            showToast("Authenticated.");
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         });
         mViewModel.getFragmentNavigationEvent().observe(this, this::showFragment);
+
         showFragment(new LoginFragment());
     }
 
