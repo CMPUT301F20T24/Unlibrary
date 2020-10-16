@@ -1,5 +1,6 @@
 package com.example.unlibrary.util;
 
+// TODO finalize citation format
 // https://github.com/NordicSemiconductor/Android-nRF-Blinky/blob/master/app/src/main/java/no/nordicsemi/android/blinky/viewmodels/SingleLiveEvent.java
 
 import android.util.Log;
