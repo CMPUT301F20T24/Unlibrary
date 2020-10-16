@@ -21,42 +21,42 @@ public class AuthViewModel extends ViewModel {
 
     public MutableLiveData<String> getEmail() {
         if (mEmail == null) {
-            mEmail = new MutableLiveData<String>();
+            mEmail = new MutableLiveData<>();
         }
         return mEmail;
     }
 
     public MutableLiveData<String> getPassword() {
         if (mPassword == null) {
-            mPassword = new MutableLiveData<String>();
+            mPassword = new MutableLiveData<>();
         }
         return mPassword;
     }
 
     public MutableLiveData<String> getUsername() {
         if (mUsername == null) {
-            mUsername = new MutableLiveData<String>();
+            mUsername = new MutableLiveData<>();
         }
         return mUsername;
     }
 
     public SingleLiveEvent<Fragment> getFragmentNavigationEvent() {
         if (mFragmentNavigationEvent == null) {
-            mFragmentNavigationEvent = new SingleLiveEvent<Fragment>();
+            mFragmentNavigationEvent = new SingleLiveEvent<>();
         }
         return mFragmentNavigationEvent;
     }
 
     public SingleLiveEvent<String> getFailureMsgEvent() {
         if (mFailureMsgEvent == null) {
-            mFailureMsgEvent = new SingleLiveEvent<String>();
+            mFailureMsgEvent = new SingleLiveEvent<>();
         }
         return mFailureMsgEvent;
     }
 
     public SingleLiveEvent<Void> getAuthenticatedEvent() {
         if (mAuthenticatedEvent == null) {
-            mAuthenticatedEvent = new SingleLiveEvent<Void>();
+            mAuthenticatedEvent = new SingleLiveEvent<>();
         }
         return mAuthenticatedEvent;
     }
