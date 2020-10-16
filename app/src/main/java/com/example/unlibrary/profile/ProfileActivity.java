@@ -16,6 +16,9 @@ public class ProfileActivity extends AuthenticatedActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        System.out.println(getUser() == null);
+        System.out.println(getUser().getUid());
     }
 
     // TODO this is a completely temporary method and UI just to demonstrate the logout capability

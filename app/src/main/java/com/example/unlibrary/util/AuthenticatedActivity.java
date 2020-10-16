@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public abstract class AuthenticatedActivity extends AppCompatActivity {
 
-    FirebaseUser mUser;
+    private FirebaseUser mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,5 +24,14 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+        System.out.println(mUser == null);
+    }
+
+    // TODO improve this, it's not great because theoretically the user could be logged out and we would get a null exception error
+    protected FirebaseUser getUser() {
+        if (mUser == null) {
+            mUser = FirebaseAuth.getInstance().getCurrentUser();
+        }
+        return mUser;
     }
 }
