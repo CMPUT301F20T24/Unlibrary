@@ -1,31 +1,125 @@
 @startuml
+package Firestore {
+}
+
+class User {
+-int id
+-string name
+-string username
+-string phone
+-timestamp createdAt
++void setId(int id)
++void setName(string name)
++void setUsername (string username)
++void setPhone(string name)
++void setCreatedAt (timestamp createdAt)
++int getId()
++string gettName()
++string getUsername ()
++string getPhone()
++timestamp getCreatedAt ()
+}
+
+class Book {
+-int id
+-string title
+-string author
+-string isbn
+-string status
+-Image photo
+-User owner
+-timestamp createdAt
++void setId(int id)
++void setTitle(string title)
++void setAuthor (string author)
++void setIsbn (string isbn)
++void setStatus(string status)
++void setPhoto(Image photo)
++void setOwner (User owner)
++void setCreatedAt(timestamp createdAt)
++int getId ()
++string getTitle ()
++string getAuthor ()
++string getIsbn ()
++string getStatus ()
++Image getPhoto ()
++User getOwner ()
++timestamp getCreatedAt()
+ }
+
+ class Request {
+-int id
+-User requester
+-Book book
+-string state
+-geopoint location
+-timestamp createdAt
++void setId(int id)
++void setRequester(User requester)
++void setBook(Book book)
++void setState(string state)
++void setLocation (geopoint location)
++void setCreatedAt (timestamp createdAt)
++int getId()
++User getRequester()
++Book getBook()
++string getState()
++geopoint getLocation()
++timestamp getCreatedAt()
+ }
+
+class LoginActivity {
+#void onCreate()
+}
+
+class LoginViewModel {
+-LoginRepository loginRepository
++LoginViewModel(LoginRepository loginRepository)
+}
+
+class LoginRepository {
+-FirebaseFirestore  loginRepository
++LiveData<User> getUserData()
++void createUser()
+}
 class ExchangeActivity{
-# void onCreate()
-    
+#void onCreate()
 }
 
 class ExchangeViewModel{
-+ ExchangeViewModel()
-+ bookRequest()
+-ExchangeRepository exchangeRepository
++ExchangeViewModel(ExchangeRepository exchangeRepository)
++bookRequest()
 }
 
 class ExchangeRepository{
+-FirebaseFirestore  exchangeRepository
+-LiveData<ArrayList<Request>> requestData
++LiveData<ArrayList<Request>> getStoreExchangeData()
++LiveData<ArrayList<Request>> getExchangeData()
++void updateExchangeData()
 }
 
 class ProfileActivity {
-- ProfileViewModel mProfileViewModel
-# void onCreate()
+-ProfileViewModel mProfileViewModel
+#void onCreate()
 }
 
 class ProfileViewModel {
-+ ProfileViewModel()
-+ setName(String newName)
-+ setPhone(String newPhone)
-+ setEmail(String newEmail)
-  
+-ProfileRepository profileRepository
++ProfileViewModel(ProfileRepository profileRepository)
++ProfileViewModel()
++setName(String newName)
++setPhone(String newPhone)
++setEmail(String newEmail)
 }
 
 class ProfileRepository {
+-FirebaseFirestore  profileRepository
+-LiveData<User> userData
++LiveData<User> getStoreProfileData()
++LiveData<User> getProfileData()
++void updateProfile(User profile)
 }
 
 class LibraryActivity {
@@ -34,8 +128,8 @@ class LibraryActivity {
 }
 
 class LibraryViewModel {
-- ArrayList<Book> mBooks
-+ LibraryViewModel()
+-LibraryRepository libraryRepository
++LibraryViewModel(LibraryRepository libraryRepository)
 + void setTitle(String newTitle)
 + void setDescription(String newDescription)
 + void setISBN(String newISBN)
@@ -47,45 +141,53 @@ class LibraryViewModel {
 }
 
 class LibraryRepository {
+-FirebaseFirestore  LibraryRepository
+-LiveData<ArrayList<Book>> booksData
++LiveData<ArrayList<Book>> getStoreLibraryData()
++LiveData<ArrayList<Book>> getLibraryData()
++void updateLibrary(Book book)
 }
 
 class GoogleMapsFragment{
-- GoogleMapAddress mMeetingLocation
+-GoogleMapAddress mMeetingLocation
 }
 
 class GoogleMapService {
 }
 
 class BookFragment {
-- Book mOpenedBook
-- Boolean isEditing
+-LiveData<Book> mOpenedBook
+-Boolean isEditing
 }
 
 class CameraService {
 }
 
 class ProfileFragment{
-- User user
+-LiveData<User> mProfile
 }
 
-
 class UnlibraryRepository {
+-FirebaseFirestore  UnlibraryRepository
+-LiveData<ArrayList<Book>> booksData
++LiveData<ArrayList<Book>> getStoreUnlibraryData()
++LiveData<ArrayList<Book>> getUnlibraryData()
++void updateUnlibrary(Book book)
 }
 
 class UnlibraryViewModel {
-- ArrayList<Book> oBooks
-+ UnlibraryViewModel()
-+ void deleteBook(Book toDelete)
-+ completeBorrowHandoff(Book book)
-+ initiateReturnHandoff(Book book)
+-UnlibraryRepository UnlibraryRepository
++UnlibraryViewModel(UnlibraryRepository UnlibraryRepository)
++void deleteBook(Book toDelete)
++completeBorrowHandoff(Book book)
++initiateReturnHandoff(Book book)
 }
 
-class UnlibraryActivity{
-- UnlibraryViewModel mLibraryViewModel
-# void onCreate()
-+ returnRequest()
+class UnlibraryActivity {
+-UnlibraryViewModel mLibraryViewModel
+#void onCreate()
++returnRequest()
 }
-
 
 UnlibraryViewModel ..> UnlibraryRepository: <<uses>>
 UnlibraryActivity ..> UnlibraryViewModel: <<uses>>
@@ -108,4 +210,30 @@ ExchangeActivity ..> ExchangeViewModel: <<uses>>
 BookFragment <.. ExchangeActivity: <<launches>>
 
 ProfileFragment --o ProfileActivity
+
+LoginViewModel ..> LoginRepository: <<uses>>
+LoginActivity ..> LoginViewModel: <<uses>>
+LoginActivity ..> LibraryActivity: <<launches>>
+
+ProfileRepository ..> Firestore: <<uses>>
+LibraryRepository ..> Firestore: <<uses>>
+ExchangeRepository ..> Firestore: <<uses>>
+LoginRepository ..> Firestore: <<uses>>
+
+ProfileRepository o-- User
+LibraryRepository o-- Book
+ExchangeRepository o-- Request
+LoginRepository o-- User
+
+note "We are following the Model-View-ViewModel (MVVM) design pattern.\n\nComments are attached to one example (UnLibrary related classes) to explain MVVM usage." as Overview
+
+note right of UnlibraryViewModel: Hold logic for updating and accessing the data models for the UnLibrary Activity.
+note right of UnlibraryRepository: Holds LiveData of Book objects from Firestore.
+note right of UnlibraryActivity: Displays List of books that the user has requested to borrow.
+note right of BookFragment: Displays information on a selected book like\nTitle, ISBN, Photos, Requests (if in Library Activity) and status.\nGets data from activity level ViewModel.
+note right of Book: Models the book objects. Data is stored in Firestore.
+note right of User: Models the individual users of the application.\nThe owner and borrowers are represented by this object.
+note right of Request: Models the relationship between a book and a user that is requesting to borrow it.
+note right of Firestore: Holds data on books, users, and requests for books.\nCurrently a blackbox, further sprints will better encapsulate the associated classes for Firestore.
+note right of GoogleMapsFragment: Initial idea is to use Google Maps API to handle picking a pick-up location.\nFurther iterations will better encapsulate the associated classes for this feature.
 @enduml
