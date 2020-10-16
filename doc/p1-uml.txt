@@ -1,101 +1,226 @@
 @startuml
-
-class ExchangeActivity{
-    #void onCreate()
-    -bookRequest()
+package Firestore {
 }
 
-class ExchangeViewModel{
-    +ExchangeViewModel()
+class User {
+-int id
+-string name
+-string username
+-string phone
+-timestamp createdAt
++void setId(int id)
++void setName(string name)
++void setUsername (string username)
++void setPhone(string name)
++void setCreatedAt (timestamp createdAt)
++int getId()
++string gettName()
++string getUsername ()
++string getPhone()
++timestamp getCreatedAt ()
 }
 
-class ExchangeRepository{
-}
+class Book {
+-int id
+-string title
+-string author
+-string isbn
+-string status
+-Image photo
+-User owner
+-timestamp createdAt
++void setId(int id)
++void setTitle(string title)
++void setAuthor (string author)
++void setIsbn (string isbn)
++void setStatus(string status)
++void setPhoto(Image photo)
++void setOwner (User owner)
++void setCreatedAt(timestamp createdAt)
++int getId ()
++string getTitle ()
++string getAuthor ()
++string getIsbn ()
++string getStatus ()
++Image getPhoto ()
++User getOwner ()
++timestamp getCreatedAt()
+ }
 
-class ProfileActivity {
-  #void onCreate()
-}
+ class Request {
+-int id
+-User requester
+-Book book
+-string state
+-geopoint location
+-timestamp createdAt
++void setId(int id)
++void setRequester(User requester)
++void setBook(Book book)
++void setState(string state)
++void setLocation (geopoint location)
++void setCreatedAt (timestamp createdAt)
++int getId()
++User getRequester()
++Book getBook()
++string getState()
++geopoint getLocation()
++timestamp getCreatedAt()
+ }
 
-class ProfileViewModel {
-  +ProfileViewModel()
-}
-
-class ProfileRepository {
-}
-
-class LibraryActivity {
-- LibraryViewModel mViewModel
+class LoginActivity {
 #void onCreate()
 }
 
+class LoginViewModel {
+-LoginRepository loginRepository
++LoginViewModel(LoginRepository loginRepository)
+}
+
+class LoginRepository {
+-FirebaseFirestore  loginRepository
++LiveData<User> getUserData()
++void createUser()
+}
+class ExchangeActivity{
+#void onCreate()
+}
+
+class ExchangeViewModel{
+-ExchangeRepository exchangeRepository
++ExchangeViewModel(ExchangeRepository exchangeRepository)
++bookRequest()
+}
+
+class ExchangeRepository{
+-FirebaseFirestore  exchangeRepository
+-LiveData<ArrayList<Request>> requestData
++LiveData<ArrayList<Request>> getStoreExchangeData()
++LiveData<ArrayList<Request>> getExchangeData()
++void updateExchangeData()
+}
+
+class ProfileActivity {
+-ProfileViewModel mProfileViewModel
+#void onCreate()
+}
+
+class ProfileViewModel {
+-ProfileRepository profileRepository
++ProfileViewModel(ProfileRepository profileRepository)
++ProfileViewModel()
++setName(String newName)
++setPhone(String newPhone)
++setEmail(String newEmail)
+}
+
+class ProfileRepository {
+-FirebaseFirestore  profileRepository
+-LiveData<User> userData
++LiveData<User> getStoreProfileData()
++LiveData<User> getProfileData()
++void updateProfile(User profile)
+}
+
+class LibraryActivity {
+- LibraryViewModel mUnlibraryViewModel
+# void onCreate()
+}
+
 class LibraryViewModel {
--ArrayList<Book> mBooks
-+LibraryViewModel()
+-LibraryRepository libraryRepository
++LibraryViewModel(LibraryRepository libraryRepository)
++ void setTitle(String newTitle)
++ void setDescription(String newDescription)
++ void setISBN(String newISBN)
++ void takePictures()
++ void sendApproval()
++ void sendDecline()
++ initiateBorrowHandoff(Book book)
++ completeReturnHandoff(Book book)
 }
 
 class LibraryRepository {
+-FirebaseFirestore  LibraryRepository
+-LiveData<ArrayList<Book>> booksData
++LiveData<ArrayList<Book>> getStoreLibraryData()
++LiveData<ArrayList<Book>> getLibraryData()
++void updateLibrary(Book book)
 }
 
 class GoogleMapsFragment{
-- GoogleMapAddress mMeetingLocation
+-GoogleMapAddress mMeetingLocation
 }
 
 class GoogleMapService {
 }
 
 class BookFragment {
-- BookFragmentViewModel mViewModel
+-LiveData<Book> mOpenedBook
+-Boolean isEditing
 }
 
 class CameraService {
 }
 
 class ProfileFragment{
-- ProfileViewModel mViewModel
+-LiveData<User> mProfile
 }
 
-class HandOffService {
+class UnlibraryRepository {
+-FirebaseFirestore  UnlibraryRepository
+-LiveData<ArrayList<Book>> booksData
++LiveData<ArrayList<Book>> getStoreUnlibraryData()
++LiveData<ArrayList<Book>> getUnlibraryData()
++void updateUnlibrary(Book book)
 }
 
-class BookFragmentViewModel {
-- Book mOpenedBook
-- Boolean isEditing
-+ void setTitle(String title)
-+ void setDescription(String description)
-+ void setISBN(String ISBN)
-- ArrayList<Profile> mRequests
-+ void takePictures()
+class UnlibraryViewModel {
+-UnlibraryRepository UnlibraryRepository
++UnlibraryViewModel(UnlibraryRepository UnlibraryRepository)
++void deleteBook(Book toDelete)
++completeBorrowHandoff(Book book)
++initiateReturnHandoff(Book book)
 }
 
-class ProfileFragmentViewModel {
-- Profile mProfile
-+ void sendApproval()
-+ void sendDecline()
+class UnlibraryActivity{
+-UnlibraryViewModel mLibraryViewModel
+#void onCreate()
++returnRequest()
 }
 
-class BookRequestService {
-+ Boolean isAccepted
-}
+UnlibraryViewModel ..> UnlibraryRepository: <<uses>>
+UnlibraryActivity ..> UnlibraryViewModel: <<uses>>
+UnlibraryActivity ..> BookFragment: <<launches>> 
 
-ProfileActivity o-- ProfileViewModel
-ProfileViewModel o-- ProfileRepository
 
-BookFragment o-- HandOffService
-BookFragment o-- GoogleMapsFragment : On Select or Edit Meeting Location
-BookFragment o-- BookFragmentViewModel
-BookFragment o-- CameraService
-BookFragmentViewModel --> LibraryViewModel
-LibraryViewModel o-- LibraryRepository
-LibraryActivity o-- BookFragment
-LibraryActivity o-- LibraryViewModel
-LibraryActivity o-- ProfileFragment
-GoogleMapsFragment o-- GoogleMapService
-ProfileFragment o-- ProfileFragmentViewModel
-ProfileFragmentViewModel --> LibraryViewModel
-ProfileFragment o-- BookRequestService
+ProfileActivity ..> ProfileViewModel: <<uses>>
+ProfileViewModel ..> ProfileRepository: <<uses>>
 
-ExchangeViewModel --o ExchangeActivity 
-ExchangeRepository --o ExchangeViewModel  
-BookFragment --o ExchangeActivity 
+BookFragment o-- GoogleMapsFragment
+BookFragment ..> CameraService: <<uses>>
+LibraryViewModel ..> LibraryRepository: <<uses>>
+LibraryActivity ..> LibraryViewModel: <<uses>>
+LibraryActivity ..> BookFragment: <<launches>>
+BookFragment ..> ProfileFragment: <<launches>>
+GoogleMapsFragment ..> GoogleMapService
 
+ExchangeViewModel ..> ExchangeRepository: <<uses>>
+ExchangeActivity ..> ExchangeViewModel: <<uses>>
+BookFragment <.. ExchangeActivity: <<launches>>
+
+ProfileFragment --o ProfileActivity
+
+LoginViewModel ..> LoginRepository: <<uses>>
+LoginActivity ..> LoginViewModel: <<uses>>
+
+ProfileRepository ..> Firestore: <<uses>>
+LibraryRepository ..> Firestore: <<uses>>
+ExchangeRepository ..> Firestore: <<uses>>
+LoginRepository ..> Firestore: <<uses>>
+
+ProfileRepository o-- User
+LibraryRepository o-- Book
+ExchangeRepository o-- Request
+LoginRepository o-- User
 @enduml
