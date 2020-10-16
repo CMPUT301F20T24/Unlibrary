@@ -4,14 +4,16 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class AuthViewModel extends ViewModel {
 
     private MutableLiveData<String> mEmail = new MutableLiveData<>();
-    private MutableLiveData<String> mPassword;
+    private MutableLiveData<String> mPassword = new MutableLiveData<>();
     private SingleLiveEvent<String> mInvalidSignupEvent;
     private SingleLiveEvent<Void> mRegisterNavigationEvent;
 
+    private FirebaseAuth mAuth;
 
     public MutableLiveData<String> getEmail() {
         if (mEmail == null) {
@@ -49,13 +51,31 @@ public class AuthViewModel extends ViewModel {
         // Validate data
         if (mEmail.getValue() == null || mEmail.getValue().isEmpty()) {
             mInvalidSignupEvent.setValue("Missing email.");
+            return;
         } else if (mPassword.getValue() == null || mPassword.getValue().isEmpty()) {
             mInvalidSignupEvent.setValue("Missing password.");
+            return;
         }
 
         // Try to authenticate the user
+        initFirebaseAuth();
+        mAuth.signInWithEmailAndPassword(mEmail.getValue(), mPassword.getValue())
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Login succeeded, navigate away from auth activity
+                        // TODO
 
-//        mInvalidSignupEvent.setValue("Invalid email or password.");
+                    } else {
+                        // Login failed, show toast
+                        mInvalidSignupEvent.setValue("Invalid email or password.");
+                    }
+                });
+    }
+
+    private void initFirebaseAuth() {
+        if (mAuth == null) {
+            mAuth = FirebaseAuth.getInstance();
+        }
     }
 
 }
