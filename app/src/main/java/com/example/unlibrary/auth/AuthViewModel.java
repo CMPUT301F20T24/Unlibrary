@@ -10,7 +10,7 @@ public class AuthViewModel extends ViewModel {
 
     private MutableLiveData<String> mEmail = new MutableLiveData<>();
     private MutableLiveData<String> mPassword = new MutableLiveData<>();
-    private SingleLiveEvent<String> mInvalidSignupEvent;
+    private SingleLiveEvent<String> mInvalidLoginEvent;
     private SingleLiveEvent<Void> mRegisterNavigationEvent;
 
     private FirebaseAuth mAuth;
@@ -36,24 +36,24 @@ public class AuthViewModel extends ViewModel {
         return mRegisterNavigationEvent;
     }
 
-    public SingleLiveEvent<String> getInvalidSignupEvent() {
-        if (mInvalidSignupEvent == null) {
-            mInvalidSignupEvent = new SingleLiveEvent<String>();
+    public SingleLiveEvent<String> getInvalidLoginEvent() {
+        if (mInvalidLoginEvent == null) {
+            mInvalidLoginEvent = new SingleLiveEvent<String>();
         }
-        return mInvalidSignupEvent;
+        return mInvalidLoginEvent;
     }
 
-    public void signUp() {
+    public void createAccount() {
         mRegisterNavigationEvent.call();
     }
 
-    public void signIn() {
+    public void login() {
         // Validate data
         if (mEmail.getValue() == null || mEmail.getValue().isEmpty()) {
-            mInvalidSignupEvent.setValue("Missing email.");
+            mInvalidLoginEvent.setValue("Missing email.");
             return;
         } else if (mPassword.getValue() == null || mPassword.getValue().isEmpty()) {
-            mInvalidSignupEvent.setValue("Missing password.");
+            mInvalidLoginEvent.setValue("Missing password.");
             return;
         }
 
@@ -67,7 +67,7 @@ public class AuthViewModel extends ViewModel {
 
                     } else {
                         // Login failed, show toast
-                        mInvalidSignupEvent.setValue("Invalid email or password.");
+                        mInvalidLoginEvent.setValue("Invalid email or password.");
                     }
                 });
     }

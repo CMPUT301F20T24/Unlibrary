@@ -22,7 +22,7 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
 
         mViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-        mViewModel.getInvalidSignupEvent().observe(this, this::showToast);
+        mViewModel.getInvalidLoginEvent().observe(this, this::showToast);
         mViewModel.getRegisterNavigationEvent().observe(this, s -> showFragment(new RegisterFragment()));
         showFragment(new LoginFragment());
     }
@@ -37,5 +37,3 @@ public class AuthActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 }
-
-// TODO consolidate on signup vs. register and signin vs. login
