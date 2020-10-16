@@ -22,8 +22,12 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
 
         mViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
-        mViewModel.getInvalidLoginEvent().observe(this, this::showToast);
-        mViewModel.getRegisterNavigationEvent().observe(this, s -> showFragment(new RegisterFragment()));
+        mViewModel.getFailureMsgEvent().observe(this, this::showToast);
+        mViewModel.getAuthenticatedEvent().observe(this, (s) -> {
+            // TODO
+            showToast("Authenticated.");
+        });
+        mViewModel.getFragmentNavigationEvent().observe(this, this::showFragment);
         showFragment(new LoginFragment());
     }
 

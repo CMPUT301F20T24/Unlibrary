@@ -2,9 +2,12 @@
     <string name="app_name">Unlibrary</string>
     <string name="auth_background_content_description">Man reading book</string>
     <string name="login_title">Login</string>
+    <string name="register_title">Register</string>
     <string name="login_button">Login</string>
+    <string name="cancel_button">Cancel</string>
     <string name="register_button">Register</string>
     <string name="create_account_button">Create Account</string>
     <string name="email_hint">Email</string>
+    <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
 </resources>

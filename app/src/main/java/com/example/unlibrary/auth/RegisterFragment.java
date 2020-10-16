@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.unlibrary.R;
-import com.example.unlibrary.databinding.FragmentLoginBinding;
+import com.example.unlibrary.databinding.FragmentRegisterBinding;
 
 public class RegisterFragment extends Fragment {
 
@@ -22,7 +22,7 @@ public class RegisterFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         AuthViewModel viewModel = new ViewModelProvider(getActivity()).get(AuthViewModel.class);
-        FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false);
+        FragmentRegisterBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false);
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(getViewLifecycleOwner());
         return binding.getRoot();
