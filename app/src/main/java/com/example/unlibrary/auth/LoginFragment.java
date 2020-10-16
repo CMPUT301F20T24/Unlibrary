@@ -17,11 +17,14 @@ public class LoginFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Get the activity viewModel
         AuthViewModel viewModel = new ViewModelProvider(getActivity()).get(AuthViewModel.class);
+
+        // Setup data binding
         FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(getViewLifecycleOwner());
+
         return binding.getRoot();
     }
 }

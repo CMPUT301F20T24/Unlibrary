@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel;
 import com.example.unlibrary.util.SingleLiveEvent;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class AuthViewModel extends ViewModel {
 
@@ -103,6 +102,7 @@ public class AuthViewModel extends ViewModel {
         mEmail.setValue("");
         mPassword.setValue("");
 
+        // Navigate
         mFragmentNavigationEvent.setValue(new LoginFragment());
     }
 
@@ -141,6 +141,4 @@ public class AuthViewModel extends ViewModel {
             mAuth = FirebaseAuth.getInstance();
         }
     }
-
 }
-

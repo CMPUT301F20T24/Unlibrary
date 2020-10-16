@@ -20,11 +20,14 @@ public class RegisterFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Get the activity viewModel
         AuthViewModel viewModel = new ViewModelProvider(getActivity()).get(AuthViewModel.class);
+
+        // Setup data binding
         FragmentRegisterBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false);
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(getViewLifecycleOwner());
+
         return binding.getRoot();
     }
 }

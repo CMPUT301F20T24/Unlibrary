@@ -9,6 +9,12 @@ import com.example.unlibrary.auth.AuthActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * This abstract activity locks any activities that extend it behind a layer of Firebase authentication.
+ * That is, if the phone does not have an active user session it will reroute the user to the auth
+ * activity immediately. This design means that any possible entry points into (launcher, notifications, etc.)
+ * will be protected by the authentication.
+ */
 public abstract class AuthenticatedActivity extends AppCompatActivity {
 
     private FirebaseUser mUser;
@@ -21,6 +27,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
         if (mUser == null) {
             // Not logged in
             Intent intent = new Intent(this, AuthActivity.class);
+            // TODO we should send an extra with the intent which is the original activity the user was trying to navigate to, this way we can route them there after signing in
             startActivity(intent);
             finish();
         }

@@ -21,6 +21,7 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
+        // Setup observers for one-time viewModel events
         mViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
         mViewModel.getFailureMsgEvent().observe(this, this::showToast);
         mViewModel.getAuthenticatedEvent().observe(this, (s) -> {
@@ -29,6 +30,7 @@ public class AuthActivity extends AppCompatActivity {
         });
         mViewModel.getFragmentNavigationEvent().observe(this, this::showFragment);
 
+        // Default to showing the login screen, user can choose to create a new account
         showFragment(new LoginFragment());
     }
 
