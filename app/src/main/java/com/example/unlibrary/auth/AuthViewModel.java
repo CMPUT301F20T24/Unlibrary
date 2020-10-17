@@ -16,9 +16,9 @@ public class AuthViewModel extends ViewModel {
     private MutableLiveData<String> mEmail = new MutableLiveData<>();
     private MutableLiveData<String> mPassword = new MutableLiveData<>();
     private MutableLiveData<String> mUsername = new MutableLiveData<>();
-    private SingleLiveEvent<String> mFailureMsgEvent;
-    private SingleLiveEvent<Fragment> mFragmentNavigationEvent;
-    private SingleLiveEvent<Void> mAuthenticatedEvent;
+    private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<Fragment> mFragmentNavigationEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<Void> mAuthenticatedEvent = new SingleLiveEvent<>();
 
     private FirebaseAuth mAuth;
 
@@ -147,7 +147,7 @@ public class AuthViewModel extends ViewModel {
      */
     public void register() {
         // Validate data
-        if (mUsername.getValue() == null || mEmail.getValue().isEmpty()) {
+        if (mUsername.getValue() == null || mUsername.getValue().isEmpty()) {
             // TODO ensure that the username is globally unique
             // TODO actually do something with the username
             mFailureMsgEvent.setValue("Missing username");

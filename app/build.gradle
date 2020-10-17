@@ -57,4 +57,7 @@ dependencies {
 
     // Material
     implementation "com.google.android.material:material:1.2.1"
+
+    // Tests
+    testImplementation 'android.arch.core:core-testing:1.0.0-alpha3'
 }
