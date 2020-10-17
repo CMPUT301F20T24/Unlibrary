@@ -19,6 +19,10 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
 
     private FirebaseUser mUser;
 
+    /**
+     * Checks if user is authenticated and if not redirects the app to the AuthActivity.
+     * @param savedInstanceState Saved bundle
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

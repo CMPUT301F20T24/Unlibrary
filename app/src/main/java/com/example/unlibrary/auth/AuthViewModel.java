@@ -8,6 +8,9 @@ import com.example.unlibrary.util.SingleLiveEvent;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * Manages the authentication flow business logic. Controls both login and registration.
+ */
 public class AuthViewModel extends ViewModel {
 
     private MutableLiveData<String> mEmail = new MutableLiveData<>();
@@ -19,6 +22,10 @@ public class AuthViewModel extends ViewModel {
 
     private FirebaseAuth mAuth;
 
+    /**
+     * Email getter for data binding. Exposes data in a mutable format so 2-way binding works.
+     * @return Email MutableLiveData
+     */
     public MutableLiveData<String> getEmail() {
         if (mEmail == null) {
             mEmail = new MutableLiveData<>();
@@ -26,6 +33,10 @@ public class AuthViewModel extends ViewModel {
         return mEmail;
     }
 
+    /**
+     * Password getter for data binding. Exposes data in a mutable format so 2-way binding works.
+     * @return Password MutableLiveData
+     */
     public MutableLiveData<String> getPassword() {
         if (mPassword == null) {
             mPassword = new MutableLiveData<>();
@@ -33,6 +44,10 @@ public class AuthViewModel extends ViewModel {
         return mPassword;
     }
 
+    /**
+     * Username getter for data binding. Exposes data in a mutable format so 2-way binding works.
+     * @return Useranme MutableLiveData
+     */
     public MutableLiveData<String> getUsername() {
         if (mUsername == null) {
             mUsername = new MutableLiveData<>();
@@ -40,6 +55,10 @@ public class AuthViewModel extends ViewModel {
         return mUsername;
     }
 
+    /**
+     * FragmentNavigationEvent getter for activity observers.
+     * @return Event of which fragment to navigate to
+     */
     public SingleLiveEvent<Fragment> getFragmentNavigationEvent() {
         if (mFragmentNavigationEvent == null) {
             mFragmentNavigationEvent = new SingleLiveEvent<>();
@@ -47,6 +66,10 @@ public class AuthViewModel extends ViewModel {
         return mFragmentNavigationEvent;
     }
 
+    /**
+     * FailureMsgEvent getter for activity observers.
+     * @return Event of failure message to display
+     */
     public SingleLiveEvent<String> getFailureMsgEvent() {
         if (mFailureMsgEvent == null) {
             mFailureMsgEvent = new SingleLiveEvent<>();
@@ -54,6 +77,10 @@ public class AuthViewModel extends ViewModel {
         return mFailureMsgEvent;
     }
 
+    /**
+     * AuthenticatedEvent getter for activity observers.
+     * @return Event representing the user has been authenticated
+     */
     public SingleLiveEvent<Void> getAuthenticatedEvent() {
         if (mAuthenticatedEvent == null) {
             mAuthenticatedEvent = new SingleLiveEvent<>();
@@ -61,6 +88,9 @@ public class AuthViewModel extends ViewModel {
         return mAuthenticatedEvent;
     }
 
+    /**
+     * To be called when the user wants to change to the registration screen.
+     */
     public void createAccount() {
         // Clear input values
         mEmail.setValue("");
@@ -70,6 +100,9 @@ public class AuthViewModel extends ViewModel {
         mFragmentNavigationEvent.setValue(new RegisterFragment());
     }
 
+    /**
+     * To be called when the user tries to login. Validates the data and accesses firebase auth.
+     */
     public void login() {
         // Validate data
         if (mEmail.getValue() == null || mEmail.getValue().isEmpty()) {
@@ -96,6 +129,9 @@ public class AuthViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * To be called when the user wants to navigate to the login screen.
+     */
     public void cancel() {
         // Clear input values
         mUsername.setValue("");
@@ -106,6 +142,9 @@ public class AuthViewModel extends ViewModel {
         mFragmentNavigationEvent.setValue(new LoginFragment());
     }
 
+    /**
+     * To be called when the user wants to register. Validates data and accesses firebase auth.
+     */
     public void register() {
         // Validate data
         if (mUsername.getValue() == null || mEmail.getValue().isEmpty()) {

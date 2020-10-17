@@ -12,10 +12,18 @@ import android.widget.Toast;
 import com.example.unlibrary.EntryActivity;
 import com.example.unlibrary.R;
 
+/**
+ * Manages the authentication flow views including login and registration. If the user is not
+ * authenticated all other activities should redirect to here to authenticate the user.
+ */
 public class AuthActivity extends AppCompatActivity {
 
     AuthViewModel mViewModel;
 
+    /**
+     * Load AuthViewModel and setup observers on its event streams. Then show the login screen.
+     * @param savedInstanceState saved bundle
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,12 +42,21 @@ public class AuthActivity extends AppCompatActivity {
         showFragment(new LoginFragment());
     }
 
+    /**
+     * Change the fragment that is displayed.
+     * @param fragment Instance of fragment to show
+     */
     public void showFragment(Fragment fragment) {
+        // TODO handle backstack
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.login_register_card_holder, fragment);
         ft.commit();
     }
 
+    /**
+     * Show a toast with a given message.
+     * @param msg Message to display in toast.
+     */
     public void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }

@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentRegisterBinding;
 
+/**
+ * View logic for the register card. Leverages the AuthViewModel.
+ */
 public class RegisterFragment extends Fragment {
 
     @Override

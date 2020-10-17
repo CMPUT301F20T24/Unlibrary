@@ -13,6 +13,9 @@ import android.view.ViewGroup;
 import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentLoginBinding;
 
+/**
+ * View logic for the login card. Leverages the AuthViewModel.
+ */
 public class LoginFragment extends Fragment {
 
     @Override
