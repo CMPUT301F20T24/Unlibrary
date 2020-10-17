@@ -2,7 +2,7 @@ package com.example.unlibrary.auth;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
-import com.example.unlibrary.util.LiveDataTestUtil;
+import com.example.unlibrary.helper.LiveDataTestUtil;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -24,28 +24,28 @@ public class AuthViewModelTest {
     }
 
     @Test
-    public void testEmailLiveData() throws InterruptedException {
+    public void testEmailLiveData() {
         mViewModel.getEmail().setValue("example@gmail.com");
 
         assertEquals(LiveDataTestUtil.getOrAwaitValue(mViewModel.getEmail()), "example@gmail.com");
     }
 
     @Test
-    public void testPasswordLiveData() throws InterruptedException {
+    public void testPasswordLiveData() {
         mViewModel.getPassword().setValue("asdf");
 
         assertEquals(LiveDataTestUtil.getOrAwaitValue(mViewModel.getPassword()), "asdf");
     }
 
     @Test
-    public void testUsernameLiveData() throws InterruptedException {
+    public void testUsernameLiveData() {
         mViewModel.getUsername().setValue("bob");
 
         assertEquals(LiveDataTestUtil.getOrAwaitValue(mViewModel.getUsername()), "bob");
     }
 
     @Test
-    public void testCreateAccount() throws InterruptedException {
+    public void testCreateAccount() {
         mViewModel.getEmail().setValue("a@gmail.com");
         mViewModel.getPassword().setValue("pass");
 
@@ -59,14 +59,14 @@ public class AuthViewModelTest {
     // TODO add more tests for validation. Probably should just make a singular validation method in the viewModel.
     // TODO figure out mocks for firebase auth
     @Test
-    public void testLogin() throws InterruptedException {
+    public void testLogin() {
         mViewModel.getEmail().setValue("bob@gmail.com");
         mViewModel.login();
         assertEquals(LiveDataTestUtil.getOrAwaitValue(mViewModel.getFailureMsgEvent()), "Missing password.");
     }
 
     @Test
-    public void testCancel() throws InterruptedException {
+    public void testCancel() {
         mViewModel.getEmail().setValue("a@gmail.com");
         mViewModel.getPassword().setValue("pass");
         mViewModel.getUsername().setValue("asdf");
@@ -82,7 +82,7 @@ public class AuthViewModelTest {
     // TODO add more tests for validation. Probably should just make a singular validation method in the viewModel.
     // TODO figure out mocks for firebase auth
     @Test
-    public void testRegister() throws InterruptedException {
+    public void testRegister() {
         mViewModel.getUsername().setValue("bob");
         mViewModel.register();
         assertEquals(LiveDataTestUtil.getOrAwaitValue(mViewModel.getFailureMsgEvent()), "Missing email.");
