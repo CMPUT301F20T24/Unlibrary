@@ -1,3 +1,11 @@
+/*
+ * AuthViewModel
+ *
+ * October 18, 2020
+ *
+ * TODO copyright information
+ */
+
 package com.example.unlibrary.auth;
 
 import androidx.fragment.app.Fragment;
@@ -175,6 +183,9 @@ public class AuthViewModel extends ViewModel {
                 });
     }
 
+    /**
+     * Wrapper to access firebase without hitting null pointer exceptions.
+     */
     private void initFirebaseAuth() {
         if (mAuth == null) {
             mAuth = FirebaseAuth.getInstance();

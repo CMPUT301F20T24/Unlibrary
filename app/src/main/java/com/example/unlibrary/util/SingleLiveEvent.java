@@ -1,3 +1,11 @@
+/*
+ * SingleLiveEvent
+ *
+ * October 18, 2020
+ *
+ * TODO copyright information
+ */
+
 package com.example.unlibrary.util;
 
 // TODO finalize citation format

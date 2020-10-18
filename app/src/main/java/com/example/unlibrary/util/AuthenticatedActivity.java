@@ -1,3 +1,11 @@
+/*
+ * AuthenticatedActivity
+ *
+ * October 18, 2020
+ *
+ * TODO copyright information
+ */
+
 package com.example.unlibrary.util;
 
 import androidx.appcompat.app.AppCompatActivity;

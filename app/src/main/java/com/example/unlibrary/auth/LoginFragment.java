@@ -1,3 +1,11 @@
+/*
+ * LoginFragment
+ *
+ * October 18, 2020
+ *
+ * TODO copyright information
+ */
+
 package com.example.unlibrary.auth;
 
 import android.os.Bundle;
@@ -19,6 +27,9 @@ import com.example.unlibrary.databinding.FragmentLoginBinding;
 public class LoginFragment extends Fragment {
 
     @Override
+    /**
+     * Access AuthActivity viewModel and setup data-binding.
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Get the activity viewModel
         AuthViewModel viewModel = new ViewModelProvider(getActivity()).get(AuthViewModel.class);

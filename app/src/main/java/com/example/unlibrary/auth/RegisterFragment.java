@@ -1,3 +1,11 @@
+/*
+ * RegisterFragment
+ *
+ * October 18, 2020
+ *
+ * TODO copyright information
+ */
+
 package com.example.unlibrary.auth;
 
 import androidx.databinding.DataBindingUtil;
@@ -22,6 +30,9 @@ import com.example.unlibrary.databinding.FragmentRegisterBinding;
 public class RegisterFragment extends Fragment {
 
     @Override
+    /**
+     * Access AuthActivity viewModel and setup data-binding.
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Get the activity viewModel
         AuthViewModel viewModel = new ViewModelProvider(getActivity()).get(AuthViewModel.class);

@@ -1,3 +1,11 @@
+/*
+ * LiveDataTestUtil
+ *
+ * October 18, 2020
+ *
+ * TODO copyright information
+ */
+
 package com.example.unlibrary.helper;
 
 // https://gist.github.com/JoseAlcerreca/1e9ee05dcdd6a6a6fa1cbfc125559bba

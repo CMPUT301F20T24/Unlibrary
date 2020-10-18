@@ -1,3 +1,11 @@
+/*
+ * AuthViewModelTest
+ *
+ * October 18, 2020
+ *
+ * TODO copyright information
+ */
+
 package com.example.unlibrary.auth;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
