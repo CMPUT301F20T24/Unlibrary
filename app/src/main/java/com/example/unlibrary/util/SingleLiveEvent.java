@@ -39,6 +39,11 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
 
     private final AtomicBoolean pending = new AtomicBoolean(false);
 
+    /**
+     * Implementation for observer interface.
+     * @param owner LifecycleOwner
+     * @param observer Observer object
+     */
     @MainThread
     @Override
     public void observe(@NonNull final LifecycleOwner owner, @NonNull final Observer<? super T> observer) {
@@ -54,6 +59,10 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
         });
     }
 
+    /**
+     * Set the value of the event.
+     * @param t Value to set
+     */
     @MainThread
     @Override
     public void setValue(@Nullable final T t) {
