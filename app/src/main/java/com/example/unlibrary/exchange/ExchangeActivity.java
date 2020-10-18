@@ -1,12 +1,11 @@
 package com.example.unlibrary.exchange;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
 import com.example.unlibrary.R;
+import com.example.unlibrary.util.AuthenticatedActivity;
 
-public class ExchangeActivity extends AppCompatActivity {
+public class ExchangeActivity extends AuthenticatedActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
