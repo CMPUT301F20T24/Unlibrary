@@ -19,6 +19,9 @@ import org.junit.rules.TestRule;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test the behaviour of the AuthViewModel that is associated with the authentication flow.
+ */
 public class AuthViewModelTest {
 
     public AuthViewModel mViewModel;
