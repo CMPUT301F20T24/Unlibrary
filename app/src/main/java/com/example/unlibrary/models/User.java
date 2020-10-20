@@ -1,7 +1,11 @@
 package com.example.unlibrary.models;
 
 /**
- * Represents a user in our application domain
+ * Represents a user in our application domain. This user information is stored in Firestore and is
+ * related to a user entry in Firebase.
+ *
+ * TODO: Link with Firebase
+ * TODO: Add authorization to secure allowed methods (e.g. editing user data)
  */
 public class User {
     String mId;
