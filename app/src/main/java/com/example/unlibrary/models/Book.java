@@ -3,18 +3,10 @@ package com.example.unlibrary.models;
 import java.util.ArrayList;
 
 public class Book {
-    enum Status {
-        AVAILABLE,
-        REQUESTED,
-        ACCEPTED,
-        BORROWED
-    }
-
     private String mIsbn;
     private String mDescription;
     private String mTitle;
     private String mAuthor;
-
     private ArrayList<String> mPhotos;
     private Status mStatus;
 
@@ -23,20 +15,12 @@ public class Book {
         this.mTitle = title;
     }
 
-    public void setIsbn(String isbn) {
-        this.mIsbn = isbn;
-    }
-
     public String getDescription() {
         return mDescription;
     }
 
     public void setDescription(String description) {
         this.mDescription = description;
-    }
-
-    public void setTitle(String title) {
-        this.mTitle = title;
     }
 
     public String getAuthor() {
@@ -67,7 +51,22 @@ public class Book {
         return this.mIsbn;
     }
 
+    public void setIsbn(String isbn) {
+        this.mIsbn = isbn;
+    }
+
     public String getTitle() {
         return this.mTitle;
+    }
+
+    public void setTitle(String title) {
+        this.mTitle = title;
+    }
+
+    enum Status {
+        AVAILABLE,
+        REQUESTED,
+        ACCEPTED,
+        BORROWED
     }
 }
