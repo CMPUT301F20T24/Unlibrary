@@ -10,6 +10,11 @@ public class Book {
     private ArrayList<String> mPhotos;
     private Status mStatus;
 
+    /**
+     * Empty constructor. Needed for Firestore.
+     */
+    public Book() {}
+
     public Book(String isbn, String title) {
         this.mIsbn = isbn;
         this.mTitle = title;
