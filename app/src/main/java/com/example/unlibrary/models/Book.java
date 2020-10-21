@@ -1,6 +1,7 @@
 package com.example.unlibrary.models;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a book in our application domain.
@@ -84,9 +85,14 @@ public class Book {
      *
      * @param photo url to add
      */
-    public void addPhoto(String photo) {
-        mPhotos.add(photo);
-    }
+    public void addPhoto(String photo) { mPhotos.add(photo); }
+
+    /**
+     * Adds multiple photos tot he list of photos associated with the book.
+     *
+     * @param photos list of photo urls to add
+     */
+    public void addPhotos(ArrayList<String> photos) { mPhotos.addAll(photos); }
 
     /**
      * Dissociates the given photo from the book if it is already associated with the book,
