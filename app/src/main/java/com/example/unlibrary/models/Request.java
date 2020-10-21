@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Represents a borrow request in our application domain.
- *
+ * <p>
  * TODO: Link and retrieve ID from Firestore
  */
 public class Request {
@@ -14,7 +14,6 @@ public class Request {
     private String mRequester;
     private String mBook;
     private State mState;
-    private List<String> mPhotos;
     private Pair<Double, Double> mLocation; // TODO: Check whether this can be stored in Firestore
 
     /**
@@ -35,26 +34,40 @@ public class Request {
         mState = State.REQUESTED;
     }
 
+    /**
+     * Returns the unique identifier of a request obtained from Firestore.
+     *
+     * @return unique identifier of request
+     */
     public String getId() {
         return mId;
     }
 
+    /**
+     * Gets the unique borrower user ID that initiated the request.
+     *
+     * @return unique ID of borrower that initiated the request
+     */
     public String getRequester() {
         return mRequester;
     }
 
+    /**
+     * Gets the unique ID of the book to be borrowed.
+     *
+     * @return unique ID of book that is involved with the request
+     */
     public String getBook() {
         return mBook;
     }
 
     /**
-     * Gets the state of a request
+     * Gets the state of a request.
      * <p>
      * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
      * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
-     * DECLINED - Owner has explicitly or implicitly decided not to lend the book to the borrower
      * BORROWED - Owner has handed off the book to the borrower
-     * ARCHIVED - Borrower has returned the book back to the owner and the borrow request is complete
+     * ARCHIVED - Request has completed either by returning the book to the owner or request was declined
      *
      * @return one of the above state
      */
@@ -62,26 +75,35 @@ public class Request {
         return mState;
     }
 
+    /**
+     * Updates the state of the request.
+     * <p>
+     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
+     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
+     * BORROWED - Owner has handed off the book to the borrower
+     * ARCHIVED - Request has completed either by returning the book to the owner or request was declined
+     *
+     * @param state one of the states above
+     */
     public void setState(State state) {
         mState = state;
     }
 
-    public List<String> getPhotos() {
-        return mPhotos;
-    }
-
-    public void addPhoto(String photo) {
-        mPhotos.add(photo);
-    }
-
-    public void removePhoto(String photo) {
-        mPhotos.remove(photo);
-    }
-
+    /**
+     * Gets the handoff location described in latitude-longitude pair.
+     *
+     * @return latitude-longitude pair of handoff location.
+     */
     public Pair<Double, Double> getLocation() {
         return mLocation;
     }
 
+    /**
+     * Sets the handoff location described in latitude-longitude pair.
+     * Latitude-longitude should be retrieved from google maps API.
+     *
+     * @param location described in latitude-longitude
+     */
     public void setLocation(Pair<Double, Double> location) {
         mLocation = location;
     }
@@ -89,7 +111,6 @@ public class Request {
     enum State {
         REQUESTED,
         ACCEPTED,
-        DECLINED,
         BORROWED,
         ARCHIVED
     }
