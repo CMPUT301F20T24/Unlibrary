@@ -13,7 +13,7 @@ public class LibraryViewModel extends ViewModel {
         mBooks = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            mBooks.add(new Book("abcd-1234", "Crafting the interpreter", "https://craftinginterpreters.com/", null));
+            mBooks.add(new Book("abcd-1234", "Crafting the interpreter", "https://craftinginterpreters.com/", "me", null));
         }
     }
 
