@@ -9,7 +9,6 @@
 package com.example.unlibrary.models;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents a book in our application domain.
