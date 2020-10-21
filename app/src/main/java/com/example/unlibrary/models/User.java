@@ -17,7 +17,8 @@ public class User {
     /**
      * Empty constructor. Needed for Firestore.
      */
-    public User() {}
+    public User() {
+    }
 
     /**
      * Constructs a user.
@@ -37,7 +38,7 @@ public class User {
     }
 
     /**
-     * Returns the unique identifier of the user.
+     * Gets the unique identifier of the user.
      *
      * @return unique user id associated with the user
      */
@@ -46,7 +47,7 @@ public class User {
     }
 
     /**
-     * Returns the user's actual/display name.
+     * Gets the user's actual/display name.
      *
      * @return actual/display name
      */
@@ -57,14 +58,14 @@ public class User {
     /**
      * Updates the user name. Can only be done to the current user.
      *
-     * @param name that replaces the old user name
+     * @param name updated name
      */
     public void setName(String name) {
         mName = name;
     }
 
     /**
-     * Returns the user's username.
+     * Gets the user's username.
      *
      * @return username
      */
@@ -75,14 +76,14 @@ public class User {
     /**
      * Updates the current username. Can only be done to the current user.
      *
-     * @param username that replaces the old username
+     * @param username updated username
      */
     public void setUsername(String username) {
         mUsername = username;
     }
 
     /**
-     * Returns the user's email.
+     * Gets the user's email.
      *
      * @return email
      */
@@ -93,14 +94,14 @@ public class User {
     /**
      * Updates the current user's email. Can only be done to the current user.
      *
-     * @param email that replaces the old email
+     * @param email updated email
      */
     public void setEmail(String email) {
         mEmail = email;
     }
 
     /**
-     * Returns the user's phone number
+     * Gets the user's phone number
      *
      * @return phone number
      */
@@ -111,9 +112,10 @@ public class User {
     /**
      * Updates the current user's phone number. Can only be done to the current user.
      *
-     * @param phone that replaces the old phone number
+     * @param phone updated phone number
      */
     public void setPhone(String phone) {
+        // TODO: Verify format
         mPhone = phone;
     }
 }

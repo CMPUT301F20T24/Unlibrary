@@ -4,6 +4,11 @@ import androidx.core.util.Pair;
 
 import java.util.List;
 
+/**
+ * Represents a borrow request in our application domain.
+ *
+ * TODO: Link and retrieve ID from Firestore
+ */
 public class Request {
     private String mId;
     private String mRequester;
@@ -27,6 +32,7 @@ public class Request {
     public Request(String requester, String book) {
         mRequester = requester;
         mBook = book;
+        mState = State.REQUESTED;
     }
 
     public String getId() {
@@ -41,6 +47,17 @@ public class Request {
         return mBook;
     }
 
+    /**
+     * Gets the state of a request
+     * <p>
+     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
+     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
+     * DECLINED - Owner has explicitly or implicitly decided not to lend the book to the borrower
+     * BORROWED - Owner has handed off the book to the borrower
+     * ARCHIVED - Borrower has returned the book back to the owner and the borrow request is complete
+     *
+     * @return one of the above state
+     */
     public State getState() {
         return mState;
     }
@@ -69,15 +86,6 @@ public class Request {
         mLocation = location;
     }
 
-    /**
-     * Represents the state of a request
-     *
-     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
-     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
-     * DECLINED - Owner has explicitly or implicitly decided not to lend the book to the borrower
-     * BORROWED - Owner has handed off the book to the borrower
-     * ARCHIVED - Borrower has returned the book back to the owner and the borrow request is complete
-     */
     enum State {
         REQUESTED,
         ACCEPTED,
