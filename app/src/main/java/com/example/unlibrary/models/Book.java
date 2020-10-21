@@ -20,6 +20,7 @@ public class Book {
     private String mIsbn;
     private String mTitle;
     private String mAuthor;
+    private String mOwner;
     private ArrayList<String> mPhotos;
     private Status mStatus;
 
@@ -36,12 +37,14 @@ public class Book {
      * @param isbn   of book
      * @param title  of book
      * @param author of book
+     * @param owner unique user identifier of the owner of the book
      * @param photos URL of photos to add, can be null if no photos are added
      */
-    public Book(String isbn, String title, String author, ArrayList<String> photos) {
+    public Book(String isbn, String title, String author, String owner, ArrayList<String> photos) {
         mIsbn = isbn;
         mTitle = title;
         mAuthor = author;
+        mOwner = owner;
         mStatus = Status.AVAILABLE;
 
         if (photos != null) {
@@ -92,14 +95,18 @@ public class Book {
      *
      * @param photo url to add
      */
-    public void addPhoto(String photo) { mPhotos.add(photo); }
+    public void addPhoto(String photo) {
+        mPhotos.add(photo);
+    }
 
     /**
      * Adds multiple photos tot he list of photos associated with the book.
      *
      * @param photos list of photo urls to add
      */
-    public void addPhotos(ArrayList<String> photos) { mPhotos.addAll(photos); }
+    public void addPhotos(ArrayList<String> photos) {
+        mPhotos.addAll(photos);
+    }
 
     /**
      * Dissociates the given photo from the book if it is already associated with the book,
@@ -155,6 +162,15 @@ public class Book {
      */
     public void setIsbn(String isbn) {
         mIsbn = isbn;
+    }
+
+    /**
+     * Gets the unique user ID of the owner of the book
+     *
+     * @return unique user ID of the book's owner
+     */
+    public String getOwner() {
+        return mOwner;
     }
 
     /**
