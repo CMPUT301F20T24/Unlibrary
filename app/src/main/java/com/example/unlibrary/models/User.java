@@ -17,7 +17,6 @@ package com.example.unlibrary.models;
  */
 public class User {
     private String mId;
-    private String mName;
     private String mUsername;
     private String mEmail;
     private String mPhone;
@@ -39,7 +38,6 @@ public class User {
      */
     public User(String id, String name, String username, String email, String phone) {
         mId = id;
-        mName = name;
         mUsername = username;
         mEmail = email;
         mPhone = phone;
@@ -52,24 +50,6 @@ public class User {
      */
     public String getId() {
         return mId;
-    }
-
-    /**
-     * Gets the user's actual/display name.
-     *
-     * @return actual/display name
-     */
-    public String getName() {
-        return mName;
-    }
-
-    /**
-     * Updates the user name. Can only be done to the current user.
-     *
-     * @param name updated name
-     */
-    public void setName(String name) {
-        mName = name;
     }
 
     /**
