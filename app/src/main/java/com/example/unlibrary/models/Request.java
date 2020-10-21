@@ -10,7 +10,7 @@ public class Request {
     private String mBook;
     private State mState;
     private List<String> mPhotos;
-    private Pair<Double, Double> mLocation; // TODO: Check whether
+    private Pair<Double, Double> mLocation; // TODO: Check whether this can be stored in Firestore
 
     /**
      * Empty constructor. Needed for Firestore.
@@ -69,11 +69,20 @@ public class Request {
         mLocation = location;
     }
 
+    /**
+     * Represents the state of a request
+     *
+     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
+     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
+     * DECLINED - Owner has explicitly or implicitly decided not to lend the book to the borrower
+     * BORROWED - Owner has handed off the book to the borrower
+     * ARCHIVED - Borrower has returned the book back to the owner and the borrow request is complete
+     */
     enum State {
         REQUESTED,
         ACCEPTED,
         DECLINED,
         BORROWED,
-        AVAILABLE
+        ARCHIVED
     }
 }
