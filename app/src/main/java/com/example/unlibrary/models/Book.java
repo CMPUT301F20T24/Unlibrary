@@ -1,3 +1,11 @@
+/*
+ * Book
+ *
+ * October 21, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.models;
 
 import java.util.ArrayList;
