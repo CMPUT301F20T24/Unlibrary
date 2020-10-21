@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class Book {
     private String mIsbn;
-    private String mDescription;
     private String mTitle;
     private String mAuthor;
     private ArrayList<String> mPhotos;
@@ -13,21 +12,14 @@ public class Book {
     /**
      * Empty constructor. Needed for Firestore.
      */
-    public Book() {}
+    public Book() {
+    }
 
     public Book(String isbn, String title) {
         this.mIsbn = isbn;
         this.mTitle = title;
     }
-
-    public String getDescription() {
-        return mDescription;
-    }
-
-    public void setDescription(String description) {
-        this.mDescription = description;
-    }
-
+    
     public String getAuthor() {
         return mAuthor;
     }
