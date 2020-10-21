@@ -4,12 +4,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.databinding.FragmentLibraryBookBinding;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.util.BookViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,9 +20,9 @@ import java.util.List;
  */
 public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentLibraryBookBinding>> {
 
-    private final List<Book> mValues;
+    private final LiveData<ArrayList<Book>> mValues;
 
-    public LibraryBooksRecyclerViewAdapter(List<Book> items) {
+    public LibraryBooksRecyclerViewAdapter(LiveData<ArrayList<Book>> items) {
         mValues = items;
     }
 
@@ -34,12 +36,12 @@ public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookVi
 
     @Override
     public void onBindViewHolder(final BookViewHolder<FragmentLibraryBookBinding> holder, int position) {
-        Book book = mValues.get(position);
+        Book book = mValues.getValue().get(position);
         holder.bind(book);
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mValues.getValue().size();
     }
 }

@@ -1,5 +1,7 @@
 package com.example.unlibrary.library;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.example.unlibrary.models.Book;
@@ -7,18 +9,21 @@ import com.example.unlibrary.models.Book;
 import java.util.ArrayList;
 
 public class LibraryViewModel extends ViewModel {
-    private ArrayList<Book> mBooks;
+    private LiveData<ArrayList<Book>> mBooks;
+    private LibraryRepository libraryRepository;
 
     public LibraryViewModel() {
-        mBooks = new ArrayList<>();
-
-        for (int i = 0; i < 10; i++) {
-            mBooks.add(new Book("abcd-1234", "Crafting the interpreter"));
-        }
+        this.libraryRepository = new LibraryRepository();
+        this.libraryRepository.attachListener();
+        this.mBooks = this.libraryRepository.getBooks();
     }
 
-    public ArrayList<Book> getBooks() {
+    public LiveData<ArrayList<Book>> getBooks() {
         return this.mBooks;
     }
 
+
+    public void detachListeners() {
+        this.libraryRepository.detachListener();
+    }
 }

@@ -2,6 +2,8 @@ package com.example.unlibrary.library;
 
 import android.os.Bundle;
 
+import androidx.databinding.DataBindingUtil;
+
 import com.example.unlibrary.R;
 import com.example.unlibrary.util.AuthenticatedActivity;
 

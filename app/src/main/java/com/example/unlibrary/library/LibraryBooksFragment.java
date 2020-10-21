@@ -6,7 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,8 +50,9 @@ public class LibraryBooksFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ViewDataBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_library_book_list,container,false);
         View view = inflater.inflate(R.layout.fragment_library_book_list, container, false);
-
+        binding.setLifecycleOwner(this);
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -57,5 +61,11 @@ public class LibraryBooksFragment extends Fragment {
             recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(mViewModel.getBooks()));
         }
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        mViewModel.detachListeners();
+        super.onDestroy();
     }
 }

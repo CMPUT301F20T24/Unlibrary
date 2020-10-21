@@ -12,9 +12,8 @@
         <activity android:name=".profile.ProfileActivity" />
         <activity android:name=".exchange.ExchangeActivity" />
         <activity android:name=".unlibrary.UnlibraryActivity" />
-        <activity android:name=".library.LibraryActivity" />
         <activity android:name=".auth.AuthActivity" />
-        <activity android:name=".EntryActivity">
+        <activity android:name=".library.LibraryActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
