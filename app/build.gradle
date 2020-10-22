@@ -59,7 +59,7 @@ dependencies {
     implementation "com.google.android.material:material:1.2.1"
 
     // Tests
-    testImplementation 'android.arch.core:core-testing:1.0.0-alpha3'
+    testImplementation 'android.arch.core:core-testing:1.1.1'
 
     // Navigation
     def nav_version = "2.3.1"

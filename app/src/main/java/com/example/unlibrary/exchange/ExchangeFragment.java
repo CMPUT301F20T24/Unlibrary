@@ -11,6 +11,10 @@ import android.view.ViewGroup;
 import com.example.unlibrary.R;
 
 public class ExchangeFragment extends Fragment {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
      @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
