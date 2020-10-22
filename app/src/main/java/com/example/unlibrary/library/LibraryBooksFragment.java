@@ -15,6 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.R;
+import com.example.unlibrary.models.Book;
+
+import java.util.ArrayList;
 
 /**
  * A fragment representing a list of Items.
@@ -24,6 +27,7 @@ public class LibraryBooksFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
 
     private LibraryViewModel mViewModel;
+    private Observer<ArrayList<Book>> bookListObserver;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -50,18 +54,23 @@ public class LibraryBooksFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ViewDataBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_library_book_list,container,false);
         View view = inflater.inflate(R.layout.fragment_library_book_list, container, false);
-        binding.setLifecycleOwner(this);
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(mViewModel.getBooks()));
-        }
+        mViewModel.getBooks().observe(getViewLifecycleOwner(), new Observer<ArrayList<Book>>() {
+            @Override
+            public void onChanged(ArrayList<Book> books) {
+                if (view instanceof RecyclerView) {
+                    Context context = view.getContext();
+                    RecyclerView recyclerView = (RecyclerView) view;
+                    recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                    recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(books));
+                }
+            }
+        });
+
         return view;
     }
+
 
     @Override
     public void onDestroy() {
@@ -69,3 +78,4 @@ public class LibraryBooksFragment extends Fragment {
         super.onDestroy();
     }
 }
+

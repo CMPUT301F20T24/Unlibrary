@@ -20,9 +20,9 @@ import java.util.List;
  */
 public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentLibraryBookBinding>> {
 
-    private final LiveData<ArrayList<Book>> mValues;
+    private final ArrayList<Book> mValues;
 
-    public LibraryBooksRecyclerViewAdapter(LiveData<ArrayList<Book>> items) {
+    public LibraryBooksRecyclerViewAdapter(ArrayList<Book> items) {
         mValues = items;
     }
 
@@ -36,12 +36,12 @@ public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookVi
 
     @Override
     public void onBindViewHolder(final BookViewHolder<FragmentLibraryBookBinding> holder, int position) {
-        Book book = mValues.getValue().get(position);
+        Book book = mValues.get(position);
         holder.bind(book);
     }
 
     @Override
     public int getItemCount() {
-        return mValues.getValue().size();
+        return mValues.size();
     }
 }
