@@ -8,7 +8,12 @@
 
 package com.example.unlibrary.auth;
 
+import androidx.annotation.NonNull;
+
 import com.example.unlibrary.models.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,8 +38,9 @@ public class AuthRepository {
 
     /**
      * Sign in a user.
-     * @param email User email
-     * @param password User password
+     *
+     * @param email      User email
+     * @param password   User password
      * @param onFinished Code to call when finished successfully or not
      */
     public void signIn(String email, String password, OnFinishedListener onFinished) {
@@ -50,9 +56,10 @@ public class AuthRepository {
 
     /**
      * Register a new user in Firebase auth. Create a new user document with a globally unique username.
-     * @param email User email
-     * @param password User password
-     * @param username User username
+     *
+     * @param email      User email
+     * @param password   User password
+     * @param username   User username
      * @param onFinished Code to call when finished successfully or not
      */
     public void register(String email, String password, String username, OnFinishedListener onFinished) {
@@ -63,22 +70,15 @@ public class AuthRepository {
             if (task.getResult().isEmpty()) {
                 // Register user with Firebase Auth
                 mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(task2 -> {
-                            if (task2.isSuccessful()) {
-                                // Create user document and link with auth
-                                String id = mAuth.getCurrentUser().getUid();
-                                User newUser = new User(id, username, email);
-                                usersRef.document(id).set(newUser).addOnCompleteListener(task3 -> {
-                                    if (task3.isSuccessful()) {
-                                        onFinished.finished(true, "");
-                                    } else {
-                                        onFinished.finished(false, "Failed to make user document. " + task3.getException().getMessage());
-                                    }
-                                });
-                            } else {
-                                onFinished.finished(false, "Failed to register user. " + task2.getException().getMessage());
-                            }
-                        });
+                        .addOnSuccessListener(authResult -> {
+                            // Create user document and link with auth
+                            String id = mAuth.getCurrentUser().getUid();
+                            User newUser = new User(id, username, email);
+                            usersRef.document(id).set(newUser)
+                                    .addOnSuccessListener(aVoid -> onFinished.finished(true, ""))
+                                    .addOnFailureListener(e -> onFinished.finished(false, "Failed to make user document. " + e.getMessage()));
+                        })
+                        .addOnFailureListener(e -> onFinished.finished(false, "Failed to register user. " + e.getMessage()));
             } else {
                 onFinished.finished(false, "Username is not globally unique.");
             }
