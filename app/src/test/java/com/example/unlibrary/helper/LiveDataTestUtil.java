@@ -3,7 +3,7 @@
  *
  * October 18, 2020
  *
- * TODO copyright information
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
 
 package com.example.unlibrary.helper;
