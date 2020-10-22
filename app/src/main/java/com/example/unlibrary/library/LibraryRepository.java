@@ -46,7 +46,13 @@ public class LibraryRepository {
     public LibraryRepository () {
         db = FirebaseFirestore.getInstance();
         query = db.collection("testRepo");
-        books = new MutableLiveData<>(new ArrayList<Book>());
+        
+        ArrayList<Book> aBooks = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            aBooks.add(new Book("abcd-1234", "Crafting the interpreter", "https://craftinginterpreters.com/", "me", null));
+        }
+
+        books = new MutableLiveData<>(aBooks);
     }
 
     /**
@@ -66,7 +72,7 @@ public class LibraryRepository {
                 //update the list to reflect changes in the database
                 ArrayList<Book> dbBooks = new ArrayList<>();
                 for (DocumentSnapshot doc: value.getDocuments()) {
-                    dbBooks.add(new Book (doc.getId(), (String)doc.getData().get("Title")));
+                    dbBooks.add(new Book (doc.getId(), (String)doc.getData().get("Title"), null, null, null));
                 }
 
                 books.setValue(dbBooks);
