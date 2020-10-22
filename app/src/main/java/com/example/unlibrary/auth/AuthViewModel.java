@@ -188,21 +188,25 @@ public class AuthViewModel extends ViewModel {
             mFailureMsgEvent.setValue(e.getMessage());
             return;
         }
-        // TODO ensure that the username is globally unique
 
         // Try to register new user
-        mAuthRepository.register(mEmail.getValue(), mPassword.getValue(), mUsername.getValue(), task -> {
-            if (task.isSuccessful()) {
+        mAuthRepository.register(mEmail.getValue(), mPassword.getValue(), mUsername.getValue(), (s, msg) -> {
+            if (s) {
                 // Creation succeeded, navigate away from auth activity
                 mAuthenticatedEvent.call();
             } else {
                 // Creation failed, show toast
-                mFailureMsgEvent.setValue("Failed to create account.");
+                mFailureMsgEvent.setValue(msg);
             }
         });
     }
 
-    // TODO
+    /**
+     * Validate an email value.
+     * @param email Email to validate
+     * @return Validated email
+     * @throws InvalidInputException Thrown when email is invalid
+     */
     private String validateEmail(String email) throws InvalidInputException {
         if (email == null) {
             throw new InvalidInputException("Email is null.");
@@ -211,7 +215,8 @@ public class AuthViewModel extends ViewModel {
         }
 
         // Valid email
-        String regex = "^[a-zA-Z0-9_+&*-]+(?:\\\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\\\.)+[a-zA-Z]{2,7}$";
+        // https://howtodoinjava.com/java/regex/java-regex-validate-email-address/
+        String regex = "^[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
         if (!email.matches(regex)) {
             throw new InvalidInputException("Email is invalid.");
         }
@@ -219,7 +224,12 @@ public class AuthViewModel extends ViewModel {
         return email;
     }
 
-    // TODO
+    /**
+     * Validate a password value.
+     * @param password Password to validate.
+     * @return Validated password.
+     * @throws InvalidInputException Thrown when password is invalid
+     */
     private String validatePassword(String password) throws InvalidInputException {
         if (password == null) {
             throw new InvalidInputException("Password is null.");
@@ -235,7 +245,12 @@ public class AuthViewModel extends ViewModel {
         return password;
     }
 
-    // TODO
+    /**
+     * Validate a username value. Does not ensure that the username is globally unique.
+     * @param username Username to validate.
+     * @return Validated username
+     * @throws InvalidInputException Thrown when username is invalid.
+     */
     private String validateUsername(String username) throws InvalidInputException {
         if (username == null) {
             throw new InvalidInputException("Username is null.");
@@ -252,8 +267,14 @@ public class AuthViewModel extends ViewModel {
         return username;
     }
 
-    // TODO
+    /**
+     * Exception thrown when input data is invalid.
+     */
     public static class InvalidInputException extends Exception {
+        /**
+         * Constructor for exception.
+         * @param errorMessage Reason that input is invalid
+         */
         public InvalidInputException(String errorMessage) {
             super(errorMessage);
         }

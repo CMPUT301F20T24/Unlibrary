@@ -8,6 +8,8 @@
 
 package com.example.unlibrary.models;
 
+import com.google.firebase.firestore.DocumentId;
+
 /**
  * Represents a user in our application domain. This user information is stored in Firestore and is
  * related to a user entry in Firebase.
@@ -19,7 +21,6 @@ public class User {
     private String mId;
     private String mUsername;
     private String mEmail;
-    private String mPhone;
 
     /**
      * Empty constructor. Needed for Firestore.
@@ -31,16 +32,13 @@ public class User {
      * Constructs a user.
      *
      * @param id       unique ID associated with the user, obtained from Firebase Auth
-     * @param name     actual/display name of the user
      * @param username that uniquely represents the user other than its ID
      * @param email    of the user
-     * @param phone    number of the user
      */
-    public User(String id, String name, String username, String email, String phone) {
+    public User(String id, String username, String email) {
         mId = id;
         mUsername = username;
         mEmail = email;
-        mPhone = phone;
     }
 
     /**
@@ -86,24 +84,5 @@ public class User {
      */
     public void setEmail(String email) {
         mEmail = email;
-    }
-
-    /**
-     * Gets the user's phone number
-     *
-     * @return phone number
-     */
-    public String getPhone() {
-        return mPhone;
-    }
-
-    /**
-     * Updates the current user's phone number. Can only be done to the current user.
-     *
-     * @param phone updated phone number
-     */
-    public void setPhone(String phone) {
-        // TODO: Verify format
-        mPhone = phone;
     }
 }
