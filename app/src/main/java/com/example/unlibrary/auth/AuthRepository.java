@@ -8,12 +8,7 @@
 
 package com.example.unlibrary.auth;
 
-import androidx.annotation.NonNull;
-
 import com.example.unlibrary.models.User;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;

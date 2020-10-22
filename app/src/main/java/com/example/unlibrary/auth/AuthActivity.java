@@ -30,6 +30,7 @@ public class AuthActivity extends AppCompatActivity {
 
     /**
      * Load AuthViewModel and setup observers on its event streams. Then show the login screen.
+     *
      * @param savedInstanceState saved bundle
      */
     @Override
@@ -52,6 +53,7 @@ public class AuthActivity extends AppCompatActivity {
 
     /**
      * Change the fragment that is displayed.
+     *
      * @param fragment Instance of fragment to show
      */
     public void showFragment(Fragment fragment) {
@@ -63,6 +65,7 @@ public class AuthActivity extends AppCompatActivity {
 
     /**
      * Show a toast with a given message.
+     *
      * @param msg Message to display in toast.
      */
     public void showToast(String msg) {

@@ -16,8 +16,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.unlibrary.util.SingleLiveEvent;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 /**
  * Manages the authentication flow business logic. Controls both login and registration.
  */

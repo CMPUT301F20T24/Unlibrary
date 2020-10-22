@@ -8,8 +8,6 @@
 
 package com.example.unlibrary.models;
 
-import com.google.firebase.firestore.DocumentId;
-
 /**
  * Represents a user in our application domain. This user information is stored in Firestore and is
  * related to a user entry in Firebase.
