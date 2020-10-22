@@ -29,7 +29,6 @@ public class AuthViewModel extends ViewModel {
     private SingleLiveEvent<Void> mAuthenticatedEvent = new SingleLiveEvent<>();
 
     private AuthRepository mAuthRepository;
-    private FirebaseAuth mAuth;
 
     public AuthViewModel() {
         this.mAuthRepository = new AuthRepository();
@@ -139,14 +138,13 @@ public class AuthViewModel extends ViewModel {
         }
 
         // Try to authenticate the user
-        mAuthRepository.signIn(mEmail.getValue(), mPassword.getValue(), task -> {
-            if (task.isSuccessful()) {
+        mAuthRepository.signIn(mEmail.getValue(), mPassword.getValue(), (s, msg) -> {
+            if (s) {
                 // Login succeeded, navigate away from auth activity
                 mAuthenticatedEvent.call();
-
             } else {
                 // Login failed, show toast
-                mFailureMsgEvent.setValue("Invalid email or password.");
+                mFailureMsgEvent.setValue(msg);
             }
         });
     }

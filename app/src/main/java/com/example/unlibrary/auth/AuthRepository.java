@@ -9,30 +9,43 @@
 package com.example.unlibrary.auth;
 
 import com.example.unlibrary.models.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-// TODO
+/**
+ * Manages interaction with Firebase for all auth functionality.
+ */
 public class AuthRepository {
     private static final String USER_COLLECTION = "users";
     private static final String USERNAME_FIELD = "username";
     private final FirebaseFirestore mDB;
     private final FirebaseAuth mAuth;
 
-    // TODO
+    /**
+     * Construct a new AuthRepository
+     */
     public AuthRepository() {
         this.mDB = FirebaseFirestore.getInstance();
         this.mAuth = FirebaseAuth.getInstance();
     }
 
-    // TODO
-    public void signIn(String email, String password, OnCompleteListener<AuthResult> onComplete) {
+    /**
+     * Sign in a user.
+     * @param email User email
+     * @param password User password
+     * @param onFinished Code to call when finished successfully or not
+     */
+    public void signIn(String email, String password, OnFinishedListener onFinished) {
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(onComplete);
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        onFinished.finished(true, "");
+                    } else {
+                        onFinished.finished(false, task.getException().getMessage());
+                    }
+                });
     }
 
     /**
