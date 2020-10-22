@@ -28,10 +28,16 @@ public class AuthViewModel extends ViewModel {
     private SingleLiveEvent<Fragment> mFragmentNavigationEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Void> mAuthenticatedEvent = new SingleLiveEvent<>();
 
+    private AuthRepository mAuthRepository;
     private FirebaseAuth mAuth;
+
+    public AuthViewModel() {
+        this.mAuthRepository = new AuthRepository();
+    }
 
     /**
      * Email getter for data binding. Exposes data in a mutable format so 2-way binding works.
+     *
      * @return Email MutableLiveData
      */
     public MutableLiveData<String> getEmail() {
@@ -43,6 +49,7 @@ public class AuthViewModel extends ViewModel {
 
     /**
      * Password getter for data binding. Exposes data in a mutable format so 2-way binding works.
+     *
      * @return Password MutableLiveData
      */
     public MutableLiveData<String> getPassword() {
@@ -54,6 +61,7 @@ public class AuthViewModel extends ViewModel {
 
     /**
      * Username getter for data binding. Exposes data in a mutable format so 2-way binding works.
+     *
      * @return Useranme MutableLiveData
      */
     public MutableLiveData<String> getUsername() {
@@ -65,6 +73,7 @@ public class AuthViewModel extends ViewModel {
 
     /**
      * FragmentNavigationEvent getter for activity observers.
+     *
      * @return Event of which fragment to navigate to
      */
     public SingleLiveEvent<Fragment> getFragmentNavigationEvent() {
@@ -76,6 +85,7 @@ public class AuthViewModel extends ViewModel {
 
     /**
      * FailureMsgEvent getter for activity observers.
+     *
      * @return Event of failure message to display
      */
     public SingleLiveEvent<String> getFailureMsgEvent() {
@@ -87,6 +97,7 @@ public class AuthViewModel extends ViewModel {
 
     /**
      * AuthenticatedEvent getter for activity observers.
+     *
      * @return Event representing the user has been authenticated
      */
     public SingleLiveEvent<Void> getAuthenticatedEvent() {
@@ -113,28 +124,31 @@ public class AuthViewModel extends ViewModel {
      */
     public void login() {
         // Validate data
-        if (mEmail.getValue() == null || mEmail.getValue().isEmpty()) {
-            mFailureMsgEvent.setValue("Missing email.");
+        String email, password;
+        try {
+            email = validateEmail(mEmail.getValue());
+        } catch (InvalidInputException e) {
+            mFailureMsgEvent.setValue(e.getMessage());
             return;
-        } else if (mPassword.getValue() == null || mPassword.getValue().isEmpty()) {
-            mFailureMsgEvent.setValue("Missing password.");
+        }
+        try {
+            password = validatePassword(mPassword.getValue());
+        } catch (InvalidInputException e) {
+            mFailureMsgEvent.setValue(e.getMessage());
             return;
         }
 
-        // TODO extract to repository
         // Try to authenticate the user
-        initFirebaseAuth();
-        mAuth.signInWithEmailAndPassword(mEmail.getValue(), mPassword.getValue())
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Login succeeded, navigate away from auth activity
-                        mAuthenticatedEvent.call();
+        mAuthRepository.signIn(mEmail.getValue(), mPassword.getValue(), task -> {
+            if (task.isSuccessful()) {
+                // Login succeeded, navigate away from auth activity
+                mAuthenticatedEvent.call();
 
-                    } else {
-                        // Login failed, show toast
-                        mFailureMsgEvent.setValue("Invalid email or password.");
-                    }
-                });
+            } else {
+                // Login failed, show toast
+                mFailureMsgEvent.setValue("Invalid email or password.");
+            }
+        });
     }
 
     /**
@@ -155,40 +169,93 @@ public class AuthViewModel extends ViewModel {
      */
     public void register() {
         // Validate data
-        if (mUsername.getValue() == null || mUsername.getValue().isEmpty()) {
-            // TODO ensure that the username is globally unique
-            // TODO actually do something with the username
-            mFailureMsgEvent.setValue("Missing username");
-            return;
-        } else if (mEmail.getValue() == null || mEmail.getValue().isEmpty()) {
-            mFailureMsgEvent.setValue("Missing email.");
-            return;
-        } else if (mPassword.getValue() == null || mPassword.getValue().isEmpty()) {
-            mFailureMsgEvent.setValue("Missing password.");
+        String email, password, username;
+        try {
+            email = validateEmail(mEmail.getValue());
+        } catch (InvalidInputException e) {
+            mFailureMsgEvent.setValue(e.getMessage());
             return;
         }
+        try {
+            password = validatePassword(mPassword.getValue());
+        } catch (InvalidInputException e) {
+            mFailureMsgEvent.setValue(e.getMessage());
+            return;
+        }
+        try {
+            username = validateUsername(mUsername.getValue());
+        } catch (InvalidInputException e) {
+            mFailureMsgEvent.setValue(e.getMessage());
+            return;
+        }
+        // TODO ensure that the username is globally unique
 
-        // TODO extract to repository
         // Try to register new user
-        initFirebaseAuth();
-        mAuth.createUserWithEmailAndPassword(mEmail.getValue(), mPassword.getValue())
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Creation succeeded, navigate away from auth activity
-                        mAuthenticatedEvent.call();
-                    } else {
-                        // Creation failed, show toast
-                        mFailureMsgEvent.setValue("Failed to create account.");
-                    }
-                });
+        mAuthRepository.register(mEmail.getValue(), mPassword.getValue(), mUsername.getValue(), task -> {
+            if (task.isSuccessful()) {
+                // Creation succeeded, navigate away from auth activity
+                mAuthenticatedEvent.call();
+            } else {
+                // Creation failed, show toast
+                mFailureMsgEvent.setValue("Failed to create account.");
+            }
+        });
     }
 
-    /**
-     * Wrapper to access firebase without hitting null pointer exceptions.
-     */
-    private void initFirebaseAuth() {
-        if (mAuth == null) {
-            mAuth = FirebaseAuth.getInstance();
+    // TODO
+    private String validateEmail(String email) throws InvalidInputException {
+        if (email == null) {
+            throw new InvalidInputException("Email is null.");
+        } else if (email.isEmpty()) {
+            throw new InvalidInputException("Email is empty.");
+        }
+
+        // Valid email
+        String regex = "^[a-zA-Z0-9_+&*-]+(?:\\\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\\\.)+[a-zA-Z]{2,7}$";
+        if (!email.matches(regex)) {
+            throw new InvalidInputException("Email is invalid.");
+        }
+
+        return email;
+    }
+
+    // TODO
+    private String validatePassword(String password) throws InvalidInputException {
+        if (password == null) {
+            throw new InvalidInputException("Password is null.");
+        } else if (password.isEmpty()) {
+            throw new InvalidInputException("Password is empty.");
+        }
+
+        // Length
+        if (password.length() < 6) {
+            throw new InvalidInputException("Password is too short.");
+        }
+
+        return password;
+    }
+
+    // TODO
+    private String validateUsername(String username) throws InvalidInputException {
+        if (username == null) {
+            throw new InvalidInputException("Username is null.");
+        } else if (username.isEmpty()) {
+            throw new InvalidInputException("Username is empty.");
+        }
+
+        // Alphanumeric
+        String regex = "[A-Za-z0-9]+";
+        if (!username.matches(regex)) {
+            throw new InvalidInputException("Username is not alphanumeric");
+        }
+
+        return username;
+    }
+
+    // TODO
+    public static class InvalidInputException extends Exception {
+        public InvalidInputException(String errorMessage) {
+            super(errorMessage);
         }
     }
 }
