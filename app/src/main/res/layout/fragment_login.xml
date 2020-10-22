@@ -50,11 +50,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/text_margin"
-                    android:hint="@string/email_hint">
+                    android:hint="@string/email_hint"
+                    app:errorEnabled="true">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:maxLines="1"
                         android:text="@={viewModel.email}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -65,12 +67,14 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/text_margin"
                     android:hint="@string/password_hint"
+                    app:errorEnabled="true"
                     app:endIconMode="password_toggle">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
+                        android:maxLines="1"
                         android:text="@={viewModel.password}" />
 
                 </com.google.android.material.textfield.TextInputLayout>

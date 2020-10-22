@@ -8,6 +8,8 @@
 
 package com.example.unlibrary.auth;
 
+import android.util.Pair;
+
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -25,10 +27,17 @@ public class AuthViewModel extends ViewModel {
     private MutableLiveData<String> mPassword = new MutableLiveData<>();
     private MutableLiveData<String> mUsername = new MutableLiveData<>();
     private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Fragment> mFragmentNavigationEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Void> mAuthenticatedEvent = new SingleLiveEvent<>();
 
-    private AuthRepository mAuthRepository;
+    private final AuthRepository mAuthRepository;
+
+    public enum InputKey {
+        EMAIL,
+        PASSWORD,
+        USERNAME
+    }
 
     public AuthViewModel() {
         this.mAuthRepository = new AuthRepository();
@@ -95,6 +104,18 @@ public class AuthViewModel extends ViewModel {
     }
 
     /**
+     * InvalidInputEvent getter for activity observers.
+     *
+     * @return Event of failure message to display
+     */
+    public SingleLiveEvent<Pair<InputKey, String>> getInvalidInputEvent() {
+        if (mInvalidInputEvent == null) {
+            mInvalidInputEvent = new SingleLiveEvent<>();
+        }
+        return mInvalidInputEvent;
+    }
+
+    /**
      * AuthenticatedEvent getter for activity observers.
      *
      * @return Event representing the user has been authenticated
@@ -123,22 +144,28 @@ public class AuthViewModel extends ViewModel {
      */
     public void login() {
         // Validate data
-        String email, password;
+        String email = "", password = "";
+        boolean invalid = false;
         try {
             email = validateEmail(mEmail.getValue());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
         } catch (InvalidInputException e) {
-            mFailureMsgEvent.setValue(e.getMessage());
-            return;
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, e.getMessage()));
+            invalid = true;
         }
         try {
             password = validatePassword(mPassword.getValue());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
         } catch (InvalidInputException e) {
-            mFailureMsgEvent.setValue(e.getMessage());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, e.getMessage()));
+            invalid = true;
+        }
+        if (invalid) {
             return;
         }
 
         // Try to authenticate the user
-        mAuthRepository.signIn(mEmail.getValue(), mPassword.getValue(), (s, msg) -> {
+        mAuthRepository.signIn(email, password, (s, msg) -> {
             if (s) {
                 // Login succeeded, navigate away from auth activity
                 mAuthenticatedEvent.call();
@@ -167,28 +194,35 @@ public class AuthViewModel extends ViewModel {
      */
     public void register() {
         // Validate data
-        String email, password, username;
+        String email = "", password = "", username = "";
+        boolean invalid = false;
         try {
             email = validateEmail(mEmail.getValue());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
         } catch (InvalidInputException e) {
-            mFailureMsgEvent.setValue(e.getMessage());
-            return;
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, e.getMessage()));
+            invalid = true;
         }
         try {
             password = validatePassword(mPassword.getValue());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
         } catch (InvalidInputException e) {
-            mFailureMsgEvent.setValue(e.getMessage());
-            return;
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, e.getMessage()));
+            invalid = true;
         }
         try {
             username = validateUsername(mUsername.getValue());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, null));
         } catch (InvalidInputException e) {
-            mFailureMsgEvent.setValue(e.getMessage());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, e.getMessage()));
+            invalid = true;
+        }
+        if (invalid) {
             return;
         }
 
         // Try to register new user
-        mAuthRepository.register(mEmail.getValue(), mPassword.getValue(), mUsername.getValue(), (s, msg) -> {
+        mAuthRepository.register(email, password, username, (s, msg) -> {
             if (s) {
                 // Creation succeeded, navigate away from auth activity
                 mAuthenticatedEvent.call();
@@ -206,9 +240,7 @@ public class AuthViewModel extends ViewModel {
      * @throws InvalidInputException Thrown when email is invalid
      */
     private String validateEmail(String email) throws InvalidInputException {
-        if (email == null) {
-            throw new InvalidInputException("Email is null.");
-        } else if (email.isEmpty()) {
+        if (email == null || email.isEmpty()) {
             throw new InvalidInputException("Email is empty.");
         }
 
@@ -229,9 +261,7 @@ public class AuthViewModel extends ViewModel {
      * @throws InvalidInputException Thrown when password is invalid
      */
     private String validatePassword(String password) throws InvalidInputException {
-        if (password == null) {
-            throw new InvalidInputException("Password is null.");
-        } else if (password.isEmpty()) {
+        if (password == null || password.isEmpty()) {
             throw new InvalidInputException("Password is empty.");
         }
 
@@ -250,9 +280,7 @@ public class AuthViewModel extends ViewModel {
      * @throws InvalidInputException Thrown when username is invalid.
      */
     private String validateUsername(String username) throws InvalidInputException {
-        if (username == null) {
-            throw new InvalidInputException("Username is null.");
-        } else if (username.isEmpty()) {
+        if (username == null || username.isEmpty()) {
             throw new InvalidInputException("Username is empty.");
         }
 

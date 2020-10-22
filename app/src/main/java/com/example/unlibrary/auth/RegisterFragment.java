@@ -42,6 +42,22 @@ public class RegisterFragment extends Fragment {
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(getViewLifecycleOwner());
 
+        // Setup observers for one-time viewModel events
+        viewModel.getInvalidInputEvent().observe(this, pair ->
+        {
+            switch (pair.first) {
+                case EMAIL:
+                    binding.registerEmailInput.setError(pair.second);
+                    break;
+                case PASSWORD:
+                    binding.registerPasswordInput.setError(pair.second);
+                    break;
+                case USERNAME:
+                    binding.registerUsernameInput.setError(pair.second);
+                    break;
+            }
+        });
+
         return binding.getRoot();
     }
 }

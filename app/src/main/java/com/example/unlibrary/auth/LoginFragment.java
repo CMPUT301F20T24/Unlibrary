@@ -12,8 +12,10 @@ import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +40,19 @@ public class LoginFragment extends Fragment {
         FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(getViewLifecycleOwner());
+
+        // Setup observers for one-time viewModel events
+        viewModel.getInvalidInputEvent().observe(this, pair ->
+        {
+            switch (pair.first) {
+                case EMAIL:
+                    binding.loginEmailInput.setError(pair.second);
+                    break;
+                case PASSWORD:
+                    binding.loginPasswordInput.setError(pair.second);
+                    break;
+            }
+        });
 
         return binding.getRoot();
     }
