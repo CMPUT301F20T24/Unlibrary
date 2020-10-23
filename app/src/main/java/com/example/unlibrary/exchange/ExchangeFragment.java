@@ -1,5 +1,5 @@
 /*
- * Exchange Fragment
+ * ExchangeFragment
  *
  * October 22, 2020
  *
