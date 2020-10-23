@@ -3,22 +3,92 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="viewmodel"
+            type="com.example.unlibrary.profile.ProfileViewModel" />
+
+        <import type="android.view.View" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/frameLayout5"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".profile.ProfileFragment">
+        android:layout_margin="10dp">
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
+        <include
+            android:id="@+id/profileImage"
+            layout="@layout/fragment_image_holder"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:subtitle=""
+            app:title="@{viewmodel.name}" />
+
+        <include
+            android:id="@+id/userName"
+            layout="@layout/fragment_editable_text"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="PROFILE"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:content="@={viewmodel.userName}"
+            app:isEditing="@{viewmodel.isEditing}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/profileImage"
+            android:layout_marginTop="10dp"
+            app:title="@{`User Name`}" />
+
+        <include
+            android:id="@+id/email"
+            layout="@layout/fragment_editable_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:content="@={viewmodel.email}"
+            app:isEditing="@{viewmodel.isEditing}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/userName"
+            android:layout_marginTop="10dp"
+            app:title="@{`Email`}" />
+
+        <include
+            android:id="@+id/phoneNumber"
+            layout="@layout/fragment_editable_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:content="@={viewmodel.phoneNumber}"
+            app:isEditing="@{viewmodel.isEditing}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/email"
+            android:layout_marginTop="10dp"
+            app:title="@{`Phone number`}" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/logout_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:text="@string/logout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/edit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit_24px"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileImage"
+            android:translationY="-30dp"
+            android:layout_marginRight="30dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
 

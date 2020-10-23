@@ -14,4 +14,6 @@
     <string name="unlibrary_nav">Unlibrary</string>
     <string name="exchange_nav">Exchange</string>
     <string name="profile_nav">Profile</string>
+    <string name="card_view_image_description">Holds image of card</string>
+    <string name="logout">Logout</string>
 </resources>
