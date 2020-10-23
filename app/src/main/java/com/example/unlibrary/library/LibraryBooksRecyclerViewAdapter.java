@@ -20,10 +20,19 @@ import java.util.List;
  */
 public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentLibraryBookBinding>> {
 
-    private final ArrayList<Book> mValues;
+    private ArrayList<Book> mValues;
 
     public LibraryBooksRecyclerViewAdapter(ArrayList<Book> items) {
         mValues = items;
+    }
+
+    /**
+     * Set the new data for the recycler view and notify the Ui of changes
+     * @param items new items to be displayed
+     */
+    public void setData (ArrayList<Book> items) {
+        mValues = items;
+        notifyDataSetChanged();
     }
 
     @NonNull

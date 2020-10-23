@@ -34,7 +34,7 @@ public class LibraryBooksFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private LibraryViewModel mViewModel;
-    private Observer<ArrayList<Book>> bookListObserver;
+    private Observer<ArrayList<Book>> mBookListObserver;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -53,10 +53,7 @@ public class LibraryBooksFragment extends Fragment {
         return fragment;
     }
 
-    /**
-     * Bind ViewModel to fragment when fragment is created.
-     * @param savedInstanceState saved instance.
-     */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,29 +62,30 @@ public class LibraryBooksFragment extends Fragment {
 
     /**
      * Access Library viewModel and setup data-binding and observer for changes to books.
-     * @param inflater inflater for the fragment.
-     * @param container ViewGroup for fragment.
-     * @param savedInstanceState saved instance.
-     * @return View returns view for the fragment
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_library_book_list, container, false);
 
-        // observe LiveData from ViewModel
-        mViewModel.getBooks().observe(getViewLifecycleOwner(), new Observer<ArrayList<Book>>() {
-            @Override
-            public void onChanged(ArrayList<Book> books) {
-                if (view instanceof RecyclerView) {
-                    Context context = view.getContext();
-                    RecyclerView recyclerView = (RecyclerView) view;
-                    recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        if (view instanceof RecyclerView) {
+            Context context = view.getContext();
+            RecyclerView recyclerView = (RecyclerView) view;
 
-                    // Set the adapter
-                    recyclerView.setAdapter(new LibraryBooksRecyclerViewAdapter(books));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+
+            LibraryBooksRecyclerViewAdapter adapter = new LibraryBooksRecyclerViewAdapter(this.mViewModel.getBooks().getValue());
+
+            // Set the adapter
+            recyclerView.setAdapter(adapter);
+
+            // observe LiveData from ViewModel
+            mViewModel.getBooks().observe(getViewLifecycleOwner(), new Observer<ArrayList<Book>>() {
+                @Override
+                public void onChanged(ArrayList<Book> books) {
+                    adapter.setData(books);
                 }
-            }
-        });
+            });
+        }
 
         return view;
     }

@@ -21,15 +21,15 @@ import java.util.ArrayList;
  */
 public class LibraryViewModel extends ViewModel {
     private LiveData<ArrayList<Book>> mBooks;
-    private LibraryRepository libraryRepository;
+    private LibraryRepository mLibraryRepository;
 
     /**
      * Constructor for the Library ViewModel. Instantiates listener to Firestore.
      */
     public LibraryViewModel() {
-        this.libraryRepository = new LibraryRepository();
-        this.libraryRepository.attachListener();
-        this.mBooks = this.libraryRepository.getBooks();
+        this.mLibraryRepository = new LibraryRepository();
+        this.mLibraryRepository.attachListener();
+        this.mBooks = this.mLibraryRepository.getBooks();
     }
 
     /**
@@ -44,6 +44,6 @@ public class LibraryViewModel extends ViewModel {
      * Detach listener when fragment is no longer being viewed.
      */
     public void detachListeners() {
-        this.libraryRepository.detachListener();
+        this.mLibraryRepository.detachListener();
     }
 }
