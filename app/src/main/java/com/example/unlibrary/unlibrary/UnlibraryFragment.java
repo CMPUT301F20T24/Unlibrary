@@ -9,33 +9,21 @@ package com.example.unlibrary.unlibrary;
 
 import android.os.Bundle;
 
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.example.unlibrary.databinding.FragmentUnlibraryBinding;
+import com.example.unlibrary.book_list.BooksFragment;
 
 /**
  * Host fragment for Unlibrary feature
  */
-public class UnlibraryFragment extends Fragment {
-
-    private FragmentUnlibraryBinding mBinding;
-
-    /**
-     * TODO: Finalize comment header when more this method is further developed
-     *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
-     */
+public class UnlibraryFragment extends BooksFragment {
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mBinding = FragmentUnlibraryBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void setBooksViewModel() {
+        mViewModel = new ViewModelProvider(getActivity()).get(UnlibraryViewModel.class);
     }
 }
