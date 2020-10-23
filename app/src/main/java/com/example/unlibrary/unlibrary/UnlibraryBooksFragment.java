@@ -38,7 +38,6 @@ public class UnlibraryBooksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_library_book_list, container, false);
 
-        // Setup ViewModel and bind RecyclerViewAdapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
@@ -47,12 +46,9 @@ public class UnlibraryBooksFragment extends Fragment {
 
             UnlibraryBooksRecyclerViewAdapter adapter = new UnlibraryBooksRecyclerViewAdapter(mViewModel.getBooks().getValue());
 
-            // Set the adapter
+            // Bind ViewModel books to RecyclerViewAdapter
             recyclerView.setAdapter(adapter);
-
-            // Observe LiveData from ViewModel
-            // Assumes ViewModel array still points to the same object and objects are appended there
-            mViewModel.getBooks().observe(getViewLifecycleOwner(), books -> adapter.notifyDataSetChanged());
+            mViewModel.getBooks().observe(getViewLifecycleOwner(), adapter::setData);
         }
 
         return view;
