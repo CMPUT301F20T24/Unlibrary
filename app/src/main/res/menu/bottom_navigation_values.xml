@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/libraryFragment"
         android:enabled="true"
         android:icon="@drawable/ic_menu_book_24px"
         android:title="@string/library_nav"/>
+
     <item
         android:id="@+id/unlibraryFragment"
         android:enabled="true"
         android:icon="@drawable/ic_library_books_24px"
         android:title="@string/unlibrary_nav"/>
+
     <item
         android:id="@+id/exchangeFragment"
         android:enabled="true"
         android:icon="@drawable/ic_search_24px"
         android:title="@string/exchange_nav"/>
+
     <item
         android:id="@+id/profileFragment"
         android:enabled="true"

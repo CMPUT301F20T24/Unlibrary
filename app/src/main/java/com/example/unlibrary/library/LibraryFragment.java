@@ -1,27 +1,32 @@
+/*
+ * Library Fragment
+ *
+ * October 22, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary.library;
 
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.unlibrary.MainViewModel;
-import com.example.unlibrary.R;
+import com.example.unlibrary.databinding.FragmentLibraryBinding;
 
+/**
+ * Host fragment for Library feature
+ */
 public class LibraryFragment extends Fragment {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private FragmentLibraryBinding mBinding;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_library, container, false);
+        mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
+        return mBinding.getRoot();
     }
 }
