@@ -34,7 +34,8 @@ public class LibraryViewModel extends ViewModel {
 
     /**
      * Getter for the mBooks object.
-     * @return LiveData<ArrayList<Book>> This returns the mBooks object
+     *
+     * @return LiveData<ArrayList < Book>> This returns the mBooks object
      */
     public LiveData<ArrayList<Book>> getBooks() {
         return this.mBooks;

@@ -43,10 +43,10 @@ public class LibraryRepository {
     /**
      * Constructor for the Library Repository.
      */
-    public LibraryRepository () {
+    public LibraryRepository() {
         db = FirebaseFirestore.getInstance();
         query = db.collection("testRepo");
-        
+
         ArrayList<Book> aBooks = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             aBooks.add(new Book("abcd-1234", "Crafting the interpreter", "https://craftinginterpreters.com/", "me", null));
@@ -59,7 +59,7 @@ public class LibraryRepository {
      * Attach a listener to a QuerySnapshot from Firestore. Listen to any changes in the database
      * and update the books object.
      */
-    public void attachListener () {
+    public void attachListener() {
         registration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -71,8 +71,8 @@ public class LibraryRepository {
 
                 //update the list to reflect changes in the database
                 ArrayList<Book> dbBooks = new ArrayList<>();
-                for (DocumentSnapshot doc: value.getDocuments()) {
-                    dbBooks.add(new Book (doc.getId(), (String)doc.getData().get("Title"), null, null, null));
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    dbBooks.add(new Book(doc.getId(), (String) doc.getData().get("Title"), null, null, null));
                 }
 
                 books.setValue(dbBooks);
@@ -82,11 +82,12 @@ public class LibraryRepository {
 
     /**
      * Save new Book object into the database.
+     *
      * @param book book object to be saved in the database.
      */
-    public void createObject (Book book) {
+    public void createObject(Book book) {
         HashMap<String, String> data = new HashMap<>();
-        if (book.getIsbn().length()>0 && book.getTitle().length()>0) {
+        if (book.getIsbn().length() > 0 && book.getTitle().length() > 0) {
             data.put("Title", book.getTitle());
             db.collection("books").document(book.getIsbn())
                     .set(data)
@@ -107,9 +108,10 @@ public class LibraryRepository {
 
     /**
      * Update the title field of the object in the document.
+     *
      * @param book book object to be saved in the database.
      */
-    public void updateObjectField (Book book) {
+    public void updateObjectField(Book book) {
         db.collection("books").document(book.getIsbn())
                 .update("Title", book.getTitle())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -128,16 +130,17 @@ public class LibraryRepository {
 
     /**
      * Delete book object from the database.
+     *
      * @param book book object to be deleted from the database.
      */
-    public void deleteObject (Book book) {
+    public void deleteObject(Book book) {
         db.collection("books")
                 .document(book.getIsbn())
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                    // These are a method which gets executed when the task is succeeded
+                        // These are a method which gets executed when the task is succeeded
                         Log.d("Delete", "Data has been deleted successfully!");
                     }
                 })
@@ -153,15 +156,16 @@ public class LibraryRepository {
     /**
      * Detach listener when fragment is no longer being viewed.
      */
-    public void detachListener () {
+    public void detachListener() {
         registration.remove();
     }
 
     /**
      * Getter for the books object.
-     * @return LiveData<ArrayList<Book>> This returns the books object.
+     *
+     * @return LiveData<ArrayList < Book>> This returns the books object.
      */
-    public LiveData<ArrayList<Book>> getBooks () {
+    public LiveData<ArrayList<Book>> getBooks() {
         return this.books;
     }
 }
