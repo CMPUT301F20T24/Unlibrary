@@ -37,7 +37,7 @@ public class Book {
      * @param isbn   of book
      * @param title  of book
      * @param author of book
-     * @param owner  unique user identifier of the owner of the book
+     * @param owner unique user identifier of the owner of the book
      * @param photos URL of photos to add, can be null if no photos are added
      */
     public Book(String isbn, String title, String author, String owner, ArrayList<String> photos) {
