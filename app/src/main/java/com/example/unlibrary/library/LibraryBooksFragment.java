@@ -79,11 +79,8 @@ public class LibraryBooksFragment extends Fragment {
             recyclerView.setAdapter(adapter);
 
             // observe LiveData from ViewModel
-            mViewModel.getBooks().observe(getViewLifecycleOwner(), new Observer<ArrayList<Book>>() {
-                @Override
-                public void onChanged(ArrayList<Book> books) {
-                    adapter.setData(books);
-                }
+            mViewModel.getBooks().observe(getViewLifecycleOwner(), books -> {
+                adapter.setData(books);
             });
         }
 
