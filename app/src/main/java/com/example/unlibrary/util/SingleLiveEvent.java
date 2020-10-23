@@ -3,7 +3,7 @@
  *
  * October 18, 2020
  *
- * TODO copyright information
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
 
 package com.example.unlibrary.util;
@@ -13,14 +13,14 @@ package com.example.unlibrary.util;
 
 import android.util.Log;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A lifecycle-aware observable that sends only new updates after subscription, used for events like
@@ -41,7 +41,8 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
 
     /**
      * Implementation for observer interface.
-     * @param owner LifecycleOwner
+     *
+     * @param owner    LifecycleOwner
      * @param observer Observer object
      */
     @MainThread
@@ -61,6 +62,7 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
 
     /**
      * Set the value of the event.
+     *
      * @param t Value to set
      */
     @MainThread
