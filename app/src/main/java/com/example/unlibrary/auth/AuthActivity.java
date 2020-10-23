@@ -3,7 +3,7 @@
  *
  * October 18, 2020
  *
- * TODO copyright information
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
 
 package com.example.unlibrary.auth;
@@ -17,7 +17,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.unlibrary.EntryActivity;
+import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.R;
 
 /**
@@ -30,6 +30,7 @@ public class AuthActivity extends AppCompatActivity {
 
     /**
      * Load AuthViewModel and setup observers on its event streams. Then show the login screen.
+     *
      * @param savedInstanceState saved bundle
      */
     @Override
@@ -41,7 +42,7 @@ public class AuthActivity extends AppCompatActivity {
         mViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
         mViewModel.getFailureMsgEvent().observe(this, this::showToast);
         mViewModel.getAuthenticatedEvent().observe(this, (s) -> {
-            Intent intent = new Intent(this, EntryActivity.class);
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         });
         mViewModel.getFragmentNavigationEvent().observe(this, this::showFragment);
@@ -52,6 +53,7 @@ public class AuthActivity extends AppCompatActivity {
 
     /**
      * Change the fragment that is displayed.
+     *
      * @param fragment Instance of fragment to show
      */
     public void showFragment(Fragment fragment) {
@@ -63,6 +65,7 @@ public class AuthActivity extends AppCompatActivity {
 
     /**
      * Show a toast with a given message.
+     *
      * @param msg Message to display in toast.
      */
     public void showToast(String msg) {

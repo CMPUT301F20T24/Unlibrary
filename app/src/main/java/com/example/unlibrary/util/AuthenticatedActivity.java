@@ -3,7 +3,7 @@
  *
  * October 18, 2020
  *
- * TODO copyright information
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
 
 package com.example.unlibrary.util;
@@ -29,6 +29,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
 
     /**
      * Checks if user is authenticated and if not redirects the app to the AuthActivity.
+     *
      * @param savedInstanceState Saved bundle
      */
     @Override

@@ -38,6 +38,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.google.firebase:firebase-firestore'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -45,6 +46,7 @@ dependencies {
     // Firebase integration
     implementation platform('com.google.firebase:firebase-bom:25.12.0')
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
 
     // ViewModel
     def lifecycle_version = "2.2.0"
@@ -59,5 +61,13 @@ dependencies {
     implementation "com.google.android.material:material:1.2.1"
 
     // Tests
-    testImplementation 'android.arch.core:core-testing:1.0.0-alpha3'
+    testImplementation 'android.arch.core:core-testing:1.1.1'
+
+    // Navigation
+    def nav_version = "2.3.1"
+
+    implementation "androidx.navigation:navigation-fragment:$nav_version"
+    implementation "androidx.navigation:navigation-ui:$nav_version"
+    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 }
