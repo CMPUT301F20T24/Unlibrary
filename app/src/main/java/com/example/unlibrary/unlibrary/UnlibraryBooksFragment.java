@@ -15,11 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.unlibrary.R;
 
 /**
- * A fragment representing a list of Books in Unlibrary page.
+ * A fragment representing a list of books that a user requests and borrows but not owns.
  */
 public class UnlibraryBooksFragment extends Fragment {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
     private UnlibraryViewModel mViewModel;
 
     /**
