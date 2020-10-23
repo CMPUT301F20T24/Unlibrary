@@ -60,23 +60,19 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
-        registration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                // error handling
-                if (error != null) {
-                    Log.w("listen:error", error);
-                    return;
-                }
-
-                //update the list to reflect changes in the database
-                ArrayList<Book> dbBooks = new ArrayList<>();
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    dbBooks.add(new Book(doc.getId(), (String) doc.getData().get("Title"), null, null, null));
-                }
-
-                books.setValue(dbBooks);
+        registration = query.addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.w("listen:error", error);
+                return;
             }
+
+            //update the list to reflect changes in the database
+            ArrayList<Book> dbBooks = new ArrayList<>();
+            for (DocumentSnapshot doc : value.getDocuments()) {
+                dbBooks.add(new Book(doc.getId(), (String) doc.getData().get("Title"), null, null, null));
+            }
+
+            books.setValue(dbBooks);
         });
     }
 
@@ -91,17 +87,11 @@ public class LibraryRepository {
             data.put("Title", book.getTitle());
             db.collection("books").document(book.getIsbn())
                     .set(data)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("Create", "Document succesfully written");
-                        }
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d("Create", "Document succesfully written");
                     })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("Create", "DocumentSnapshot not written", e);
-                        }
+                    .addOnFailureListener(e -> {
+                        Log.w("Create", "DocumentSnapshot not written", e);
                     });
         }
     }
@@ -114,18 +104,12 @@ public class LibraryRepository {
     public void updateObjectField(Book book) {
         db.collection("books").document(book.getIsbn())
                 .update("Title", book.getTitle())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("Create", "Document succesfully Updated");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("Create", "DocumentSnapshot not updated", e);
-                    }
-                });
+                .addOnSuccessListener(aVoid ->
+                        Log.d("Create", "Document succesfully Updated")
+                )
+                .addOnFailureListener(e ->
+                        Log.w("Create", "DocumentSnapshot not updated", e)
+                );
     }
 
     /**
@@ -136,21 +120,12 @@ public class LibraryRepository {
     public void deleteObject(Book book) {
         db.collection("books")
                 .document(book.getIsbn())
-                .delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // These are a method which gets executed when the task is succeeded
-                        Log.d("Delete", "Data has been deleted successfully!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // These are a method which gets executed if there’s any problem
-                        Log.d("Delete", "Data could not be deleted!" + e.toString());
-                    }
-                });
+                .delete().addOnSuccessListener(aVoid ->
+                Log.d("Delete", "Data has been deleted successfully!")
+        )
+                .addOnFailureListener(e ->
+                        Log.d("Delete", "Data could not be deleted!" + e.toString())
+                );
     }
 
     /**
