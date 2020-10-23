@@ -4,12 +4,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.databinding.FragmentLibraryBookBinding;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.util.BookViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,10 +20,20 @@ import java.util.List;
  */
 public class LibraryBooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentLibraryBookBinding>> {
 
-    private final List<Book> mValues;
+    private ArrayList<Book> mValues;
 
-    public LibraryBooksRecyclerViewAdapter(List<Book> items) {
+    public LibraryBooksRecyclerViewAdapter(ArrayList<Book> items) {
         mValues = items;
+    }
+
+    /**
+     * Set the new data for the recycler view and notify the Ui of changes
+     *
+     * @param items new items to be displayed
+     */
+    public void setData(ArrayList<Book> items) {
+        mValues = items;
+        notifyDataSetChanged();
     }
 
     @NonNull
