@@ -17,11 +17,11 @@ import java.util.ArrayList;
 
 /**
  * A fragment representing a list of books. A book source should be specified before the fragment
- * is displayed. Book source must implement {@link CanGetBooks}. Refer to
+ * is displayed. Book source must implement {@link BooksSource}. Refer to
  * {@link com.example.unlibrary.unlibrary.UnlibraryFragment} for example.
  */
 public class BooksFragment extends Fragment {
-    private CanGetBooks mBooksSource;
+    private BooksSource mBooksSource;
     private FragmentBookListBinding mBinding;
 
     /**
@@ -31,7 +31,7 @@ public class BooksFragment extends Fragment {
     public BooksFragment() {
     }
 
-    public void setBooksSource(CanGetBooks booksSource) {
+    public void setBooksSource(BooksSource booksSource) {
         mBooksSource = booksSource;
     }
 

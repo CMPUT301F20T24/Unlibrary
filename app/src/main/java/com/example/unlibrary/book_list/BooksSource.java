@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * Interface that must be implemented by book source passed to BooksFragment
  */
-public interface CanGetBooks {
+public interface BooksSource {
     /**
      * Gets a list of observable books. Typically from a repository.
      *
