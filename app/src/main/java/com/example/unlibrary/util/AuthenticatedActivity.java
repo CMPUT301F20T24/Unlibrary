@@ -29,6 +29,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
 
     /**
      * Checks if user is authenticated and if not redirects the app to the AuthActivity.
+     *
      * @param savedInstanceState Saved bundle
      */
     @Override

@@ -26,6 +26,7 @@ public class MainActivity extends AuthenticatedActivity {
 
     /**
      * Set up data binding and bottom navigation bar.
+     *
      * @param savedInstanceState Saved bundle
      */
     @Override
@@ -43,7 +44,7 @@ public class MainActivity extends AuthenticatedActivity {
      * Retrieves the navigation controller from navigation host fragment and connects with
      * bottom navigation bar
      */
-    public void setUpBottomNavigation(){
+    public void setUpBottomNavigation() {
         // Cannot use view binding for nav host fragment
         // See: https://stackoverflow.com/questions/60733289/navigation-with-view-binding
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);

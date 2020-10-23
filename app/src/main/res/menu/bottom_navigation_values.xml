@@ -5,23 +5,23 @@
         android:id="@+id/libraryFragment"
         android:enabled="true"
         android:icon="@drawable/ic_menu_book_24px"
-        android:title="@string/library_nav"/>
+        android:title="@string/library_nav" />
 
     <item
         android:id="@+id/unlibraryFragment"
         android:enabled="true"
         android:icon="@drawable/ic_library_books_24px"
-        android:title="@string/unlibrary_nav"/>
+        android:title="@string/unlibrary_nav" />
 
     <item
         android:id="@+id/exchangeFragment"
         android:enabled="true"
         android:icon="@drawable/ic_search_24px"
-        android:title="@string/exchange_nav"/>
+        android:title="@string/exchange_nav" />
 
     <item
         android:id="@+id/profileFragment"
         android:enabled="true"
         android:icon="@drawable/ic_person_24px"
-        android:title="@string/profile_nav"/>
+        android:title="@string/profile_nav" />
 </menu>

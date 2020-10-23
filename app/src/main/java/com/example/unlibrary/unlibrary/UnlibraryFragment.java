@@ -26,6 +26,7 @@ public class UnlibraryFragment extends Fragment {
 
     /**
      * TODO: Finalize comment header when more this method is further developed
+     *
      * @param inflater
      * @param container
      * @param savedInstanceState
@@ -34,7 +35,7 @@ public class UnlibraryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = FragmentUnlibraryBinding.inflate(inflater, container,false);
+        mBinding = FragmentUnlibraryBinding.inflate(inflater, container, false);
         return mBinding.getRoot();
     }
 }

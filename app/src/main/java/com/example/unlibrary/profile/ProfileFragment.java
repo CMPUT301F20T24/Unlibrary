@@ -26,6 +26,7 @@ public class ProfileFragment extends Fragment {
 
     /**
      * TODO: Finalize comment header when more this method is further developed
+     *
      * @param inflater
      * @param container
      * @param savedInstanceState
