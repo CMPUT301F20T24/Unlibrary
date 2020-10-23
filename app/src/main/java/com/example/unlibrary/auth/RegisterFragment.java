@@ -3,23 +3,21 @@
  *
  * October 18, 2020
  *
- * TODO copyright information
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
 
 package com.example.unlibrary.auth;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentRegisterBinding;
@@ -41,6 +39,22 @@ public class RegisterFragment extends Fragment {
         FragmentRegisterBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_register, container, false);
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(getViewLifecycleOwner());
+
+        // Setup observers for one-time viewModel events
+        viewModel.getInvalidInputEvent().observe(this, pair ->
+        {
+            switch (pair.first) {
+                case EMAIL:
+                    binding.registerEmailInput.setError(pair.second);
+                    break;
+                case PASSWORD:
+                    binding.registerPasswordInput.setError(pair.second);
+                    break;
+                case USERNAME:
+                    binding.registerUsernameInput.setError(pair.second);
+                    break;
+            }
+        });
 
         return binding.getRoot();
     }
