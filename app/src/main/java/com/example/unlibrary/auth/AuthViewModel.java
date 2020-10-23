@@ -233,6 +233,7 @@ public class AuthViewModel extends ViewModel {
 
     /**
      * Validate an email value.
+     *
      * @param email Email to validate
      * @return Validated email
      * @throws InvalidInputException Thrown when email is invalid
@@ -254,6 +255,7 @@ public class AuthViewModel extends ViewModel {
 
     /**
      * Validate a password value.
+     *
      * @param password Password to validate.
      * @return Validated password.
      * @throws InvalidInputException Thrown when password is invalid
@@ -273,6 +275,7 @@ public class AuthViewModel extends ViewModel {
 
     /**
      * Validate a username value. Does not ensure that the username is globally unique.
+     *
      * @param username Username to validate.
      * @return Validated username
      * @throws InvalidInputException Thrown when username is invalid.
@@ -297,6 +300,7 @@ public class AuthViewModel extends ViewModel {
     public static class InvalidInputException extends Exception {
         /**
          * Constructor for exception.
+         *
          * @param errorMessage Reason that input is invalid
          */
         public InvalidInputException(String errorMessage) {
