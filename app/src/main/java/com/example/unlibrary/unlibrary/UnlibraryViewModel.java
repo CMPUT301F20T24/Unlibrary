@@ -7,6 +7,9 @@ import com.example.unlibrary.models.Book;
 
 import java.util.ArrayList;
 
+/**
+ * Manages the Unlibrary flow business logic. Connects the  fragments to the repository.
+ */
 public class UnlibraryViewModel extends ViewModel {
     private LiveData<ArrayList<Book>> mBooks;
     private UnlibraryRepository mUnlibraryRepository;
