@@ -1,3 +1,11 @@
+/*
+ * LibraryRepository
+ *
+ * October 22, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.library;
 
 import android.util.Log;
@@ -22,14 +30,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-/*
- * LibraryRepository
- *
- * October 22, 2020
- *
- * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
- */
 
 /**
  * Manages all the database interaction for the Library ViewModel.

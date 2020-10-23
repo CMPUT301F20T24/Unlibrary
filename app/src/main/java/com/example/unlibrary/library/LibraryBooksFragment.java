@@ -1,3 +1,11 @@
+/*
+ * LibraryBooksFragment
+ *
+ * October 22, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.library;
 
 import android.content.Context;
@@ -18,14 +26,6 @@ import com.example.unlibrary.R;
 import com.example.unlibrary.models.Book;
 
 import java.util.ArrayList;
-
-/*
- * LibraryBooksFragment
- *
- * October 22, 2020
- *
- * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
- */
 
 /**
  * A fragment representing a list of Items.
@@ -52,7 +52,6 @@ public class LibraryBooksFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

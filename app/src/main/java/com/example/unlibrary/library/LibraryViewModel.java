@@ -1,3 +1,11 @@
+/*
+ * LibraryViewModel
+ *
+ * October 22, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.library;
 
 import androidx.lifecycle.LiveData;
@@ -7,14 +15,6 @@ import androidx.lifecycle.ViewModel;
 import com.example.unlibrary.models.Book;
 
 import java.util.ArrayList;
-
-/*
- * LibraryViewModel
- *
- * October 22, 2020
- *
- * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
- */
 
 /**
  * Manages the Library flow business logic. Connects the library fragments to the repository.
