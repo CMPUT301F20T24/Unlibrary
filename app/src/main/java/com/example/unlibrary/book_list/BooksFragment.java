@@ -13,12 +13,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.databinding.FragmentBookListBinding;
 
+import java.util.ArrayList;
+
 /**
- * A fragment representing a list of books. Extensible to allow navigating to custom fragments in
- * different context (e.g. in LibraryFragment, we want to navigate to DetailedLibraryBookFragment)
+ * A fragment representing a list of books. A book source should be specified before the fragment
+ * is displayed. Book source must implement {@link CanGetBooks}. Refer to
+ * {@link com.example.unlibrary.unlibrary.UnlibraryFragment} for example.
  */
-public abstract class BooksFragment extends Fragment {
-    protected BooksViewModel mViewModel;
+public class BooksFragment extends Fragment {
+    private CanGetBooks mBooksSource;
     private FragmentBookListBinding mBinding;
 
     /**
@@ -28,19 +31,9 @@ public abstract class BooksFragment extends Fragment {
     public BooksFragment() {
     }
 
-    /**
-     * Initialize essential components of the fragment that is retained when the fragment is paused
-     * or stopped, then resumed.
-     *
-     * @param savedInstanceState
-     */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setBooksViewModel();
+    public void setBooksSource(CanGetBooks booksSource) {
+        mBooksSource = booksSource;
     }
-
-    public abstract void setBooksViewModel();
 
     /**
      * Draws the fragment UI
@@ -59,11 +52,15 @@ public abstract class BooksFragment extends Fragment {
 
         view.setLayoutManager(new LinearLayoutManager(context));
 
-        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mViewModel.getBooks().getValue());
+        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource == null ? new ArrayList<>() : mBooksSource.getBooks().getValue());
 
         // Bind ViewModel books to RecyclerViewAdapter
         view.setAdapter(adapter);
-        mViewModel.getBooks().observe(getViewLifecycleOwner(), adapter::setData);
+
+        // Watch changes in bookSource and update the view accordingly
+        if (mBooksSource != null) {
+            mBooksSource.getBooks().observe(getViewLifecycleOwner(), adapter::setData);
+        }
 
         return view;
     }

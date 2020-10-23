@@ -1,8 +1,9 @@
 package com.example.unlibrary.unlibrary;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModel;
 
-import com.example.unlibrary.book_list.BooksViewModel;
+import com.example.unlibrary.book_list.CanGetBooks;
 import com.example.unlibrary.models.Book;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 /**
  * Manages the Unlibrary flow business logic. Connects the  fragments to the repository.
  */
-public class UnlibraryViewModel extends BooksViewModel {
+public class UnlibraryViewModel extends ViewModel implements CanGetBooks {
     private LiveData<ArrayList<Book>> mBooks;
     private UnlibraryRepository mUnlibraryRepository;
 
