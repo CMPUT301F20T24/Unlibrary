@@ -10,4 +10,8 @@
     <string name="email_hint">Email</string>
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
+    <string name="library_nav">Library</string>
+    <string name="unlibrary_nav">Unlibrary</string>
+    <string name="exchange_nav">Exchange</string>
+    <string name="profile_nav">Profile</string>
 </resources>
