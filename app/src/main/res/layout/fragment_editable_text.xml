@@ -4,6 +4,7 @@
 
     <data>
 
+        <!-- TODO: change variable name -->
         <variable
             name="isEditing"
             type="Boolean" />

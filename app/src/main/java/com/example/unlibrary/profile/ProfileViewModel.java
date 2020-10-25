@@ -5,44 +5,52 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class ProfileViewModel extends ViewModel {
-    private MutableLiveData<Boolean> isEditing;
-    private MutableLiveData<String> userName;
-    private MutableLiveData<String> phoneNumber;
-    private MutableLiveData<String> email;
-    private MutableLiveData<String> name;
+    private MutableLiveData<String> mUserName = new MutableLiveData<>();
+    private MutableLiveData<String> mEmail = new MutableLiveData<>();
+    private ProfileRepository mProfileRepository;
 
     public ProfileViewModel() {
-        isEditing = new MutableLiveData<>(false);
-        userName = new MutableLiveData<>("cdiego");
-        name = new MutableLiveData<>("Cyrus Diego");
-        phoneNumber = new MutableLiveData<>("1234567");
-        email = new MutableLiveData<>("fake_email@gmail.com");
-
+        mProfileRepository = new ProfileRepository();
+        mProfileRepository.fetchCurrentUser((s, userName, email) -> {
+            if (s) {
+                mUserName.setValue(userName);
+                mEmail.setValue(email);
+            }
+        });
     }
 
-    // TODO: do the if null thing for mut data
     public MutableLiveData<String> getUserName() {
-        return userName;
-    }
-
-    public MutableLiveData<String> getPhoneNumber() {
-        return phoneNumber;
+        if (mUserName == null) {
+            mUserName = new MutableLiveData<>();
+        }
+        return mUserName;
     }
 
     public MutableLiveData<String> getEmail() {
-        return email;
+        if (mEmail == null) {
+            mEmail = new MutableLiveData<>();
+        }
+        return mEmail;
     }
 
-    public LiveData<Boolean> getIsEditing() {
-        return isEditing;
-    }
 
-    public MutableLiveData<String> getName() {
-        return name;
-    }
+//    public LiveData<Boolean> getIsEditing() {
+////        if (isEditing == null) {
+////            isEditing = new MutableLiveData<>(false);
+////        }
+////        return isEditing;
+//    }
 
-    public void toggleIsEditing() {
-        isEditing.setValue(!isEditing.getValue());
-    }
+//    public void toggleIsEditing() {
+////        isEditing.setValue(!getIsEditing().getValue());
+//
+////        if (toggle) {
+////            mProfileRepository.updateEmail(mEmail.getValue(), isUpdated -> {
+////                isEditing.setValue(!isUpdated);
+////                // do toast notification and error on text field !!
+////            } );
+////        }
+//
+//    }
 
 }
