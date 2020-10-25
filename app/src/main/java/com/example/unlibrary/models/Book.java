@@ -31,6 +31,13 @@ public class Book {
     public Book() {
     }
 
+    public Book(String isbn, String mTitle, String mAuthor, String mStatus) {
+        this.mIsbn = isbn;
+        this.mTitle = mTitle;
+        this.mAuthor = mAuthor;
+        this.mStatus = Status.valueOf(mStatus);
+    }
+
     /**
      * Construct a book and initialize it with a list of photos.
      *
@@ -130,6 +137,10 @@ public class Book {
      */
     public Status getStatus() {
         return mStatus;
+    }
+
+
+    public String stringStatus(){ return mStatus.toString();
     }
 
     /**
