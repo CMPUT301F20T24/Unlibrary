@@ -63,7 +63,7 @@ public class ProfileFragment extends Fragment {
 
     // Editable items: email, profile pic!!
     // TODO ERROR CHECKING FOR UPDATING!!
-    public static class EditingState {
+    public class EditingState {
         private MutableLiveData<Boolean> isEditing;
         public EditingState() {
             isEditing = new MutableLiveData<>(false);
@@ -77,7 +77,10 @@ public class ProfileFragment extends Fragment {
         }
 
         public void editContent() { isEditing.setValue(true); }
-        public void confirmUpdate() { }
+        public void confirmUpdate() {
+            mViewModel.updateProfile();
+            isEditing.setValue(false);
+        }
         public void cancelUpdate() { isEditing.setValue(false); }
     }
 }

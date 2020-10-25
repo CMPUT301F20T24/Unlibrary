@@ -24,6 +24,7 @@ public class ProfileRepository {
 
     private FirebaseUser mFirebaseUser;
     private FirebaseFirestore mDB;
+    private FirebaseAuth mAuth;
     private String mUID;
 
     /**
@@ -32,6 +33,7 @@ public class ProfileRepository {
     public ProfileRepository() {
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         mDB = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         mUID = mFirebaseUser.getUid();
     }
 
@@ -53,10 +55,14 @@ public class ProfileRepository {
     }
 
     public void updateEmail(String email, OnFinishedUpdateEmailListener onFinished) {
-        mDB.collection(USERS_COLLECTION)
-                .document(mUID)
-                .update(EMAIL_FIELD, email)
-                .addOnCompleteListener(task -> onFinished.finished(task.isSuccessful()));
+        mAuth.getCurrentUser().updateEmail(email).addOnCompleteListener(authTask -> {
+            if (authTask.isSuccessful()) {
+                mDB.collection(USERS_COLLECTION)
+                        .document(mUID)
+                        .update(EMAIL_FIELD, email)
+                        .addOnCompleteListener(dbTask -> onFinished.finished(dbTask.isSuccessful()));
+            }
+        });
     }
 
     public interface OnFinishedFetchListener {

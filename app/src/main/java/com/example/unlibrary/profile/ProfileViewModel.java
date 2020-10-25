@@ -33,24 +33,9 @@ public class ProfileViewModel extends ViewModel {
         return mEmail;
     }
 
-
-//    public LiveData<Boolean> getIsEditing() {
-////        if (isEditing == null) {
-////            isEditing = new MutableLiveData<>(false);
-////        }
-////        return isEditing;
-//    }
-
-//    public void toggleIsEditing() {
-////        isEditing.setValue(!getIsEditing().getValue());
-//
-////        if (toggle) {
-////            mProfileRepository.updateEmail(mEmail.getValue(), isUpdated -> {
-////                isEditing.setValue(!isUpdated);
-////                // do toast notification and error on text field !!
-////            } );
-////        }
-//
-//    }
-
+    public void updateProfile() {
+        mProfileRepository.updateEmail(mEmail.getValue(), isUpdated -> {
+                // do toast notification and error on text field !!
+            } );
+    }
 }
