@@ -29,18 +29,34 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:subtitle=""
-            app:title="@{viewmodel.userName}" />
+            app:title="" />
+
+        <include
+            android:id="@+id/username"
+            layout="@layout/fragment_editable_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:content="@={viewmodel.userName}"
+            app:isEditing="@{editstate.isEditing}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileImage"
+            app:title="@{`Username`}" />
 
         <include
             android:id="@+id/email"
             layout="@layout/fragment_editable_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             app:content="@={viewmodel.email}"
             app:isEditing="@{editstate.isEditing}"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage"
+            app:layout_constraintTop_toBottomOf="@+id/username"
             app:title="@{`Email`}" />
 
         <com.google.android.material.button.MaterialButton
@@ -51,7 +67,8 @@
             android:text="@string/logout"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            android:visibility="@{editstate.isEditing ? View.GONE : View.VISIBLE }" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_button"

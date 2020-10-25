@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.unlibrary.databinding.FragmentProfileBinding;
-import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * Host fragment for Profile feature
@@ -29,8 +28,9 @@ public class ProfileFragment extends Fragment {
     private FragmentProfileBinding mBinding;
     private ProfileViewModel mViewModel;
     private EditingState mEditingState;
+
     /**
-     * TODO: Finalize comment header when more this method is further developed
+     * Initialize data binding, viewmodel, and data binding
      *
      * @param inflater
      * @param container
@@ -53,22 +53,31 @@ public class ProfileFragment extends Fragment {
 
     /**
      * User logs out of account and will re-launch AuthActivity to initiate login again
+     * TODO Implement Logout
      */
     public void logout() {
         System.out.println("logged out");
-        // TODO Setup navigation for Auth flow and use Navigation component to go back to AuthActivity
-        // FirebaseAuth auth = FirebaseAuth.getInstance();
-        // auth.signOut();
     }
 
-    // Editable items: email, profile pic!!
-    // TODO ERROR CHECKING FOR UPDATING!!
+    /**
+     * Abstract editing state of profile fragment.
+     * Binds UI to isEditing state and uses view model to update profile
+     */
     public class EditingState {
+
         private MutableLiveData<Boolean> isEditing;
+
+        /**
+         * Initially, user should not be editing profile
+         */
         public EditingState() {
             isEditing = new MutableLiveData<>(false);
         }
 
+        /**
+         * Used for data binding in UI, toggles edit text fields and button placements
+         * @return isEditing
+         */
         public LiveData<Boolean> getIsEditing() {
             if (isEditing == null) {
                 isEditing = new MutableLiveData<>(false);
@@ -76,11 +85,22 @@ public class ProfileFragment extends Fragment {
             return isEditing;
         }
 
+        /**
+         * Bound to the edit_button in profile fragment
+         */
         public void editContent() { isEditing.setValue(true); }
+
+        /**
+         * Bound to cancel_button in profile fragment
+         */
+        public void cancelUpdate() { isEditing.setValue(false); }
+
+        /**
+         * Bound to confirm_button in profile fragment
+         */
         public void confirmUpdate() {
             mViewModel.updateProfile();
             isEditing.setValue(false);
         }
-        public void cancelUpdate() { isEditing.setValue(false); }
     }
 }

@@ -39,22 +39,22 @@ public class ProfileRepository {
 
     public void fetchCurrentUser(OnFinishedFetchListener onFinished) {
         mDB.collection(USERS_COLLECTION)
+                .whereEqualTo(UID_FIELD, mUID)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            String UID = (String) document.getData().get(UID_FIELD);
-                            if (UID != null && UID.equals(mUID)) {
-                                String email = (String) document.getData().get(EMAIL_FIELD);
-                                String username = (String) document.getData().get(USERNAME_FIELD);
-                                onFinished.finished(true, username, email);
-                            }
+                            String email = (String) document.getData().get(EMAIL_FIELD);
+                            String username = (String) document.getData().get(USERNAME_FIELD);
+                            onFinished.finished(true, username, email);
                         }
+                    } else {
+                        // TODO will raise some sort of UI error but this should never happen
                     }
                 });
     }
 
-    public void updateEmail(String email, OnFinishedUpdateEmailListener onFinished) {
+    public void updateEmail(String email, OnFinishedUpdateFieldListener onFinished) {
         mAuth.getCurrentUser().updateEmail(email).addOnCompleteListener(authTask -> {
             if (authTask.isSuccessful()) {
                 mDB.collection(USERS_COLLECTION)
@@ -65,11 +65,18 @@ public class ProfileRepository {
         });
     }
 
+    public void updateUserName(String username, OnFinishedUpdateFieldListener onFinished) {
+        mDB.collection(USERS_COLLECTION)
+                .document(mUID)
+                .update(USERNAME_FIELD, username)
+                .addOnCompleteListener(dbTask -> onFinished.finished(dbTask.isSuccessful()));
+    }
+
     public interface OnFinishedFetchListener {
         void finished(Boolean succeeded, String userName, String email);
     }
 
-    public interface OnFinishedUpdateEmailListener {
+    public interface OnFinishedUpdateFieldListener {
         void finished(Boolean succeeded);
     }
 }
