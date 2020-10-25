@@ -42,15 +42,8 @@ public class MainActivity extends AuthenticatedActivity {
         profileVM = new ProfileViewModel();
 
         setUpBottomNavigation();
-        setupViewModels();
     }
 
-    /**
-     * Do initial setup for all view models
-     */
-    public void setupViewModels(){
-        profileVM.fetchUser();
-    }
 
     /**
      * Retrieves the navigation controller from navigation host fragment and connects with

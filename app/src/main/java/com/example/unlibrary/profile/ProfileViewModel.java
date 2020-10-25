@@ -15,8 +15,8 @@ import androidx.lifecycle.ViewModel;
  */
 public class ProfileViewModel extends ViewModel {
 
-    private MutableLiveData<String> mUserName = new MutableLiveData<>();
-    private MutableLiveData<String> mEmail = new MutableLiveData<>();
+    private MutableLiveData<String> mUserName = new MutableLiveData<>("");
+    private MutableLiveData<String> mEmail = new MutableLiveData<>("");
     private ProfileRepository mProfileRepository;
 
     /**
@@ -24,6 +24,7 @@ public class ProfileViewModel extends ViewModel {
      */
     public ProfileViewModel() {
         mProfileRepository = new ProfileRepository();
+        fetchUser();
     }
 
     /**
@@ -48,6 +49,7 @@ public class ProfileViewModel extends ViewModel {
         return mEmail;
     }
 
+
     /**
      * Update user's profile in repository
      * TODO Be able to edit profile picture
@@ -61,6 +63,9 @@ public class ProfileViewModel extends ViewModel {
         });
     }
 
+    /**
+     * Fetches the current user and sets the username and email
+     */
     public void fetchUser() {
         mProfileRepository.fetchCurrentUser((s, userName, email) -> {
             if (s) {
