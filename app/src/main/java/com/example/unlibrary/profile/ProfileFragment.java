@@ -30,7 +30,7 @@ public class ProfileFragment extends Fragment {
     private EditingState mEditingState;
 
     /**
-     * Initialize data binding, viewmodel, and data binding
+     * Initialize data binding, view model, and data binding
      *
      * @param inflater
      * @param container

@@ -37,6 +37,10 @@ public class ProfileRepository {
         mUID = mFirebaseUser.getUid();
     }
 
+    /**
+     * Gets the current user email and username from firestore
+     * @param onFinished callback to notify completed query
+     */
     public void fetchCurrentUser(OnFinishedFetchListener onFinished) {
         mDB.collection(USERS_COLLECTION)
                 .whereEqualTo(UID_FIELD, mUID)
@@ -54,6 +58,11 @@ public class ProfileRepository {
                 });
     }
 
+    /**
+     * Updates the users email in firebase auth and firestore
+     * @param email new email to update
+     * @param onFinished callback to notify completed task
+     */
     public void updateEmail(String email, OnFinishedUpdateFieldListener onFinished) {
         mAuth.getCurrentUser().updateEmail(email).addOnCompleteListener(authTask -> {
             if (authTask.isSuccessful()) {
@@ -65,6 +74,11 @@ public class ProfileRepository {
         });
     }
 
+    /**
+     * Updates the user's username in firestore
+     * @param username new username to update
+     * @param onFinished callback to notify completed task
+     */
     public void updateUserName(String username, OnFinishedUpdateFieldListener onFinished) {
         mDB.collection(USERS_COLLECTION)
                 .document(mUID)
@@ -72,10 +86,16 @@ public class ProfileRepository {
                 .addOnCompleteListener(dbTask -> onFinished.finished(dbTask.isSuccessful()));
     }
 
+    /**
+     * Callback interface for asynchronous nature of fetching user
+     */
     public interface OnFinishedFetchListener {
         void finished(Boolean succeeded, String userName, String email);
     }
 
+    /**
+     * Callback interface for asynchronous nature of updating user's info
+     */
     public interface OnFinishedUpdateFieldListener {
         void finished(Boolean succeeded);
     }
