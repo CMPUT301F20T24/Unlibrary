@@ -40,7 +40,16 @@ public class MainActivity extends AuthenticatedActivity {
         setContentView(view);
 
         profileVM = new ProfileViewModel();
+
         setUpBottomNavigation();
+        setupViewModels();
+    }
+
+    /**
+     * Do initial setup for all view models
+     */
+    public void setupViewModels(){
+        profileVM.fetchUser();
     }
 
     /**

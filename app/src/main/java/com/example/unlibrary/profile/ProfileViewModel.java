@@ -24,12 +24,6 @@ public class ProfileViewModel extends ViewModel {
      */
     public ProfileViewModel() {
         mProfileRepository = new ProfileRepository();
-        mProfileRepository.fetchCurrentUser((s, userName, email) -> {
-            if (s) {
-                mUserName.setValue(userName);
-                mEmail.setValue(email);
-            }
-        });
     }
 
     /**
@@ -64,6 +58,15 @@ public class ProfileViewModel extends ViewModel {
             } );
         mProfileRepository.updateUserName(mUserName.getValue(), isUpdate -> {
             // TODO: update UI to show update success or err
+        });
+    }
+
+    public void fetchUser() {
+        mProfileRepository.fetchCurrentUser((s, userName, email) -> {
+            if (s) {
+                mUserName.setValue(userName);
+                mEmail.setValue(email);
+            }
         });
     }
 }
