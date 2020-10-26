@@ -31,6 +31,16 @@ public class Book {
     public Book() {
     }
 
+    /**
+     * TODO: delete this constructor once determined how to store images taken by the camera
+     * TODO: link logged in user with the owner of books to modify the book lists in each fragment
+     * Constructor a book for cardviews
+     * @param isbn
+     * @param mTitle
+     * @param mAuthor
+     * @param mStatus
+     */
+
     public Book(String isbn, String mTitle, String mAuthor, String mStatus) {
         this.mIsbn = isbn;
         this.mTitle = mTitle;
@@ -139,7 +149,10 @@ public class Book {
         return mStatus;
     }
 
-
+    /**
+     * Returns the current status of the book in string
+     * @return
+     */
     public String stringStatus(){ return mStatus.toString();
     }
 

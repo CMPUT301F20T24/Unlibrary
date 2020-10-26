@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
-        <variable name="book" type="com.example.unlibrary.models.Book"/>
-        <!--       <import type="com.example.unlibrary.models.Book"/>-->
-        <!--       <import type="com.example.unlibrary.models.Book.Status"/>-->
-        <!--       <import type="android.view.View" />-->
+
+        <variable
+            name="book"
+            type="com.example.unlibrary.models.Book" />
     </data>
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/item_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
         android:checkable="true"
         android:clickable="true"
         android:focusable="true"
         app:cardElevation="5dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="150dp"
@@ -71,8 +74,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
-                    android:text="@{book.stringStatus()}"
                     android:layout_marginRight="5dp"
+                    android:text="@{book.stringStatus()}"
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     app:chipIcon="@drawable/status_color"
