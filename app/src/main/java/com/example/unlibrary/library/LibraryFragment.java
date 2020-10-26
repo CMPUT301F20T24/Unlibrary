@@ -24,9 +24,16 @@ public class LibraryFragment extends Fragment {
     private FragmentLibraryBinding mBinding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
+
+        mBinding.scanBarcodeButton.setOnClickListener(v -> {
+            // TODO
+        });
+        mBinding.takePictureButton.setOnClickListener(v -> {
+            // TODO
+        });
+
         return mBinding.getRoot();
     }
 }
