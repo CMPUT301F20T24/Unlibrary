@@ -43,6 +43,8 @@ public class ProfileFragment extends Fragment {
         mViewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
         mEditingState = new EditingState();
 
+        mViewModel.fetchUser();
+
         mBinding.setViewmodel(mViewModel);
         mBinding.setEditstate(mEditingState);
         mBinding.logoutButton.setOnClickListener(view -> logout());

@@ -22,19 +22,16 @@ public class ProfileRepository {
     private final String EMAIL_FIELD = "email";
     private final String USERNAME_FIELD = "username";
 
-    private FirebaseUser mFirebaseUser;
     private FirebaseFirestore mDB;
     private FirebaseAuth mAuth;
     private String mUID;
 
     /**
-     * Constructor for the Profile Repository
+     * Get instances of firestore database and firebase auth
      */
     public ProfileRepository() {
-        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         mDB = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        mUID = mFirebaseUser.getUid();
     }
 
     /**
@@ -43,6 +40,8 @@ public class ProfileRepository {
      * @param onFinished callback to notify completed query
      */
     public void fetchCurrentUser(OnFinishedFetchListener onFinished) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        mUID = user.getUid();
         mDB.collection(USERS_COLLECTION)
                 .whereEqualTo(UID_FIELD, mUID)
                 .get()

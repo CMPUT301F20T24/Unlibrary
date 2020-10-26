@@ -17,14 +17,12 @@ public class ProfileViewModel extends ViewModel {
 
     private MutableLiveData<String> mUserName = new MutableLiveData<>("");
     private MutableLiveData<String> mEmail = new MutableLiveData<>("");
-    private ProfileRepository mProfileRepository;
+    private ProfileRepository mProfileRepository = new ProfileRepository();
 
     /**
-     * Initialize Profile repository and fetches current user information from repo
+     * Constructs Profile ViewModel
      */
     public ProfileViewModel() {
-        mProfileRepository = new ProfileRepository();
-        fetchUser();
     }
 
     /**
