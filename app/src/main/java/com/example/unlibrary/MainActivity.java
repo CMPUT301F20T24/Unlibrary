@@ -7,12 +7,12 @@
  */
 package com.example.unlibrary;
 
+import android.os.Bundle;
+import android.view.View;
+
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
-
-import android.os.Bundle;
-import android.view.View;
 
 import com.example.unlibrary.databinding.ActivityMainBinding;
 import com.example.unlibrary.profile.ProfileViewModel;
@@ -24,7 +24,7 @@ import com.example.unlibrary.util.AuthenticatedActivity;
 public class MainActivity extends AuthenticatedActivity {
 
     private ActivityMainBinding mBinding;
-    private ProfileViewModel profileVM;
+    private ProfileViewModel mProfileVM;
 
     /**
      * Set up data binding and bottom navigation bar.
@@ -39,11 +39,10 @@ public class MainActivity extends AuthenticatedActivity {
         View view = mBinding.getRoot();
         setContentView(view);
 
-        profileVM = new ProfileViewModel();
+        mProfileVM = new ProfileViewModel();
 
         setUpBottomNavigation();
     }
-
 
     /**
      * Retrieves the navigation controller from navigation host fragment and connects with
