@@ -39,6 +39,7 @@ public class ProfileRepository {
 
     /**
      * Gets the current user email and username from firestore
+     *
      * @param onFinished callback to notify completed query
      */
     public void fetchCurrentUser(OnFinishedFetchListener onFinished) {
@@ -60,7 +61,8 @@ public class ProfileRepository {
 
     /**
      * Updates the users email in firebase auth and firestore
-     * @param email new email to update
+     *
+     * @param email      new email to update
      * @param onFinished callback to notify completed task
      */
     public void updateEmail(String email, OnFinishedUpdateFieldListener onFinished) {
@@ -76,7 +78,8 @@ public class ProfileRepository {
 
     /**
      * Updates the user's username in firestore
-     * @param username new username to update
+     *
+     * @param username   new username to update
      * @param onFinished callback to notify completed task
      */
     public void updateUserName(String username, OnFinishedUpdateFieldListener onFinished) {

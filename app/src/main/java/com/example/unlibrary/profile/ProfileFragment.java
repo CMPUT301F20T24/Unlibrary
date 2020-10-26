@@ -8,15 +8,14 @@
 package com.example.unlibrary.profile;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.unlibrary.databinding.FragmentProfileBinding;
 
@@ -76,6 +75,7 @@ public class ProfileFragment extends Fragment {
 
         /**
          * Used for data binding in UI, toggles edit text fields and button placements
+         *
          * @return isEditing
          */
         public LiveData<Boolean> getIsEditing() {
@@ -88,12 +88,16 @@ public class ProfileFragment extends Fragment {
         /**
          * Bound to the edit_button in profile fragment
          */
-        public void editContent() { isEditing.setValue(true); }
+        public void editContent() {
+            isEditing.setValue(true);
+        }
 
         /**
          * Bound to cancel_button in profile fragment
          */
-        public void cancelUpdate() { isEditing.setValue(false); }
+        public void cancelUpdate() {
+            isEditing.setValue(false);
+        }
 
         /**
          * Bound to confirm_button in profile fragment

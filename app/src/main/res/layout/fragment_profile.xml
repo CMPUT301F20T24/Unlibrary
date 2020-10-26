@@ -7,6 +7,7 @@
         <variable
             name="viewmodel"
             type="com.example.unlibrary.profile.ProfileViewModel" />
+
         <variable
             name="editstate"
             type="com.example.unlibrary.profile.ProfileFragment.EditingState" />
@@ -65,22 +66,22 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
             android:text="@string/logout"
+            android:visibility="@{editstate.isEditing ? View.GONE : View.VISIBLE }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:visibility="@{editstate.isEditing ? View.GONE : View.VISIBLE }" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_edit_24px"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage"
-            android:translationY="-30dp"
             android:layout_marginEnd="30dp"
+            android:onClick="@{() -> editstate.editContent()}"
+            android:src="@drawable/ic_edit_24px"
+            android:translationY="-30dp"
             android:visibility="@{editstate.isEditing ? View.GONE : View.VISIBLE }"
-            android:onClick="@{() -> editstate.editContent()}"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profileImage" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/confirm_button"

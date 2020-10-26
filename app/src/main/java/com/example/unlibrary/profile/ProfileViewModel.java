@@ -29,6 +29,7 @@ public class ProfileViewModel extends ViewModel {
 
     /**
      * Gets mutable live data to facilitate two way binding username
+     *
      * @return username
      */
     public MutableLiveData<String> getUserName() {
@@ -40,6 +41,7 @@ public class ProfileViewModel extends ViewModel {
 
     /**
      * Gets mutable live data to facilitate two way binding email
+     *
      * @return email
      */
     public MutableLiveData<String> getEmail() {
@@ -57,7 +59,7 @@ public class ProfileViewModel extends ViewModel {
     public void updateProfile() {
         mProfileRepository.updateEmail(mEmail.getValue(), isUpdated -> {
             // TODO: update UI to show update success or error
-            } );
+        });
         mProfileRepository.updateUserName(mUserName.getValue(), isUpdate -> {
             // TODO: update UI to show update success or err
         });

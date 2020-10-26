@@ -8,7 +8,6 @@
 
 package com.example.unlibrary.profile;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,15 +17,15 @@ import static org.junit.Assert.assertEquals;
  */
 public class ProfileViewModelTest {
 
-    private ProfileViewModel mViewModel;
-    private ProfileRepository mRepo;
-
-    @Before
-    public void setup() {
-        mViewModel = new ProfileViewModel();
-        mRepo = new ProfileRepository();
-
-    }
+//    private ProfileViewModel mViewModel;
+//    private ProfileRepository mRepo;
+//
+//    @Before
+//    public void setup() {
+//        mViewModel = new ProfileViewModel();
+//        mRepo = new ProfileRepository();
+//
+//    }
 
     @Test
     public void test() {
