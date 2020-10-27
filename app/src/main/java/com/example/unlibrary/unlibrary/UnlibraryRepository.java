@@ -10,16 +10,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
+/**
+ * Manages all the database interaction for {@link UnlibraryViewModel}
+ */
 public class UnlibraryRepository {
-    private final String mTag = "UNLIBRARY_REPOSITORY";
-    private final String mDevCollection = "devBooks";
+    private final static String mTag = "UNLIBRARY_REPOSITORY";
+    // TODO: Rename to "books" or "Books" when current "Books" collection in Firestore is safe to delete
+    private final static String mCollectionName = "devBooks";
 
     private FirebaseFirestore mDb;
     private MutableLiveData<ArrayList<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
 
+    /**
+     * Constructor for UnlibraryRepository. Sets up Firestore
+     */
     public UnlibraryRepository() {
         mDb = FirebaseFirestore.getInstance();
-        mDb.collection(mDevCollection).addSnapshotListener((snapshot, error) -> {
+        mDb.collection(mCollectionName).addSnapshotListener((snapshot, error) -> {
             if (error != null) {
                 Log.w(mTag, error);
             }
@@ -36,12 +43,23 @@ public class UnlibraryRepository {
         });
     }
 
+    /**
+     * Gets an observable list of books that are requested or borrowed by the current user.
+     *
+     * @return observable list of books
+     */
     public MutableLiveData<ArrayList<Book>> getBooks() {
         return mBooks;
     }
 
+    /**
+     * Adds a new book entry in Firestore. This book entry does not need to have an id, this id
+     * will be automatically generated in Firestore backend.
+     *
+     * @param book new book to add
+     */
     public void addBook(Book book) {
-        mDb.collection(mDevCollection).add(book).addOnSuccessListener(documentReference -> {
+        mDb.collection(mCollectionName).add(book).addOnSuccessListener(documentReference -> {
             Log.d(mTag, "Success uploading book " + book.getTitle());
         }).addOnFailureListener(e -> {
             Log.w(mTag, "Unable to upload book " + book.getTitle(), e);
@@ -49,8 +67,13 @@ public class UnlibraryRepository {
 
     }
 
+    /**
+     * Removes a book entry from Firestore.
+     *
+     * @param book book to delete
+     */
     public void removeBook(Book book) {
-        mDb.collection(mDevCollection).document(book.getId()).delete().addOnSuccessListener(aVoid -> {
+        mDb.collection(mCollectionName).document(book.getId()).delete().addOnSuccessListener(aVoid -> {
             Log.d(mTag, "Successfully removed book " + book.getTitle());
         }).addOnFailureListener(e -> {
             Log.w(mTag, "Unable to remove book " + book.getTitle());

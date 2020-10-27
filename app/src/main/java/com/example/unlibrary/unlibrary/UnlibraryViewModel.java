@@ -16,13 +16,12 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
     private UnlibraryRepository mUnlibraryRepository;
 
     /**
-     * Constructor for the Library ViewModel. Instantiates listener to Firestore.
+     * Constructor for the UnLibrary ViewModel. Binds the list of books to return from the
+     * repository.
      */
     public UnlibraryViewModel() {
         mUnlibraryRepository = new UnlibraryRepository();
-        for (int i = 0; i < 10; i++) {
-            mUnlibraryRepository.addBook(new Book("abcd-1234", "Hello world", "me", "me", null));
-        }
+        mBooks = mUnlibraryRepository.getBooks();
     }
 
     /**
@@ -31,6 +30,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
      * @return list of observable books
      */
     public LiveData<ArrayList<Book>> getBooks() {
-        return mUnlibraryRepository.getBooks();
+        return mBooks;
     }
 }
