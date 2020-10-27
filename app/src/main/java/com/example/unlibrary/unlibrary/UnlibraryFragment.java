@@ -29,8 +29,8 @@ public class UnlibraryFragment extends Fragment {
     private FragmentUnlibraryBinding mBinding;
 
     /**
-     * Initialize essential components of the fragment that you want to retain when the fragment is
-     * paused or stopped, then resumed
+     * Initialize ViewModel of the fragment that you want to retain when the fragment is
+     * paused or stopped, then resumed.
      *
      * @param savedInstanceState
      */
@@ -41,7 +41,8 @@ public class UnlibraryFragment extends Fragment {
     }
 
     /**
-     * Draws the fragment UI
+     * Draws the fragment UI. Sets the {@link com.example.unlibrary.book_list.BooksSource} to the
+     * child {@link BooksFragment}.
      *
      * @param inflater
      * @param container
@@ -53,8 +54,7 @@ public class UnlibraryFragment extends Fragment {
                              Bundle savedInstanceState) {
         mBinding = FragmentUnlibraryBinding.inflate(inflater, container, false);
 
-        // TODO: Remove
-        // Dummy function to illustrate how the fragments can be customized to suit its needs
+        // TODO: Remove dummy function to illustrate how the fragments can be customized to suit its needs
         mBinding.setVariable(BR.filterButtonClickListener, (View.OnClickListener) view ->
                 Toast.makeText(getContext(), "Filter button clicked", Toast.LENGTH_LONG).show());
 

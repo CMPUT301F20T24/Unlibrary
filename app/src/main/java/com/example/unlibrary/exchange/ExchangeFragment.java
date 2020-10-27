@@ -26,6 +26,12 @@ public class ExchangeFragment extends Fragment {
     private ExchangeViewModel mViewModel;
     private FragmentExchangeBinding mBinding;
 
+    /**
+     * Initialize ViewModel of the fragment that you want to retain when the fragment is
+     * paused or stopped, then resumed.
+     *
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +39,8 @@ public class ExchangeFragment extends Fragment {
     }
 
     /**
-     * TODO: Finalize comment header when more this method is further developed
+     * Draws the fragment UI. Sets the {@link com.example.unlibrary.book_list.BooksSource} to the
+     * child {@link BooksFragment}.
      *
      * @param inflater
      * @param container
