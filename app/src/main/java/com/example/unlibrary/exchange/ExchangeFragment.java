@@ -35,8 +35,7 @@ public class ExchangeFragment extends Fragment {
      * @return
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentExchangeBinding.inflate(inflater, container, false);
         return mBinding.getRoot();
     }
