@@ -9,6 +9,8 @@ package com.example.unlibrary.library;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -24,13 +26,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
+import com.google.android.gms.tasks.Task;
+import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.BarcodeScanner;
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
+import com.google.mlkit.vision.barcode.BarcodeScanning;
+import com.google.mlkit.vision.common.InputImage;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -50,6 +60,7 @@ public class LibraryFragment extends Fragment {
         // TODO
         if (result) {
             System.out.println("IT WORKED");
+            scanBarcode();
         } else {
             System.out.println("IT DIDN'T WORK");
         }
@@ -135,5 +146,48 @@ public class LibraryFragment extends Fragment {
 
         Bitmap bitmap = BitmapFactory.decodeFile(pictureImagePath, bmOptions);
         imageView.setImageBitmap(bitmap);
+    }
+
+    private void scanBarcode() {
+        InputImage image = null;
+        try {
+            image = InputImage.fromFilePath(getActivity().getApplicationContext(), barcodeImageUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        BarcodeScannerOptions options =
+                new BarcodeScannerOptions.Builder()
+                        .setBarcodeFormats(
+                                Barcode.FORMAT_EAN_8,
+                                Barcode.FORMAT_EAN_13)
+                        .build();
+
+        BarcodeScanner scanner = BarcodeScanning.getClient(options);
+
+        Task<List<Barcode>> result = scanner.process(image)
+                .addOnSuccessListener(barcodes -> {
+                    // Task completed successfully
+                    // ...
+                    for (Barcode barcode: barcodes) {
+                        Rect bounds = barcode.getBoundingBox();
+                        Point[] corners = barcode.getCornerPoints();
+
+                        String rawValue = barcode.getRawValue();
+
+                        int valueType = barcode.getValueType();
+                        // See API reference for complete list of supported types
+                        if (valueType == Barcode.TYPE_ISBN) {
+                            String isbn = barcode.getDisplayValue();
+                            mBinding.isbn.setText(isbn);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Task failed with an exception
+                    // ...
+                    System.out.println("FAILED TO SCAN");
+                });
     }
 }
