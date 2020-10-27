@@ -14,4 +14,5 @@
     <string name="unlibrary_nav">Unlibrary</string>
     <string name="exchange_nav">Exchange</string>
     <string name="profile_nav">Profile</string>
+    <string name="search_bar_hint">Search for books to borrow...</string>
 </resources>

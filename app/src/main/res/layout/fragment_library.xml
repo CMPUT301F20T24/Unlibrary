@@ -9,14 +9,10 @@
         android:layout_height="match_parent"
         tools:context=".library.LibraryFragment">
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/list"
             android:name="com.example.unlibrary.library.LibraryBooksFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
+            style="@style/FullScreenFragment"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
