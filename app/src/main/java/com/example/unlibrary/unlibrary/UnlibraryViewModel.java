@@ -20,7 +20,9 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
      */
     public UnlibraryViewModel() {
         mUnlibraryRepository = new UnlibraryRepository();
-        mBooks = mUnlibraryRepository.getBooks();
+        for (int i = 0; i < 10; i++) {
+            mUnlibraryRepository.addBook(new Book("abcd-1234", "Hello world", "me", "me", null));
+        }
     }
 
     /**
@@ -29,6 +31,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
      * @return list of observable books
      */
     public LiveData<ArrayList<Book>> getBooks() {
-        return this.mBooks;
+        return mUnlibraryRepository.getBooks();
     }
 }
