@@ -21,9 +21,8 @@ import java.util.ArrayList;
  * Manages all the database interaction for {@link UnlibraryViewModel}
  */
 public class UnlibraryRepository {
-    private final static String mTag = "UNLIBRARY_REPOSITORY";
-    // TODO: Rename to "books" or "Books" when current "Books" collection in Firestore is safe to delete
-    private final static String mCollectionName = "devBooks";
+    private final static String TAG = "UNLIBRARY_REPOSITORY";
+    private final static String BOOK_COLLECTION = "Books";
 
     private FirebaseFirestore mDb;
     private MutableLiveData<ArrayList<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
@@ -33,9 +32,9 @@ public class UnlibraryRepository {
      */
     public UnlibraryRepository() {
         mDb = FirebaseFirestore.getInstance();
-        mDb.collection(mCollectionName).addSnapshotListener((snapshot, error) -> {
+        mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshot, error) -> {
             if (error != null) {
-                Log.w(mTag, error);
+                Log.w(TAG, error);
             }
 
             ArrayList<Book> books = new ArrayList<>();
@@ -66,10 +65,10 @@ public class UnlibraryRepository {
      * @param book new book to add
      */
     public void addBook(Book book) {
-        mDb.collection(mCollectionName).add(book).addOnSuccessListener(documentReference -> {
-            Log.d(mTag, "Success uploading book " + book.getTitle());
+        mDb.collection(BOOK_COLLECTION).add(book).addOnSuccessListener(documentReference -> {
+            Log.d(TAG, "Success uploading book " + book.getTitle());
         }).addOnFailureListener(e -> {
-            Log.w(mTag, "Unable to upload book " + book.getTitle(), e);
+            Log.w(TAG, "Unable to upload book " + book.getTitle(), e);
         });
 
     }
@@ -80,10 +79,10 @@ public class UnlibraryRepository {
      * @param book book to delete
      */
     public void removeBook(Book book) {
-        mDb.collection(mCollectionName).document(book.getId()).delete().addOnSuccessListener(aVoid -> {
-            Log.d(mTag, "Successfully removed book " + book.getTitle());
+        mDb.collection(BOOK_COLLECTION).document(book.getId()).delete().addOnSuccessListener(aVoid -> {
+            Log.d(TAG, "Successfully removed book " + book.getTitle());
         }).addOnFailureListener(e -> {
-            Log.w(mTag, "Unable to remove book " + book.getTitle());
+            Log.w(TAG, "Unable to remove book " + book.getTitle());
         });
     }
 }

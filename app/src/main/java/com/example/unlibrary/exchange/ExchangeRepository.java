@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -53,13 +54,16 @@ public class ExchangeRepository {
                 Log.w("LISTEN:ERROR", error);
                 return;
             }
-            //update the list to reflect changes in the database
+
+            // Update the list to reflect changes in the database
             ArrayList<Book> dbBooks = new ArrayList<>();
             for (DocumentSnapshot doc : value.getDocuments()) {
-                // only show the book with AVAILABLE or REQUESTED status for exchange
+                // Only show the book with AVAILABLE or REQUESTED status for exchange
                 // TODO: change this to get image urls and user ids to customize the exchange list
-                if (doc.getData().get(STATUS).equals("AVAILABLE") || doc.getData().get(STATUS).equals("REQUESTED")) {
-                    dbBooks.add(new Book(doc.getId(), (String) doc.getData().get(TITLE), (String) doc.getData().get(AUTHOR), (String) doc.getData().get(STATUS)));
+                Book book = doc.toObject(Book.class);
+                if (book.getStatus() == Book.Status.AVAILABLE && book.getStatus() != Book.Status.REQUESTED
+                        && !book.getOwner().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    dbBooks.add(book);
                 }
             }
             mBooks.setValue(dbBooks);

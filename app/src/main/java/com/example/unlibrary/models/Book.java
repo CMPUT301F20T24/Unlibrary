@@ -220,7 +220,7 @@ public class Book {
     }
 
     // TODO: Check if there's a better way of holding this information without making another fetch request to the database to retrieve Requests
-    enum Status {
+    public enum Status {
         AVAILABLE,
         REQUESTED,
         ACCEPTED,
