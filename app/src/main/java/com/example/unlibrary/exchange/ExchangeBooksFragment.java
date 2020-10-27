@@ -38,19 +38,19 @@ public class ExchangeBooksFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ExchangeBooksFragment() {
-    }
+//    public ExchangeBooksFragment() {
+//    }
 
     /**
      * Called when exchange activity is started
      *
      * @param savedInstanceState
      */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(requireActivity()).get(ExchangeViewModel.class);
-    }
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        mViewModel = new ViewModelProvider(requireActivity()).get(ExchangeViewModel.class);
+//    }
 
     /**
      * Access ExchangeViewModel and setup data-binding and observer for changes to books.
@@ -59,6 +59,7 @@ public class ExchangeBooksFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mViewModel = new ViewModelProvider(requireActivity()).get(ExchangeViewModel.class);
         View view = inflater.inflate(R.layout.fragment_library_book_list, container, false);
 
         if (view instanceof RecyclerView) {

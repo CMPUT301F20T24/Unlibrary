@@ -24,19 +24,23 @@ import java.util.ArrayList;
  * Manages all the database interaction for the ExchangeViewModel.
  */
 public class ExchangeRepository {
+    private static final String BOOKS_COLLECTION = "books";
+    private static final String STATUS = "mStatus";
+    private static final String TITLE = "mTitle";
+    private static final String AUTHOR = "mAuthor";
 
-    FirebaseFirestore db;
-    Query query;
+    FirebaseFirestore mdb;
+    Query mQuery;
     ListenerRegistration registration;
-    MutableLiveData<ArrayList<Book>> books;
+    MutableLiveData<ArrayList<Book>> mBooks;
 
     /**
      * Constructor for the Exchange Repository.
      */
     public ExchangeRepository() {
-        db = FirebaseFirestore.getInstance();
-        query = db.collection("Books");
-        books = new MutableLiveData<>(new ArrayList<Book>());
+        mdb = FirebaseFirestore.getInstance();
+        mQuery = mdb.collection(BOOKS_COLLECTION);
+        mBooks = new MutableLiveData<>(new ArrayList<Book>());
     }
 
     /**
@@ -44,9 +48,9 @@ public class ExchangeRepository {
      * and updates books object
      */
     public void attachListener() {
-        registration = query.addSnapshotListener((value, error) -> {
+        registration = mQuery.addSnapshotListener((value, error) -> {
             if (error != null) {
-                Log.w("listen:error", error);
+                Log.w("LISTEN:ERROR", error);
                 return;
             }
             //update the list to reflect changes in the database
@@ -54,11 +58,11 @@ public class ExchangeRepository {
             for (DocumentSnapshot doc : value.getDocuments()) {
                 // only show the book with AVAILABLE or REQUESTED status for exchange
                 // TODO: change this to get image urls and user ids to customize the exchange list
-                if (doc.getData().get("mStatus").equals("AVAILABLE") || doc.getData().get("mStatus").equals("REQUESTED")) {
-                    dbBooks.add(new Book(doc.getId(), (String) doc.getData().get("mTitle"), (String) doc.getData().get("mAuthor"), (String) doc.getData().get("mStatus")));
+                if (doc.getData().get(STATUS).equals("AVAILABLE") || doc.getData().get(STATUS).equals("REQUESTED")) {
+                    dbBooks.add(new Book(doc.getId(), (String) doc.getData().get(TITLE), (String) doc.getData().get(AUTHOR), (String) doc.getData().get(STATUS)));
                 }
             }
-            books.setValue(dbBooks);
+            mBooks.setValue(dbBooks);
         });
     }
 
@@ -75,7 +79,7 @@ public class ExchangeRepository {
      * @return LiveData<ArrayList < Book>> This returns the books object.
      */
     public LiveData<ArrayList<Book>> getBooks() {
-        return this.books;
+        return this.mBooks;
     }
 }
 

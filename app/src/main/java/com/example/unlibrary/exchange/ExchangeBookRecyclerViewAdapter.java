@@ -25,10 +25,18 @@ import java.util.ArrayList;
 public class ExchangeBookRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentLibraryBookBinding>> {
     private ArrayList<Book> mValues;
 
+    /**
+     * Constructor for the exchange recyclerview adapter
+     *
+     * @param items
+     */
     public ExchangeBookRecyclerViewAdapter(ArrayList<Book> items) {
         mValues = items;
     }
 
+    /**
+     * sets the collection of books to recyclerview
+     */
     public void setData(ArrayList<Book> items) {
         mValues = items;
         notifyDataSetChanged();

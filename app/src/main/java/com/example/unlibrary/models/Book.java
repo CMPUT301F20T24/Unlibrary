@@ -153,8 +153,7 @@ public class Book {
      * Returns the current status of the book in string
      * @return
      */
-    public String stringStatus(){ return mStatus.toString();
-    }
+    public String stringStatus(){ return mStatus.toString(); }
 
     /**
      * Updates the state of the book.
