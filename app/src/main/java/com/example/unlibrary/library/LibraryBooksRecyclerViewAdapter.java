@@ -1,10 +1,17 @@
+/*
+ * LibraryBooksRecyclerViewAdapter
+ *
+ * October 22, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.library;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.databinding.FragmentLibraryBookBinding;
@@ -12,7 +19,6 @@ import com.example.unlibrary.models.Book;
 import com.example.unlibrary.util.BookViewHolder;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Book}.

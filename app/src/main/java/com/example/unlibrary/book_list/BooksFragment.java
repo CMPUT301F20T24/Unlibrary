@@ -1,5 +1,12 @@
-package com.example.unlibrary.book_list;
+/*
+ * BooksFragment
+ *
+ * October 27, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 
+package com.example.unlibrary.book_list;
 
 import android.content.Context;
 import android.os.Bundle;
