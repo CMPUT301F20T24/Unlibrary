@@ -8,14 +8,18 @@
 
 package com.example.unlibrary.models;
 
+import com.google.firebase.firestore.DocumentId;
+
 import java.util.ArrayList;
 
 /**
- * Represents a book in our application domain.
+ * Represents a book in our application domain. Book is a pure POJO class (getters and setters only)
+ * so that it can be used as a custom object when interacting with Firestore.
  * <p>
  * TODO: Link and retrieve ID from Firestore
  */
 public class Book {
+
     private String mId;
     private String mIsbn;
     private String mTitle;
@@ -59,8 +63,24 @@ public class Book {
      *
      * @return book's unique identifier
      */
+    @DocumentId
     public String getId() {
         return mId;
+    }
+
+    /**
+     * Updates the unique identifier of the book. Should not be called explicitly in code. This is
+     * called automatically when {@link com.google.firebase.firestore.DocumentSnapshot#toObject(Class)}
+     * is called when retrieving documents from Firestore.
+     *
+     * @param id updated unique identifier of book
+     */
+    public void setId(String id) {
+        if (mId != null) {
+            throw new IllegalArgumentException("ID has already been initialized");
+        }
+
+        mId = id;
     }
 
     /**
@@ -91,31 +111,12 @@ public class Book {
     }
 
     /**
-     * Adds a single photo to the list of photos associated with the book.
+     * Updates the list of photo URLs associated with this book. Can only be done by the book owner.
      *
-     * @param photo url to add
+     * @param photos updated list of photo URLs
      */
-    public void addPhoto(String photo) {
-        mPhotos.add(photo);
-    }
-
-    /**
-     * Adds multiple photos tot he list of photos associated with the book.
-     *
-     * @param photos list of photo urls to add
-     */
-    public void addPhotos(ArrayList<String> photos) {
-        mPhotos.addAll(photos);
-    }
-
-    /**
-     * Dissociates the given photo from the book if it is already associated with the book,
-     * does nothing otherwise.
-     *
-     * @param photo url to remove
-     */
-    public void removePhoto(String photo) {
-        mPhotos.remove(photo);
+    public void setPhotos(ArrayList<String> photos) {
+        mPhotos = photos;
     }
 
     /**
@@ -171,6 +172,10 @@ public class Book {
      */
     public String getOwner() {
         return mOwner;
+    }
+
+    public void setOwner(String owner) {
+        mOwner = owner;
     }
 
     /**
