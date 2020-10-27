@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * Manages all the database interaction for the ExchangeViewModel.
  */
 public class ExchangeRepository {
-    private static final String BOOKS_COLLECTION = "books";
+    private static final String BOOKS_COLLECTION = "Books";
     private static final String STATUS = "mStatus";
     private static final String TITLE = "mTitle";
     private static final String AUTHOR = "mAuthor";

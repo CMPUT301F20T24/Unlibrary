@@ -27,7 +27,6 @@ public class ExchangeBookRecyclerViewAdapter extends RecyclerView.Adapter<BookVi
 
     /**
      * Constructor for the exchange recyclerview adapter
-     *
      * @param items
      */
     public ExchangeBookRecyclerViewAdapter(ArrayList<Book> items) {

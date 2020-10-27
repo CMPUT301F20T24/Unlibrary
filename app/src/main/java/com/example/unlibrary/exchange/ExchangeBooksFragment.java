@@ -35,24 +35,6 @@ public class ExchangeBooksFragment extends Fragment {
     private Observer<ArrayList<Book>> mBookListObserver;
 
     /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-//    public ExchangeBooksFragment() {
-//    }
-
-    /**
-     * Called when exchange activity is started
-     *
-     * @param savedInstanceState
-     */
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        mViewModel = new ViewModelProvider(requireActivity()).get(ExchangeViewModel.class);
-//    }
-
-    /**
      * Access ExchangeViewModel and setup data-binding and observer for changes to books.
      *
      * @return instance of recyclerview for book exchange
