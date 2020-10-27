@@ -27,7 +27,7 @@
             android:onClick="@{filterButtonClickListener}"/>
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment"
+            android:id="@+id/unlibrary_book_list"
             android:name="com.example.unlibrary.book_list.BooksFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"

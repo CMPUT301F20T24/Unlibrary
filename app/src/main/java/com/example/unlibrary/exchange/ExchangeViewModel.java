@@ -11,6 +11,7 @@ package com.example.unlibrary.exchange;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 /**
  * Manages the Exchange flow business logic. Connects the exchange fragment to the repository.
  */
-public class ExchangeViewModel extends ViewModel {
+public class ExchangeViewModel extends ViewModel implements BooksSource {
     private LiveData<ArrayList<Book>> mBooks;
     private ExchangeRepository mExchangeRepository;
 

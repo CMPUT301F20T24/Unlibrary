@@ -51,7 +51,6 @@ public class UnlibraryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
         mBinding = FragmentUnlibraryBinding.inflate(inflater, container, false);
 
         // TODO: Remove
