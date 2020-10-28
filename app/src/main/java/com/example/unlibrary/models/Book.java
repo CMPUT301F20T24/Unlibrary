@@ -35,25 +35,6 @@ public class Book {
     }
 
     /**
-     * Constructor a book for cardviews
-     * <p>
-     * TODO: delete this constructor once determined how to store images taken by the camera
-     * TODO: link logged in user with the owner of books to modify the book lists in each fragment
-     *
-     * @param isbn
-     * @param mTitle
-     * @param mAuthor
-     * @param mStatus
-     */
-
-    public Book(String isbn, String mTitle, String mAuthor, String mStatus) {
-        this.mIsbn = isbn;
-        this.mTitle = mTitle;
-        this.mAuthor = mAuthor;
-        this.mStatus = Status.valueOf(mStatus);
-    }
-
-    /**
      * Construct a book and initialize it with a list of photos.
      *
      * @param isbn   of book
