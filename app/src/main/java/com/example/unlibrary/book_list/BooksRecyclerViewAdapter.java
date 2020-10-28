@@ -46,6 +46,14 @@ public class BooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolde
         notifyDataSetChanged();
     }
 
+    /**
+     * Inflate fragment_book_card and bind it with the {@link BookViewHolder} class. OnClickListeners
+     * can be passed here as well.
+     *
+     * @param parent
+     * @param viewType
+     * @return
+     */
     @NonNull
     @Override
     public BookViewHolder<FragmentBookCardBinding> onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -54,12 +62,23 @@ public class BooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolde
         return new BookViewHolder<>(bookBinding);
     }
 
+    /**
+     * Binds the {@link BookViewHolder} to its {@link Book} item.
+     *
+     * @param holder   view holder instance
+     * @param position index of the view holder in the list
+     */
     @Override
     public void onBindViewHolder(final BookViewHolder<FragmentBookCardBinding> holder, int position) {
         Book book = mBooks.get(position);
         holder.bind(book);
     }
 
+    /**
+     * Gets the number of books displayed.
+     *
+     * @return number of books displayed
+     */
     @Override
     public int getItemCount() {
         return mBooks.size();
