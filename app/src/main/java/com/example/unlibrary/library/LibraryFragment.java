@@ -8,25 +8,45 @@
 package com.example.unlibrary.library;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
 
 /**
  * Host fragment for Library feature
  */
 public class LibraryFragment extends Fragment {
+    private LibraryViewModel mViewModel;
     private FragmentLibraryBinding mBinding;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
+        mBinding.setLifecycleOwner(getViewLifecycleOwner());
+
+        // Child fragments are can only be accessed on view creation, so this is the earliest
+        // point where we can specify the data source
+        for (Fragment f : getChildFragmentManager().getFragments()) {
+            if (f instanceof BooksFragment) {
+                BooksFragment bookFragment = (BooksFragment) f;
+                bookFragment.setBooksSource(mViewModel);
+            }
+        }
+
         return mBinding.getRoot();
     }
 }

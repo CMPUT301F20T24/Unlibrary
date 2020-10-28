@@ -21,8 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.databinding.FragmentBookListBinding;
 
-import java.util.ArrayList;
-
 /**
  * A fragment representing a list of books. A book source should be specified before the fragment
  * is displayed. Book source must implement {@link BooksSource}. Refer to
@@ -39,6 +37,13 @@ public class BooksFragment extends Fragment {
     public BooksFragment() {
     }
 
+    /**
+     * Sets the book source for the current fragment instantiation. Should be called during
+     * {@link Fragment#onCreateView(LayoutInflater, ViewGroup, Bundle)} in the parent or
+     * containing fragment.
+     *
+     * @param booksSource object that implements {@link BooksSource#getBooks()} usually a view model
+     */
     public void setBooksSource(BooksSource booksSource) {
         mBooksSource = booksSource;
     }
@@ -60,15 +65,13 @@ public class BooksFragment extends Fragment {
 
         view.setLayoutManager(new LinearLayoutManager(context));
 
-        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource == null ? new ArrayList<>() : mBooksSource.getBooks().getValue());
+        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue());
 
         // Bind ViewModel books to RecyclerViewAdapter
         view.setAdapter(adapter);
 
         // Watch changes in bookSource and update the view accordingly
-        if (mBooksSource != null) {
-            mBooksSource.getBooks().observe(getViewLifecycleOwner(), adapter::setData);
-        }
+        mBooksSource.getBooks().observe(getViewLifecycleOwner(), adapter::setData);
 
         return view;
     }

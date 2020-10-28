@@ -10,24 +10,14 @@ package com.example.unlibrary.library;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,24 +25,19 @@ import java.util.HashMap;
  * Manages all the database interaction for the Library ViewModel.
  */
 public class LibraryRepository {
+    private static final String BOOK_COLLECTION = "Books";
+
     FirebaseFirestore db;
-    Query query;
-    ListenerRegistration registration;
-    MutableLiveData<ArrayList<Book>> books;
+    ListenerRegistration mListenerRegistration;
+    MutableLiveData<ArrayList<Book>> mBooks;
 
     /**
-     * Constructor for the Library Repository.
+     * Constructor for the Library Repository. Sets up the database snapshot listener.
      */
     public LibraryRepository() {
         db = FirebaseFirestore.getInstance();
-        query = db.collection("testRepo");
-
-        ArrayList<Book> aBooks = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            aBooks.add(new Book("abcd-1234", "Crafting the interpreter", "https://craftinginterpreters.com/", "me", null));
-        }
-
-        books = new MutableLiveData<>(aBooks);
+        mBooks = new MutableLiveData<>(new ArrayList<>());
+        attachListener();
     }
 
     /**
@@ -60,19 +45,19 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
-        registration = query.addSnapshotListener((value, error) -> {
+        mListenerRegistration = db.collection(BOOK_COLLECTION).addSnapshotListener((snapshots, error) -> {
             if (error != null) {
-                Log.w("listen:error", error);
-                return;
+                Log.w("LIBRARY_REPOSITORY", error);
             }
 
-            //update the list to reflect changes in the database
-            ArrayList<Book> dbBooks = new ArrayList<>();
-            for (DocumentSnapshot doc : value.getDocuments()) {
-                dbBooks.add(new Book(doc.getId(), (String) doc.getData().get("Title"), null, null, null));
-            }
+            ArrayList<Book> books = new ArrayList<>();
+            if (snapshots != null) {
+                for (DocumentSnapshot book : snapshots.getDocuments()) {
+                    books.add(book.toObject(Book.class));
+                }
 
-            books.setValue(dbBooks);
+                mBooks.setValue(books);
+            }
         });
     }
 
@@ -85,7 +70,7 @@ public class LibraryRepository {
         HashMap<String, String> data = new HashMap<>();
         if (book.getIsbn().length() > 0 && book.getTitle().length() > 0) {
             data.put("Title", book.getTitle());
-            db.collection("books").document(book.getIsbn())
+            db.collection(BOOK_COLLECTION).document(book.getIsbn())
                     .set(data)
                     .addOnSuccessListener(aVoid -> {
                         Log.d("Create", "Document succesfully written");
@@ -102,7 +87,7 @@ public class LibraryRepository {
      * @param book book object to be saved in the database.
      */
     public void updateObjectField(Book book) {
-        db.collection("books").document(book.getIsbn())
+        db.collection(BOOK_COLLECTION).document(book.getIsbn())
                 .update("Title", book.getTitle())
                 .addOnSuccessListener(aVoid ->
                         Log.d("Create", "Document succesfully Updated")
@@ -132,7 +117,7 @@ public class LibraryRepository {
      * Detach listener when fragment is no longer being viewed.
      */
     public void detachListener() {
-        registration.remove();
+        mListenerRegistration.remove();
     }
 
     /**
@@ -141,6 +126,6 @@ public class LibraryRepository {
      * @return LiveData<ArrayList < Book>> This returns the books object.
      */
     public LiveData<ArrayList<Book>> getBooks() {
-        return this.books;
+        return this.mBooks;
     }
 }

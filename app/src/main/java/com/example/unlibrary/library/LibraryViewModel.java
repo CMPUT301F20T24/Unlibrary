@@ -11,6 +11,7 @@ package com.example.unlibrary.library;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 /**
  * Manages the Library flow business logic. Connects the library fragments to the repository.
  */
-public class LibraryViewModel extends ViewModel {
+public class LibraryViewModel extends ViewModel implements BooksSource {
     private LiveData<ArrayList<Book>> mBooks;
     private LibraryRepository mLibraryRepository;
 
@@ -27,7 +28,6 @@ public class LibraryViewModel extends ViewModel {
      */
     public LibraryViewModel() {
         this.mLibraryRepository = new LibraryRepository();
-        this.mLibraryRepository.attachListener();
         this.mBooks = this.mLibraryRepository.getBooks();
     }
 
@@ -41,9 +41,11 @@ public class LibraryViewModel extends ViewModel {
     }
 
     /**
-     * Detach listener when fragment is no longer being viewed.
+     * Cleans up resources, removes the snapshot listener from the repository.
      */
-    public void detachListeners() {
-        this.mLibraryRepository.detachListener();
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mLibraryRepository.detachListener();
     }
 }

@@ -89,7 +89,6 @@ public class LibraryBooksFragment extends Fragment {
      */
     @Override
     public void onDestroy() {
-        mViewModel.detachListeners();
         super.onDestroy();
     }
 }

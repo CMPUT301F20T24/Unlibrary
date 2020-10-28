@@ -10,12 +10,16 @@
         tools:context=".library.LibraryFragment">
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/list"
-            android:name="com.example.unlibrary.library.LibraryBooksFragment"
-            style="@style/FullScreenFragment"
+            android:id="@+id/library_book_list"
+            android:name="com.example.unlibrary.book_list.BooksFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.fragment.app.FragmentContainerView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabFilter"
@@ -25,7 +29,6 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
-            android:backgroundTint="@color/Red"
             android:src="@drawable/ic_search"
             app:fabSize="normal" />
 
@@ -37,7 +40,6 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
-            android:backgroundTint="@color/Red"
             android:src="@drawable/ic_add"
             app:fabSize="normal" />
 
