@@ -18,4 +18,5 @@
     <string name="logout">Logout</string>
     <string name="enter_password_to_confirm_changes">Password</string>
     <string name="password_confirmation_dialog_title">Enter Password to confirm changes</string>
+    <string name="search_bar_hint">Search for books to borrow...</string>
 </resources>
