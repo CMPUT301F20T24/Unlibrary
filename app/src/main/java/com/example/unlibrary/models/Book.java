@@ -197,6 +197,11 @@ public class Book {
         return mOwner;
     }
 
+    /**
+     * Updates the owner of the book
+     *
+     * @param owner unique id associated with the owner
+     */
     public void setOwner(String owner) {
         mOwner = owner;
     }
