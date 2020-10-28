@@ -31,6 +31,8 @@ public class UnlibraryRepository {
 
     /**
      * Constructor for UnlibraryRepository. Sets up Firestore
+     *
+     * TODO: Add querying logic to return only books that have been requested or borrowed by the user
      */
     public UnlibraryRepository() {
         mDb = FirebaseFirestore.getInstance();

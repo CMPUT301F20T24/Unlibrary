@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -45,20 +46,22 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
-        mListenerRegistration = mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshots, error) -> {
-            if (error != null) {
-                Log.w("LIBRARY_REPOSITORY", error);
-            }
+        mListenerRegistration = mDb.collection(BOOK_COLLECTION)
+                .whereEqualTo("owner", FirebaseAuth.getInstance().getUid())
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null) {
+                        Log.w("LIBRARY_REPOSITORY", error);
+                    }
 
-            ArrayList<Book> books = new ArrayList<>();
-            if (snapshots != null) {
-                for (DocumentSnapshot book : snapshots.getDocuments()) {
-                    books.add(book.toObject(Book.class));
-                }
+                    ArrayList<Book> books = new ArrayList<>();
+                    if (snapshots != null) {
+                        for (DocumentSnapshot book : snapshots.getDocuments()) {
+                            books.add(book.toObject(Book.class));
+                        }
 
-                mBooks.setValue(books);
-            }
-        });
+                        mBooks.setValue(books);
+                    }
+                });
     }
 
     /**

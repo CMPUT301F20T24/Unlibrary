@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Manages all the database interaction for the ExchangeViewModel.
@@ -45,24 +46,24 @@ public class ExchangeRepository {
      * and updates books object
      */
     public void attachListener() {
-        mListenerRegistration = mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> {
-            if (error != null) {
-                Log.w(TAG, error);
-                return;
-            }
+        mListenerRegistration = mDb.collection(BOOKS_COLLECTION)
+                .whereIn("status", Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED))
+                .whereNotEqualTo("owner", FirebaseAuth.getInstance().getUid())
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.w(TAG, error);
+                        return;
+                    }
 
-            // Update the list to reflect changes in the database
-            ArrayList<Book> dbBooks = new ArrayList<>();
-            for (DocumentSnapshot doc : value.getDocuments()) {
-                // Only show the book with AVAILABLE or REQUESTED status for exchange
-                Book book = doc.toObject(Book.class);
-                if ((book.getStatus() == Book.Status.AVAILABLE || book.getStatus() == Book.Status.REQUESTED)
-                        && !book.getOwner().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                    dbBooks.add(book);
-                }
-            }
-            mBooks.setValue(dbBooks);
-        });
+                    // Update the list to reflect changes in the database
+                    ArrayList<Book> dbBooks = new ArrayList<>();
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        // Only show the book with AVAILABLE or REQUESTED status for exchange
+                        dbBooks.add(doc.toObject(Book.class));
+                    }
+
+                    mBooks.setValue(dbBooks);
+                });
     }
 
     /**
