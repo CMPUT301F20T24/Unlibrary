@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.databinding.FragmentProfileBinding;
 
@@ -29,6 +28,19 @@ public class ProfileFragment extends Fragment {
     private EditingState mEditingState;
 
     /**
+     * Instantiate view model on creation of the fragment, before inflation of view so
+     * that it can fetch the current user a bit sooner
+     *
+     * @param savedInstanceState
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mViewModel = new ProfileViewModel();
+        mViewModel.fetchUser();
+    }
+
+    /**
      * Initialize data binding, view model, and data binding
      *
      * @param inflater
@@ -40,10 +52,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentProfileBinding.inflate(inflater, container, false);
-        mViewModel = new ViewModelProvider(getActivity()).get(ProfileViewModel.class);
         mEditingState = new EditingState();
-
-        mViewModel.fetchUser();
 
         mBinding.setViewmodel(mViewModel);
         mBinding.setEditstate(mEditingState);
