@@ -16,4 +16,6 @@
     <string name="profile_nav">Profile</string>
     <string name="card_view_image_description">Holds image of card</string>
     <string name="logout">Logout</string>
+    <string name="enter_password_to_confirm_changes">Password</string>
+    <string name="password_confirmation_dialog_title">Enter Password to confirm changes</string>
 </resources>

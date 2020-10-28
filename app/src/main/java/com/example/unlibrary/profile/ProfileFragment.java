@@ -49,6 +49,23 @@ public class ProfileFragment extends Fragment {
         mBinding.setEditstate(mEditingState);
         mBinding.logoutButton.setOnClickListener(view -> logout());
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
+
+        // Setup observers for one-time viewModel events
+        mViewModel.getInvalidInputEvent().observe(this, pair ->
+        {
+            switch (pair.first) {
+                case EMAIL:
+                    mBinding.email.inputLayout.setError(pair.second);
+                    break;
+                case USERNAME:
+                    mBinding.username.inputLayout.setError(pair.second);
+                    break;
+                case PASSWORD:
+                    mBinding.password.setError(pair.second);
+                    break;
+
+            }
+        });
         return mBinding.getRoot();
     }
 
@@ -59,6 +76,7 @@ public class ProfileFragment extends Fragment {
     public void logout() {
         System.out.println("logged out");
     }
+
 
     /**
      * Abstract editing state of profile fragment.
@@ -91,6 +109,7 @@ public class ProfileFragment extends Fragment {
          * Bound to the edit_button in profile fragment
          */
         public void editContent() {
+            mViewModel.saveTextFields();
             isEditing.setValue(true);
         }
 
@@ -98,6 +117,7 @@ public class ProfileFragment extends Fragment {
          * Bound to cancel_button in profile fragment
          */
         public void cancelUpdate() {
+            mViewModel.resetTextFields();
             isEditing.setValue(false);
         }
 
@@ -105,8 +125,12 @@ public class ProfileFragment extends Fragment {
          * Bound to confirm_button in profile fragment
          */
         public void confirmUpdate() {
-            mViewModel.updateProfile();
-            isEditing.setValue(false);
+            mViewModel.getUpdatedProfileEvent().observe(getViewLifecycleOwner(), (s) -> {
+                mViewModel.clearPassword();
+                isEditing.setValue(false);
+            });
+            mViewModel.attemptUpdateProfile();
         }
     }
 }
+
