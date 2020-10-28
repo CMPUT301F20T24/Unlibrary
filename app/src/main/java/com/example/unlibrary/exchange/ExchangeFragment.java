@@ -27,7 +27,7 @@ public class ExchangeFragment extends Fragment {
     private FragmentExchangeBinding mBinding;
 
     /**
-     * Initialize ViewModel of the fragment that you want to retain when the fragment is
+     * Initialize ViewModel of the fragment that will be retained when the fragment is
      * paused or stopped, then resumed.
      *
      * @param savedInstanceState
