@@ -2,7 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="filterButtonClickListener"
             type="android.view.View.OnClickListener" />
@@ -12,19 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".unlibrary.UnlibraryFragment">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_search_24px"
-            android:onClick="@{filterButtonClickListener}"/>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/unlibrary_book_list"

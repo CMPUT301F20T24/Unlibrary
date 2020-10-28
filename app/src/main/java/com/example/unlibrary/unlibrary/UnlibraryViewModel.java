@@ -20,8 +20,8 @@ import java.util.ArrayList;
  * Manages the Unlibrary flow business logic. Connects the  fragments to the repository.
  */
 public class UnlibraryViewModel extends ViewModel implements BooksSource {
-    private LiveData<ArrayList<Book>> mBooks;
-    private UnlibraryRepository mUnlibraryRepository;
+    private final LiveData<ArrayList<Book>> mBooks;
+    private final UnlibraryRepository mUnlibraryRepository;
 
     /**
      * Constructor for the UnLibrary ViewModel. Binds the list of books to return from the

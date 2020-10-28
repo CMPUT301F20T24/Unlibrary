@@ -24,8 +24,8 @@ public class UnlibraryRepository {
     private final static String TAG = "UNLIBRARY_REPOSITORY";
     private final static String BOOK_COLLECTION = "Books";
 
-    private FirebaseFirestore mDb;
-    private MutableLiveData<ArrayList<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
+    private final FirebaseFirestore mDb;
+    private final MutableLiveData<ArrayList<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
 
     /**
      * Constructor for UnlibraryRepository. Sets up Firestore

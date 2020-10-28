@@ -20,8 +20,8 @@ import java.util.ArrayList;
  * Manages the Exchange flow business logic. Connects the exchange fragment to the repository.
  */
 public class ExchangeViewModel extends ViewModel implements BooksSource {
-    private LiveData<ArrayList<Book>> mBooks;
-    private ExchangeRepository mExchangeRepository;
+    private final LiveData<ArrayList<Book>> mBooks;
+    private final ExchangeRepository mExchangeRepository;
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.

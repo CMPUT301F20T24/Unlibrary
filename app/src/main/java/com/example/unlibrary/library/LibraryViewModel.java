@@ -20,8 +20,8 @@ import java.util.ArrayList;
  * Manages the Library flow business logic. Connects the library fragments to the repository.
  */
 public class LibraryViewModel extends ViewModel implements BooksSource {
-    private LiveData<ArrayList<Book>> mBooks;
-    private LibraryRepository mLibraryRepository;
+    private final LiveData<ArrayList<Book>> mBooks;
+    private final LibraryRepository mLibraryRepository;
 
     /**
      * Constructor for the Library ViewModel. Instantiates listener to Firestore.

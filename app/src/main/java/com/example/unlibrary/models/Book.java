@@ -16,7 +16,6 @@ import java.util.ArrayList;
  * Represents a book in our application domain. Book is a pure POJO class (getters and setters only)
  * so that it can be used as a custom object when interacting with Firestore.
  * <p>
- * TODO: Link and retrieve ID from Firestore
  */
 public class Book {
 
@@ -36,9 +35,11 @@ public class Book {
     }
 
     /**
+     * Constructor a book for cardviews
+     * <p>
      * TODO: delete this constructor once determined how to store images taken by the camera
      * TODO: link logged in user with the owner of books to modify the book lists in each fragment
-     * Constructor a book for cardviews
+     *
      * @param isbn
      * @param mTitle
      * @param mAuthor
@@ -149,12 +150,6 @@ public class Book {
     public Status getStatus() {
         return mStatus;
     }
-
-    /**
-     * Returns the current status of the book in string
-     * @return
-     */
-    public String stringStatus(){ return mStatus.toString(); }
 
     /**
      * Updates the state of the book.
