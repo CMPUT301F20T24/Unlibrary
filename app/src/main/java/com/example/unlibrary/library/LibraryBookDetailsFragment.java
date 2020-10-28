@@ -16,12 +16,13 @@ import android.view.ViewGroup;
 
 import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
-import com.example.unlibrary.databinding.FragmentLibraryNewBookBinding;
 
 import org.jetbrains.annotations.NotNull;
 
 // TODO
 public class LibraryBookDetailsFragment extends Fragment {
+
+    FragmentLibraryBookDetailsBinding mBinding;
 
     // TODO
     @Override
@@ -30,13 +31,13 @@ public class LibraryBookDetailsFragment extends Fragment {
         LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
         // Setup data binding
-        FragmentLibraryBookDetailsBinding mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_library_book_details, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_library_book_details, container, false);
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
         // Setup buttons
         mBinding.editBook.setOnClickListener(v -> {
-            NavDirections action = LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryNewBookFragment();
+            NavDirections action = LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryEditBookFragment();
             Navigation.findNavController(v).navigate(action);
         });
 

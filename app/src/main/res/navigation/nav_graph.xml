@@ -17,8 +17,8 @@
         android:label="fragment_library"
         tools:layout="@layout/fragment_library">
         <action
-            android:id="@+id/action_libraryFragment_to_libraryNewBookFragment"
-            app:destination="@id/libraryNewBookFragment" />
+            android:id="@+id/action_libraryFragment_to_libraryEditBookFragment"
+            app:destination="@id/libraryEditBookFragment" />
         <action
             android:id="@+id/action_libraryFragment_to_libraryBookDetailsFragment"
             app:destination="@id/libraryBookDetailsFragment" />
@@ -36,12 +36,12 @@
         android:label="fragment_exchange"
         tools:layout="@layout/fragment_exchange" />
     <fragment
-        android:id="@+id/libraryNewBookFragment"
-        android:name="com.example.unlibrary.library.LibraryNewBookFragment"
+        android:id="@+id/libraryEditBookFragment"
+        android:name="com.example.unlibrary.library.LibraryEditBookFragment"
         android:label="fragment_library_new_book"
-        tools:layout="@layout/fragment_library_new_book">
+        tools:layout="@layout/fragment_library_edit_book">
         <action
-            android:id="@+id/action_libraryNewBookFragment_to_libraryBookDetailsFragment"
+            android:id="@+id/action_libraryEditBookFragment_to_libraryBookDetailsFragment"
             app:destination="@id/libraryBookDetailsFragment"
             app:popUpTo="@+id/libraryFragment"
             app:popUpToInclusive="false"/>
@@ -52,8 +52,8 @@
         android:label="fragment_library_book_details"
         tools:layout="@layout/fragment_library_book_details">
         <action
-            android:id="@+id/action_libraryBookDetailsFragment_to_libraryNewBookFragment"
-            app:destination="@id/libraryNewBookFragment" />
+            android:id="@+id/action_libraryBookDetailsFragment_to_libraryEditBookFragment"
+            app:destination="@id/libraryEditBookFragment" />
     </fragment>
 
 </navigation>

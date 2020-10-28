@@ -81,7 +81,7 @@ public class LibraryFragment extends Fragment {
         mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
 
         mBinding.fabAdd.setOnClickListener(v -> {
-            NavDirections action = LibraryFragmentDirections.actionLibraryFragmentToLibraryNewBookFragment();
+            NavDirections action = LibraryFragmentDirections.actionLibraryFragmentToLibraryEditBookFragment();
             Navigation.findNavController(v).navigate(action);
         });
 

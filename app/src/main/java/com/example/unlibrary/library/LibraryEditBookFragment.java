@@ -17,24 +17,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.unlibrary.R;
-import com.example.unlibrary.databinding.FragmentLibraryNewBookBinding;
+import com.example.unlibrary.databinding.FragmentLibraryEditBookBinding;
 
 import org.jetbrains.annotations.NotNull;
 
 // TODO
-public class LibraryNewBookFragment extends Fragment {
+public class LibraryEditBookFragment extends Fragment {
 
     LibraryViewModel mViewModel;
-    FragmentLibraryNewBookBinding mBinding;
+    FragmentLibraryEditBookBinding mBinding;
 
     // TODO
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Get the activity viewModel
-        LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
         // Setup data binding
-        FragmentLibraryNewBookBinding mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_library_new_book, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_library_edit_book, container, false);
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
@@ -43,7 +43,7 @@ public class LibraryNewBookFragment extends Fragment {
             // TODO
         });
         mBinding.saveButton.setOnClickListener(v -> {
-            NavDirections action = LibraryNewBookFragmentDirections.actionLibraryNewBookFragmentToLibraryBookDetailsFragment();
+            NavDirections action = LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment();
             Navigation.findNavController(v).navigate(action);
         });
 
