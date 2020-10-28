@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:text="@={viewModel.title}" />
+                android:text="@={viewModel.currentBook.title}" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -72,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:text="@={viewModel.author}" />
+                android:text="@={viewModel.currentBook.author}" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -92,7 +92,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:text="@={viewModel.ISBN}" />
+                android:text="@={viewModel.currentBook.isbn}" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

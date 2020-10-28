@@ -23,8 +23,8 @@
             app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="@{viewModel.title}"
-            app:subtitle="@{viewModel.author}" />
+            app:title="@{viewModel.currentBook.title}"
+            app:subtitle="@{viewModel.currentBook.author}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_book"

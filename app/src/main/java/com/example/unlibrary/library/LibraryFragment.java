@@ -19,6 +19,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
@@ -48,6 +49,8 @@ import java.util.Locale;
  * Host fragment for Library feature
  */
 public class LibraryFragment extends Fragment {
+
+    LibraryViewModel mViewModel;
 
     // TODO combine URI and path
     private Uri barcodeImageUri;
@@ -80,7 +83,12 @@ public class LibraryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
 
+        // Get the activity viewModel
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+
         mBinding.fabAdd.setOnClickListener(v -> {
+            // TODO should this be done here?
+            mViewModel.createNewBook();
             NavDirections action = LibraryFragmentDirections.actionLibraryFragmentToLibraryEditBookFragment();
             Navigation.findNavController(v).navigate(action);
         });

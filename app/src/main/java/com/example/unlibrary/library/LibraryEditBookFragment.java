@@ -43,6 +43,8 @@ public class LibraryEditBookFragment extends Fragment {
             // TODO
         });
         mBinding.saveButton.setOnClickListener(v -> {
+            // TODO this probs shouldn't be called here
+            mViewModel.saveNewBook();
             NavDirections action = LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment();
             Navigation.findNavController(v).navigate(action);
         });
