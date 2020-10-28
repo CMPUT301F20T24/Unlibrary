@@ -46,6 +46,7 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
+        // TODO: Parametrize this or refactor to update on swipe down so that filters can be passed dynamically
         mListenerRegistration = mDb.collection(BOOK_COLLECTION)
                 .whereEqualTo("owner", FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((snapshots, error) -> {
