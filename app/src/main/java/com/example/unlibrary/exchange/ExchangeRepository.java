@@ -61,7 +61,7 @@ public class ExchangeRepository {
                 // Only show the book with AVAILABLE or REQUESTED status for exchange
                 // TODO: change this to get image urls and user ids to customize the exchange list
                 Book book = doc.toObject(Book.class);
-                if (book.getStatus() == Book.Status.AVAILABLE && book.getStatus() != Book.Status.REQUESTED
+                if ((book.getStatus() == Book.Status.AVAILABLE && book.getStatus() == Book.Status.REQUESTED)
                         && !book.getOwner().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                     dbBooks.add(book);
                 }
