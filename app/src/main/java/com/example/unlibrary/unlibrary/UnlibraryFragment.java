@@ -53,6 +53,7 @@ public class UnlibraryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = FragmentUnlibraryBinding.inflate(inflater, container, false);
+        mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
         // TODO: Remove dummy function to illustrate how the fragments can be customized to suit its needs
         mBinding.setVariable(BR.filterButtonClickListener, (View.OnClickListener) view ->
