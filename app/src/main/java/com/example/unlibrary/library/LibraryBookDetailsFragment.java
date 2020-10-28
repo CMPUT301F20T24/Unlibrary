@@ -35,9 +35,13 @@ public class LibraryBookDetailsFragment extends Fragment {
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
         // Setup buttons
-        mBinding.button.setOnClickListener(v -> {
+        mBinding.editBook.setOnClickListener(v -> {
             NavDirections action = LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryNewBookFragment();
             Navigation.findNavController(v).navigate(action);
+        });
+
+        mBinding.deleteBook.setOnClickListener(v -> {
+            // TODO
         });
 
         return mBinding.getRoot();

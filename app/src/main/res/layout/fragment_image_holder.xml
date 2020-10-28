@@ -11,6 +11,8 @@
         <variable
             name="subtitle"
             type="String" />
+
+        <import type="android.view.View" />
     </data>
 
     <RelativeLayout

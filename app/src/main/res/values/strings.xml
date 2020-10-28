@@ -21,4 +21,6 @@
     <string name="auto_fill_button">Auto-Fill</string>
     <string name="save_button">Save</string>
     <string name="card_view_image_description">Holds image of card</string>
+    <string name="edit_book_fab_description">Edit book</string>
+    <string name="delete_book_fab_description">Delete book</string>
 </resources>
