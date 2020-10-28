@@ -15,7 +15,7 @@
         android:id="@+id/libraryFragment"
         android:name="com.example.unlibrary.library.LibraryFragment"
         android:label="fragment_library"
-        tools:layout="@layout/fragment_library" >
+        tools:layout="@layout/fragment_library">
         <action
             android:id="@+id/action_libraryFragment_to_libraryNewBookFragment"
             app:destination="@id/libraryNewBookFragment" />
@@ -39,11 +39,21 @@
         android:id="@+id/libraryNewBookFragment"
         android:name="com.example.unlibrary.library.LibraryNewBookFragment"
         android:label="fragment_library_new_book"
-        tools:layout="@layout/fragment_library_new_book" />
+        tools:layout="@layout/fragment_library_new_book">
+        <action
+            android:id="@+id/action_libraryNewBookFragment_to_libraryBookDetailsFragment"
+            app:destination="@id/libraryBookDetailsFragment"
+            app:popUpTo="@+id/libraryFragment"
+            app:popUpToInclusive="false"/>
+    </fragment>
     <fragment
         android:id="@+id/libraryBookDetailsFragment"
         android:name="com.example.unlibrary.library.LibraryBookDetailsFragment"
         android:label="fragment_library_book_details"
-        tools:layout="@layout/fragment_library_book_details" />
+        tools:layout="@layout/fragment_library_book_details">
+        <action
+            android:id="@+id/action_libraryBookDetailsFragment_to_libraryNewBookFragment"
+            app:destination="@id/libraryNewBookFragment" />
+    </fragment>
 
 </navigation>

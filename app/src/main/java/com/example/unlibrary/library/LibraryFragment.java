@@ -23,7 +23,6 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import android.os.Environment;
-import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
