@@ -3,6 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="fabAddOnClickListener"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="fabFilterOnClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
     <RelativeLayout
         android:id="@+id/frameLayout2"
         android:layout_width="match_parent"
@@ -29,6 +40,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
+            android:onClick="@{fabFilterOnClickListener}"
             android:src="@drawable/ic_search"
             app:fabSize="normal" />
 
@@ -40,6 +52,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
+            android:onClick="@{fabAddOnClickListener}"
             android:src="@drawable/ic_add"
             app:fabSize="normal" />
 

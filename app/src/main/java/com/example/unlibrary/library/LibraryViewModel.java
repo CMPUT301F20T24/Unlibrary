@@ -41,6 +41,16 @@ public class LibraryViewModel extends ViewModel implements BooksSource {
     }
 
     /**
+     * Creates a new book entry in Firestore. This book will also be displayed in
+     * {@link LibraryFragment}.
+     *
+     * @param book new book to add to Firestore
+     */
+    public void addBook(Book book) {
+        mLibraryRepository.addBook(book);
+    }
+
+    /**
      * Cleans up resources, removes the snapshot listener from the repository.
      */
     @Override
