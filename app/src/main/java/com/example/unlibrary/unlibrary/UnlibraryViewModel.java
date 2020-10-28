@@ -40,4 +40,12 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
     public LiveData<ArrayList<Book>> getBooks() {
         return mBooks;
     }
+
+    /**
+     * Cleans up resources, removes the snapshot listener from the repository.
+     */
+    @Override
+    protected void onCleared() {
+        mUnlibraryRepository.detachListeners();
+    }
 }

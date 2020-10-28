@@ -17,7 +17,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 
@@ -26,22 +25,19 @@ import java.util.ArrayList;
  */
 public class ExchangeRepository {
     private static final String BOOKS_COLLECTION = "Books";
-    private static final String STATUS = "mStatus";
-    private static final String TITLE = "mTitle";
-    private static final String AUTHOR = "mAuthor";
+    private static final String TAG = "EXCHANGE_REPOSITORY";
 
-    FirebaseFirestore mdb;
-    Query mQuery;
-    ListenerRegistration registration;
-    MutableLiveData<ArrayList<Book>> mBooks;
+    private final FirebaseFirestore mDb;
+    private final MutableLiveData<ArrayList<Book>> mBooks;
+    private ListenerRegistration mListenerRegistration;
 
     /**
      * Constructor for the Exchange Repository.
      */
     public ExchangeRepository() {
-        mdb = FirebaseFirestore.getInstance();
-        mQuery = mdb.collection(BOOKS_COLLECTION);
-        mBooks = new MutableLiveData<>(new ArrayList<Book>());
+        mDb = FirebaseFirestore.getInstance();
+        mBooks = new MutableLiveData<>(new ArrayList<>());
+        attachListener();
     }
 
     /**
@@ -49,9 +45,9 @@ public class ExchangeRepository {
      * and updates books object
      */
     public void attachListener() {
-        registration = mQuery.addSnapshotListener((value, error) -> {
+        mListenerRegistration = mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> {
             if (error != null) {
-                Log.w("LISTEN:ERROR", error);
+                Log.w(TAG, error);
                 return;
             }
 
@@ -70,19 +66,19 @@ public class ExchangeRepository {
     }
 
     /**
-     * Detach listener when fragment is no longer being viewed.
-     */
-    public void detachListener() {
-        registration.remove();
-    }
-
-    /**
      * Getter for the books object.
      *
      * @return LiveData<ArrayList < Book>> This returns the books object.
      */
     public LiveData<ArrayList<Book>> getBooks() {
         return this.mBooks;
+    }
+
+    /**
+     * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
+     */
+    public void detachListener() {
+        mListenerRegistration.remove();
     }
 }
 

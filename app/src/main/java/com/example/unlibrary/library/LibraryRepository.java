@@ -62,6 +62,15 @@ public class LibraryRepository {
     }
 
     /**
+     * Getter for the books object.
+     *
+     * @return LiveData<ArrayList < Book>> This returns the books object.
+     */
+    public LiveData<ArrayList<Book>> getBooks() {
+        return this.mBooks;
+    }
+
+    /**
      * Save new Book object into the database.
      *
      * @param book book object to be saved in the database.
@@ -114,18 +123,10 @@ public class LibraryRepository {
     }
 
     /**
-     * Detach listener when fragment is no longer being viewed.
+     * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
         mListenerRegistration.remove();
     }
 
-    /**
-     * Getter for the books object.
-     *
-     * @return LiveData<ArrayList < Book>> This returns the books object.
-     */
-    public LiveData<ArrayList<Book>> getBooks() {
-        return this.mBooks;
-    }
 }

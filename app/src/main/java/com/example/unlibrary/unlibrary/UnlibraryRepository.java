@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.unlibrary.models.Book;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 
@@ -26,13 +27,14 @@ public class UnlibraryRepository {
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<ArrayList<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
+    private final ListenerRegistration mListenerRegistration;
 
     /**
      * Constructor for UnlibraryRepository. Sets up Firestore
      */
     public UnlibraryRepository() {
         mDb = FirebaseFirestore.getInstance();
-        mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshot, error) -> {
+        mListenerRegistration = mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshot, error) -> {
             if (error != null) {
                 Log.w(TAG, error);
             }
@@ -84,5 +86,12 @@ public class UnlibraryRepository {
         }).addOnFailureListener(e -> {
             Log.w(TAG, "Unable to remove book " + book.getTitle());
         });
+    }
+
+    /**
+     * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
+     */
+    public void detachListeners() {
+        mListenerRegistration.remove();
     }
 }

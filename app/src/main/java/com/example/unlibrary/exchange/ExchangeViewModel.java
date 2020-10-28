@@ -27,9 +27,8 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
      */
     public ExchangeViewModel() {
-        this.mExchangeRepository = new ExchangeRepository();
-        this.mExchangeRepository.attachListener();
-        this.mBooks = this.mExchangeRepository.getBooks();
+        mExchangeRepository = new ExchangeRepository();
+        mBooks = mExchangeRepository.getBooks();
     }
 
     /**
@@ -42,9 +41,11 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     }
 
     /**
-     * Detach listener when fragment is no longer being viewed.
+     * Cleans up resources, removes the snapshot listener from the repository.
      */
-    public void detachListeners() {
-        this.mExchangeRepository.detachListener();
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mExchangeRepository.detachListener();
     }
 }
