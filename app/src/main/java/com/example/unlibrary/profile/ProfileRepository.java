@@ -25,10 +25,10 @@ import java.util.List;
  */
 public class ProfileRepository {
 
-    private final String USERS_COLLECTION = "users";
-    private final String UID_FIELD = "id";
-    private final String EMAIL_FIELD = "email";
-    private final String USERNAME_FIELD = "username";
+    private final static String USERS_COLLECTION = "users";
+    private final static String UID_FIELD = "id";
+    private final static String EMAIL_FIELD = "email";
+    private final static String USERNAME_FIELD = "username";
 
     private FirebaseFirestore mDB;
     private FirebaseAuth mAuth;
