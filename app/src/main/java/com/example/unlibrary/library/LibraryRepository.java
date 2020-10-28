@@ -19,23 +19,23 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Manages all the database interaction for the Library ViewModel.
  */
 public class LibraryRepository {
     private static final String BOOK_COLLECTION = "Books";
+    private static final String TAG = "LIBRARY_REPOSITORY";
 
-    FirebaseFirestore db;
-    ListenerRegistration mListenerRegistration;
-    MutableLiveData<ArrayList<Book>> mBooks;
+    private FirebaseFirestore mDb;
+    private ListenerRegistration mListenerRegistration;
+    private MutableLiveData<ArrayList<Book>> mBooks;
 
     /**
      * Constructor for the Library Repository. Sets up the database snapshot listener.
      */
     public LibraryRepository() {
-        db = FirebaseFirestore.getInstance();
+        mDb = FirebaseFirestore.getInstance();
         mBooks = new MutableLiveData<>(new ArrayList<>());
         attachListener();
     }
@@ -45,7 +45,7 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
-        mListenerRegistration = db.collection(BOOK_COLLECTION).addSnapshotListener((snapshots, error) -> {
+        mListenerRegistration = mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshots, error) -> {
             if (error != null) {
                 Log.w("LIBRARY_REPOSITORY", error);
             }
@@ -75,19 +75,14 @@ public class LibraryRepository {
      *
      * @param book book object to be saved in the database.
      */
-    public void createObject(Book book) {
-        HashMap<String, String> data = new HashMap<>();
-        if (book.getIsbn().length() > 0 && book.getTitle().length() > 0) {
-            data.put("Title", book.getTitle());
-            db.collection(BOOK_COLLECTION).document(book.getIsbn())
-                    .set(data)
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("Create", "Document succesfully written");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w("Create", "DocumentSnapshot not written", e);
-                    });
-        }
+    public void addBook(Book book) {
+        mDb.collection(BOOK_COLLECTION).add(book)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Create", "Document succesfully written");
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Create", "DocumentSnapshot not written", e);
+                });
     }
 
     /**
@@ -95,15 +90,14 @@ public class LibraryRepository {
      *
      * @param book book object to be saved in the database.
      */
-    public void updateObjectField(Book book) {
-        db.collection(BOOK_COLLECTION).document(book.getIsbn())
-                .update("Title", book.getTitle())
-                .addOnSuccessListener(aVoid ->
-                        Log.d("Create", "Document succesfully Updated")
-                )
-                .addOnFailureListener(e ->
-                        Log.w("Create", "DocumentSnapshot not updated", e)
-                );
+    public void updateBook(Book book) {
+        mDb.collection(BOOK_COLLECTION).document(book.getId()).set(book)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Successfully updated book " + book.getTitle());
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Unable to update book " + book.getTitle());
+                });
     }
 
     /**
@@ -111,12 +105,13 @@ public class LibraryRepository {
      *
      * @param book book object to be deleted from the database.
      */
-    public void deleteObject(Book book) {
-        db.collection("books")
-                .document(book.getIsbn())
-                .delete().addOnSuccessListener(aVoid ->
-                Log.d("Delete", "Data has been deleted successfully!")
-        )
+    public void deleteBook(Book book) {
+        mDb.collection(BOOK_COLLECTION)
+                .document(book.getId())
+                .delete()
+                .addOnSuccessListener(aVoid ->
+                        Log.d("Delete", "Data has been deleted successfully!")
+                )
                 .addOnFailureListener(e ->
                         Log.d("Delete", "Data could not be deleted!" + e.toString())
                 );
