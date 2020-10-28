@@ -15,7 +15,14 @@
         android:id="@+id/libraryFragment"
         android:name="com.example.unlibrary.library.LibraryFragment"
         android:label="fragment_library"
-        tools:layout="@layout/fragment_library" />
+        tools:layout="@layout/fragment_library" >
+        <action
+            android:id="@+id/action_libraryFragment_to_libraryNewBookFragment"
+            app:destination="@id/libraryNewBookFragment" />
+        <action
+            android:id="@+id/action_libraryFragment_to_libraryBookDetailsFragment"
+            app:destination="@id/libraryBookDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/unlibraryFragment"
@@ -28,5 +35,15 @@
         android:name="com.example.unlibrary.exchange.ExchangeFragment"
         android:label="fragment_exchange"
         tools:layout="@layout/fragment_exchange" />
+    <fragment
+        android:id="@+id/libraryNewBookFragment"
+        android:name="com.example.unlibrary.library.LibraryNewBookFragment"
+        android:label="fragment_library_new_book"
+        tools:layout="@layout/fragment_library_new_book" />
+    <fragment
+        android:id="@+id/libraryBookDetailsFragment"
+        android:name="com.example.unlibrary.library.LibraryBookDetailsFragment"
+        android:label="fragment_library_book_details"
+        tools:layout="@layout/fragment_library_book_details" />
 
 </navigation>
