@@ -12,8 +12,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
-import com.example.unlibrary.util.BarcodeScanner;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -85,9 +90,38 @@ public class LibraryViewModel extends ViewModel {
 
     // TODO
     public void autoFill(String isbn) {
-        Book book = mCurrentBook.getValue();
-        book.setIsbn(isbn);
-        mCurrentBook.setValue(book);
-        System.out.println(isbn);
+        mLibraryRepository.fetchBookDataFromIsbn(isbn, new JSONObjectRequestListener() {
+            @Override
+            public void onResponse(JSONObject response) {
+                // TODO parse out author and title
+                String title = "";
+                String author = "";
+                JSONArray items = null;
+                try {
+                    items = response.getJSONArray("items");
+                    JSONObject firstItem = items.getJSONObject(0);
+                    JSONObject volumeInfo = firstItem.getJSONObject("volumeInfo");
+                    title = volumeInfo.getString("title");
+                    JSONArray authors = volumeInfo.getJSONArray("authors");
+                    author = authors.getString(0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    // TODO handle
+                }
+                Book book = mCurrentBook.getValue();
+                book.setIsbn(isbn);
+                book.setTitle(title);
+                book.setAuthor(author);
+                mCurrentBook.setValue(book);
+            }
+
+            @Override
+            public void onError(ANError error) {
+                // TODO share error that it failed to get author or title
+                Book book = mCurrentBook.getValue();
+                book.setIsbn(isbn);
+                mCurrentBook.setValue(book);
+            }
+        });
     }
 }

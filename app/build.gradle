@@ -78,4 +78,7 @@ dependencies {
 
     // MLKit for scanning barcode
     implementation 'com.google.mlkit:barcode-scanning:16.0.3'
+
+    // Helper for REST API calls. See https://medium.com/@filswino/making-rest-calls-download-upload-files-with-one-line-of-code-on-android-no-retrofit-needed-5c0574f41476
+    implementation 'com.amitshekhar.android:android-networking:1.0.2'
 }

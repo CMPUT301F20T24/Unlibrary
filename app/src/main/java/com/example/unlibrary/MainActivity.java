@@ -18,6 +18,7 @@ import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
 
+import com.androidnetworking.AndroidNetworking;
 import com.example.unlibrary.databinding.ActivityMainBinding;
 import com.example.unlibrary.util.AuthenticatedActivity;
 
@@ -48,6 +49,8 @@ public class MainActivity extends AuthenticatedActivity {
         setContentView(view);
 
         setUpBottomNavigation();
+
+        AndroidNetworking.initialize(getApplicationContext());
     }
 
     /**

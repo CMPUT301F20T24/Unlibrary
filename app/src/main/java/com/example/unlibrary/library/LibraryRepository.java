@@ -13,11 +13,18 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.ANRequest;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -26,6 +33,7 @@ import java.util.ArrayList;
  */
 public class LibraryRepository {
 
+    private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
     private static final String TAG = LibraryRepository.class.getSimpleName();
 
@@ -117,6 +125,17 @@ public class LibraryRepository {
                 .addOnFailureListener(e -> {
                     // TODO
                 });
+    }
+
+    // TODO
+    public void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener) {
+        AndroidNetworking.get("https://www.googleapis.com/books/v1/volumes")
+                .addQueryParameter("q", "ISBN:" + isbn)
+                .addQueryParameter("key", "AIzaSyAD0VElKl_qWGbjeDSzLKR9PcKuRqbFu6M")
+                .setTag(ISBN_FETCH_TAG)
+                .setPriority(Priority.LOW)
+                .build()
+                .getAsJSONObject(listener);
     }
 
     /**
