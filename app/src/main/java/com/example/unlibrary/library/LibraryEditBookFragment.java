@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 // TODO
-public class LibraryEditBookFragment extends Fragment {
+public class LibraryEditBookFragment extends Fragment implements BarcodeScanner.OnFinishedScanListener {
 
     private LibraryViewModel mViewModel;
     private FragmentLibraryEditBookBinding mBinding;
@@ -37,9 +37,9 @@ public class LibraryEditBookFragment extends Fragment {
     private final ActivityResultLauncher<Uri> mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), (ActivityResultCallback<Boolean>) result -> {
         // TODO
         if (result) {
-            BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), autofillUri, mViewModel);
+            BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), autofillUri, this);
         } else {
-            ((MainActivity) requireActivity()).showToast("Failed to get photo.");
+            showToast("Failed to get photo.");
         }
     });
 
@@ -60,16 +60,33 @@ public class LibraryEditBookFragment extends Fragment {
                 autofillUri = ((MainActivity) requireActivity()).buildFileUri();
                 mScanBarcodeContract.launch(autofillUri);
             } catch (IOException e) {
-                ((MainActivity) requireActivity()).showToast("Failed to build uri.");
+                showToast("Failed to build uri.");
             }
         });
         mBinding.saveButton.setOnClickListener(v -> {
-            // TODO this probs shouldn't be called here
+            // TODO maybe move this to a lambda in the data binding
             mViewModel.saveNewBook();
             NavDirections action = LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment();
             Navigation.findNavController(v).navigate(action);
         });
 
         return mBinding.getRoot();
+    }
+
+    // TODO
+    private void showToast(String msg) {
+        ((MainActivity) requireActivity()).showToast(msg);
+    }
+
+    // TODO
+    @Override
+    public void onFinishedScanSuccess(String isbn) {
+        mViewModel.autoFill(isbn);
+    }
+
+    // TODO
+    @Override
+    public void onFinishedScanFailure(Throwable e) {
+        showToast("Failed to scan barcode");
     }
 }

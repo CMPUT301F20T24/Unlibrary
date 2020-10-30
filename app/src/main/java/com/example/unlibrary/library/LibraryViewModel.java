@@ -20,7 +20,7 @@ import java.util.ArrayList;
 /**
  * Manages the Library flow business logic. Connects the library fragments to the repository.
  */
-public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFinishedScanListener {
+public class LibraryViewModel extends ViewModel {
 
     private MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
     private LiveData<ArrayList<Book>> mBooks;
@@ -84,18 +84,10 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     // TODO
-    @Override
-    public void onFinishedScanSuccess(String isbn) {
+    public void autoFill(String isbn) {
         Book book = mCurrentBook.getValue();
         book.setIsbn(isbn);
         mCurrentBook.setValue(book);
         System.out.println(isbn);
-    }
-
-    // TODO
-    @Override
-    public void onFinishedScanFailure(Throwable e) {
-        // TODO
-        System.out.println("IT FAILED");
     }
 }
