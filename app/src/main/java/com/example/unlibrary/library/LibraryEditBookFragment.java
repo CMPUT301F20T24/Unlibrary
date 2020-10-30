@@ -1,6 +1,10 @@
-// TODO
-
-// TODO refactor to handle both edits and additions
+/*
+ * LibraryEditBookFragment
+ *
+ * October 30, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 
 package com.example.unlibrary.library;
 
@@ -28,7 +32,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-// TODO
+/**
+ * Fragment to edit an existing book or create a new one.
+ */
 public class LibraryEditBookFragment extends Fragment implements BarcodeScanner.OnFinishedScanListener {
 
     private LibraryViewModel mViewModel;
@@ -43,7 +49,13 @@ public class LibraryEditBookFragment extends Fragment implements BarcodeScanner.
         }
     });
 
-    // TODO
+    /**
+     * Build the fragment
+     * @param inflater default
+     * @param container default
+     * @param savedInstanceState default
+     * @return fragment view
+     */
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Get the activity viewModel
@@ -73,7 +85,10 @@ public class LibraryEditBookFragment extends Fragment implements BarcodeScanner.
         return mBinding.getRoot();
     }
 
-    // TODO
+    /**
+     * Utility to show a toast via the MainActivity.
+     * @param msg Message to show
+     */
     private void showToast(String msg) {
         ((MainActivity) requireActivity()).showToast(msg);
     }
@@ -90,3 +105,5 @@ public class LibraryEditBookFragment extends Fragment implements BarcodeScanner.
         showToast("Failed to scan barcode");
     }
 }
+
+// TODO refactor how viewModel is used here

@@ -1,4 +1,10 @@
-// TODO
+/*
+ * BarcodeScanner
+ *
+ * October 30, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 
 package com.example.unlibrary.util;
 
@@ -12,10 +18,17 @@ import com.google.mlkit.vision.common.InputImage;
 
 import java.io.IOException;
 
-// TODO
+/**
+ * Utility class to manage scanning a barcode from an image with MLKit.
+ */
 public class BarcodeScanner {
 
-    // TODO
+    /**
+     * Scan a barcode from an image and return an isbn.
+     * @param context Application context needed to access image
+     * @param uri Uri of the image that should be scanned.
+     * @param onFinished Callbacks to invoke when scan succeeds or fails.
+     */
     public static void scanBarcode(Context context, Uri uri, OnFinishedScanListener onFinished) {
         InputImage image = null;
         try {
@@ -25,6 +38,7 @@ public class BarcodeScanner {
             return;
         }
 
+        // Only scan EAN_8 and EAN_13 (book barcodes) to speed up scanning
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(
@@ -52,16 +66,23 @@ public class BarcodeScanner {
                 .addOnFailureListener(onFinished::onFinishedScanFailure);
     }
 
-    // TODO
+    /**
+     * Exception thrown when something goes wrong during a scan.
+     */
     public static class FailedToScan extends Exception {
 
-        // TODO
+        /**
+         * Build the exception.
+         * @param msg Message for exception.
+         */
         public FailedToScan(String msg) {
             super(msg);
         }
     }
 
-    // TODO
+    /**
+     * Callbacks to be invoked when scan finishes.
+     */
     public interface OnFinishedScanListener {
         void onFinishedScanSuccess(String isbn);
 

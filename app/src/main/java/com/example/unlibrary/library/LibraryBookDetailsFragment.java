@@ -1,5 +1,10 @@
-// TODO
-
+/*
+ * LibraryBookDetailsFragment
+ *
+ * October 30, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary.library;
 
 import android.os.Bundle;
@@ -19,12 +24,20 @@ import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
 
 import org.jetbrains.annotations.NotNull;
 
-// TODO
+/**
+ * Fragment to display the details and requests upon a user owned book.
+ */
 public class LibraryBookDetailsFragment extends Fragment {
 
-    FragmentLibraryBookDetailsBinding mBinding;
+    private FragmentLibraryBookDetailsBinding mBinding;
 
-    // TODO
+    /**
+     * Setup the fragment
+     * @param inflater default
+     * @param container default
+     * @param savedInstanceState default
+     * @return fragment view
+     */
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Get the activity viewModel

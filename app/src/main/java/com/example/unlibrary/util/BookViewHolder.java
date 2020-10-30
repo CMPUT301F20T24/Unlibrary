@@ -1,3 +1,11 @@
+/*
+ * BookViewHolder
+ *
+ * October 30, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.util;
 
 import androidx.databinding.ViewDataBinding;
