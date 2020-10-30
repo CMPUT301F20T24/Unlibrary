@@ -13,13 +13,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.util.BarcodeScanner;
 
 import java.util.ArrayList;
 
 /**
  * Manages the Library flow business logic. Connects the library fragments to the repository.
  */
-public class LibraryViewModel extends ViewModel {
+public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFinishedScanListener {
 
     private MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
     private LiveData<ArrayList<Book>> mBooks;
@@ -80,5 +81,21 @@ public class LibraryViewModel extends ViewModel {
 
     public void deleteCurrentBook() {
         // TODO
+    }
+
+    // TODO
+    @Override
+    public void onFinishedScanSuccess(String isbn) {
+        Book book = mCurrentBook.getValue();
+        book.setIsbn(isbn);
+        mCurrentBook.setValue(book);
+        System.out.println(isbn);
+    }
+
+    // TODO
+    @Override
+    public void onFinishedScanFailure(Throwable e) {
+        // TODO
+        System.out.println("IT FAILED");
     }
 }
