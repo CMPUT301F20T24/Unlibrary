@@ -131,7 +131,7 @@ public class LibraryRepository {
     public void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener) {
         AndroidNetworking.get("https://www.googleapis.com/books/v1/volumes")
                 .addQueryParameter("q", "ISBN:" + isbn)
-                .addQueryParameter("key", "AIzaSyAD0VElKl_qWGbjeDSzLKR9PcKuRqbFu6M")
+                .addQueryParameter("key", "AIzaSyAD0VElKl_qWGbjeDSzLKR9PcKuRqbFu6M") // This probably shouldn't be embedded here but ya know...
                 .setTag(ISBN_FETCH_TAG)
                 .setPriority(Priority.LOW)
                 .build()
