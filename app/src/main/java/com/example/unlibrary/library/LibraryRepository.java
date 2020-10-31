@@ -45,7 +45,6 @@ public class LibraryRepository {
      * Constructor for the Library Repository.
      */
     public LibraryRepository() {
-        // TODO
         mDb = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mBooks = new MutableLiveData<>(new ArrayList<>());
@@ -55,16 +54,14 @@ public class LibraryRepository {
      * Attach a listener to a QuerySnapshot from Firestore. Listen to any changes in the database
      * and update the books object.
      */
-    // TODO listener not working
     public void attachListener() {
-        // TODO
         listenerRegistration = mDb.collection(BOOKS_COLLECTION).addSnapshotListener((snapshot, error) -> {
             if (error != null) {
                 Log.w(TAG, "Error listening", error);
                 return;
             }
 
-            // TODO only use getDocumentChanges
+            // TODO only use getDocumentChanges instead of rebuilding the entire list
             // Rebuild the list
             ArrayList<Book> newBooks = new ArrayList<>();
             for (DocumentSnapshot doc : snapshot.getDocuments()) {
@@ -82,8 +79,10 @@ public class LibraryRepository {
      * @param onFailureListener code to call on failure
      */
     public void createBook(Book book, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener) {
-        // TODO check null case
         String uid = mAuth.getCurrentUser().getUid();
+        if (uid == null) {
+            onFailureListener.onFailure(new NullPointerException("Null user id"));
+        }
         book.setOwner(uid);
         mDb.collection(BOOKS_COLLECTION).add(book)
                 .addOnSuccessListener(onSuccessListener)
@@ -135,7 +134,6 @@ public class LibraryRepository {
      * Detach listener when fragment is no longer being viewed.
      */
     public void detachListener() {
-        // TODO
         listenerRegistration.remove();
     }
 
