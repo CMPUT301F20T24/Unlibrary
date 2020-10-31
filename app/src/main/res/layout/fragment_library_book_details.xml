@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/text_margin"
             android:layout_marginTop="16dp"
-            android:text="ISBN"
+            android:text="@string/isbn"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profileImage" />
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/text_margin"
             android:layout_marginTop="8dp"
-            android:text="1938392"
+            android:text="@{viewModel.currentBook.isbn}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/text_margin"
             android:layout_marginTop="@dimen/text_margin"
-            android:text="Request Status"
+            android:text="@string/request_status"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView5" />
@@ -92,7 +92,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginStart="@dimen/text_margin"
             android:layout_marginTop="8dp"
-            android:text="Available"
+            android:text="@{viewModel.currentBook.status.toString()}"
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             app:chipIcon="@drawable/status_color"

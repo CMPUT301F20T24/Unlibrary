@@ -23,4 +23,6 @@
     <string name="card_view_image_description">Holds image of card</string>
     <string name="edit_book_fab_description">Edit book</string>
     <string name="delete_book_fab_description">Delete book</string>
+    <string name="isbn">ISBN</string>
+    <string name="request_status">Request Status</string>
 </resources>
