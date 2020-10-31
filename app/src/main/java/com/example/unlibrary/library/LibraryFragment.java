@@ -12,15 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
-import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
 
 /**
@@ -37,7 +33,7 @@ public class LibraryFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
         // Setup data binding
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_library, container, false);
+        mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
 

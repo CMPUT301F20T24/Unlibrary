@@ -12,13 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
-import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +42,7 @@ public class LibraryBookDetailsFragment extends Fragment {
         LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
         // Setup data binding
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_library_book_details, container, false);
+        mBinding = FragmentLibraryBookDetailsBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
