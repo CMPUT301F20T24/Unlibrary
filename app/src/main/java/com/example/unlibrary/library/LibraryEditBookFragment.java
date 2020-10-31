@@ -35,7 +35,7 @@ public class LibraryEditBookFragment extends Fragment {
 
     private LibraryViewModel mViewModel;
     private FragmentLibraryEditBookBinding mBinding;
-    private Uri autofillUri;
+    private Uri mAutofillUri;
     private ActivityResultLauncher<Uri> mScanBarcodeContract;
 
     /**
@@ -76,7 +76,7 @@ public class LibraryEditBookFragment extends Fragment {
         // Setup scanBarcode contract
         mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
             if (result) {
-                BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), autofillUri, mViewModel);
+                BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), mAutofillUri, mViewModel);
             } else {
                 showToast("Failed to get photo.");
             }
@@ -85,8 +85,8 @@ public class LibraryEditBookFragment extends Fragment {
         // Setup autoFill button. This is done in fragment because camera requires lots of access to application context
         mBinding.autoFillButton.setOnClickListener(v -> {
             try {
-                autofillUri = ((MainActivity) requireActivity()).buildFileUri();
-                mScanBarcodeContract.launch(autofillUri);
+                mAutofillUri = ((MainActivity) requireActivity()).buildFileUri();
+                mScanBarcodeContract.launch(mAutofillUri);
             } catch (IOException e) {
                 showToast("Failed to build uri.");
             }
