@@ -53,6 +53,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
+                android:singleLine="true"
+                android:lines="1"
+                android:inputType="text"
                 android:text="@={viewModel.currentBook.title}" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -72,6 +75,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
+                android:singleLine="true"
+                android:lines="1"
+                android:inputType="textPersonName"
                 android:text="@={viewModel.currentBook.author}" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -92,6 +98,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
+                android:singleLine="true"
+                android:lines="1"
+                android:inputType="number"
                 android:text="@={viewModel.currentBook.isbn}" />
 
         </com.google.android.material.textfield.TextInputLayout>

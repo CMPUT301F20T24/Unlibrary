@@ -63,10 +63,17 @@ public class LibraryEditBookFragment extends Fragment {
         // Setup observers
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.saveButton).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, this::showToast);
-        mViewModel.getInvalidInputEvent().observe(this, new Observer<Pair<LibraryViewModel.InputKey, String>>() {
-            @Override
-            public void onChanged(Pair<LibraryViewModel.InputKey, String> inputKeyStringPair) {
-                // TODO
+        mViewModel.getInvalidInputEvent().observe(this, pair -> {
+            switch (pair.first) {
+                case TITLE:
+                    mBinding.bookTitleInput.setError(pair.second);
+                    break;
+                case AUTHOR:
+                    mBinding.bookAuthorInput.setError(pair.second);
+                    break;
+                case ISBN:
+                    mBinding.bookIsbnInput.setError(pair.second);
+                    break;
             }
         });
 

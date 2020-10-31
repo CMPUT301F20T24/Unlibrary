@@ -18,6 +18,7 @@ import androidx.navigation.NavDirections;
 
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.example.unlibrary.auth.AuthViewModel;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
@@ -34,6 +35,9 @@ import java.util.ArrayList;
 public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFinishedScanListener {
 
     private static final String TAG = LibraryViewModel.class.getSimpleName();
+    private static final int MAX_TITLE_LENGTH = 100;
+    private static final int MAX_AUTHOR_LENGTH = 100;
+    private static final int ISBN_LENGTH = 13;
     private MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
     private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
@@ -137,8 +141,34 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * Save the book that is currently being created or edited
      */
     public void saveBook() {
-        // TODO validate data
+        // Validate data
         Book book = mCurrentBook.getValue();
+        boolean invalid = false;
+        try {
+            validateTitle(book.getTitle());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.TITLE, null));
+        } catch (InvalidInputException e) {
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.TITLE, e.getMessage()));
+            invalid = true;
+        }
+        try {
+             validateAuthor(book.getAuthor());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.AUTHOR, null));
+        } catch (InvalidInputException e) {
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.AUTHOR, e.getMessage()));
+            invalid = true;
+        }
+        try {
+            validateIsbn(book.getIsbn());
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.ISBN, null));
+        } catch (InvalidInputException e) {
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.ISBN, e.getMessage()));
+            invalid = true;
+        }
+        if (invalid) {
+            return;
+        }
+
         if (book.getId() == null) {
             // Book is new
             book.setStatus(Book.Status.AVAILABLE); // A book is by default available
@@ -237,4 +267,73 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         Log.e(TAG, "Failed to scan barcode.", e);
     }
 
+    /**
+     * Validate an title value.
+     *
+     * @param title Title to validate
+     * @throws InvalidInputException Thrown when title is invalid
+     */
+    private void validateTitle(String title) throws InvalidInputException {
+        // Non-empty
+        if (title == null || title.isEmpty()) {
+            throw new InvalidInputException("Title is empty.");
+        }
+
+        // Length
+        if (title.length() > MAX_TITLE_LENGTH) {
+            throw new InvalidInputException("Title is too long.");
+        }
+    }
+
+    /**
+     * Validate an author value.
+     *
+     * @param author Author to validate.
+     * @throws InvalidInputException Thrown when author is invalid
+     */
+    private void validateAuthor(String author) throws InvalidInputException {
+        // Non-empty
+        if (author == null || author.isEmpty()) {
+            throw new InvalidInputException("Author is empty.");
+        }
+
+        // Length
+        if (author.length() > MAX_AUTHOR_LENGTH) {
+            throw new InvalidInputException("Author is too long.");
+        }
+    }
+
+    /**
+     * Validate an isbn value.
+     *
+     * @param isbn Isbn to validate.
+     * @throws InvalidInputException Thrown when isbn is invalid.
+     */
+    private void validateIsbn(String isbn) throws InvalidInputException {
+        // Length
+        if (isbn == null || isbn.isEmpty() || isbn.length() != ISBN_LENGTH) {
+            throw new InvalidInputException("Invalid isbn.");
+        }
+
+        // All numbers
+        try {
+            Long.parseLong(isbn, 10);
+        } catch (NumberFormatException e) {
+            throw new InvalidInputException("Isbn is not all numbers.");
+        }
+    }
+
+    /**
+     * Exception thrown when input data is invalid.
+     */
+    public static class InvalidInputException extends Exception {
+        /**
+         * Constructor for exception.
+         *
+         * @param errorMessage Reason that input is invalid
+         */
+        public InvalidInputException(String errorMessage) {
+            super(errorMessage);
+        }
+    }
 }
