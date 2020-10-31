@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.unlibrary.library.LibraryViewModel" />
+
+    </data>
+
     <RelativeLayout
         android:id="@+id/frameLayout2"
         android:layout_width="match_parent"
@@ -27,6 +35,7 @@
             android:layout_marginBottom="20dp"
             android:backgroundTint="@color/Red"
             android:src="@drawable/ic_search"
+            android:onClick="@{()->viewModel.filter()}"
             app:fabSize="normal" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -39,6 +48,7 @@
             android:layout_marginBottom="20dp"
             android:backgroundTint="@color/Red"
             android:src="@drawable/ic_add"
+            android:onClick="@{()->viewModel.createBook()}"
             app:fabSize="normal" />
 
     </RelativeLayout>

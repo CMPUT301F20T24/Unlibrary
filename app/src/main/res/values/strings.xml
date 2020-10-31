@@ -15,4 +15,14 @@
     <string name="exchange_nav">Exchange</string>
     <string name="profile_nav">Profile</string>
     <string name="search_bar_hint">Search for books to borrow...</string>
+    <string name="title_hint">Title</string>
+    <string name="author_hint">Author</string>
+    <string name="isbn_hint">ISBN</string>
+    <string name="auto_fill_button">Auto-Fill</string>
+    <string name="save_button">Save</string>
+    <string name="card_view_image_description">Holds image of card</string>
+    <string name="edit_book_fab_description">Edit book</string>
+    <string name="delete_book_fab_description">Delete book</string>
+    <string name="isbn">ISBN</string>
+    <string name="request_status">Request Status</string>
 </resources>

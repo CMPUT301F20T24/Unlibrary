@@ -8,6 +8,9 @@
 
 package com.example.unlibrary.models;
 
+import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.Exclude;
+
 import java.util.ArrayList;
 
 /**
@@ -76,6 +79,8 @@ public class Book {
      *
      * @return book's unique identifier
      */
+    @Exclude
+    @DocumentId
     public String getId() {
         return mId;
     }
@@ -153,7 +158,9 @@ public class Book {
      * Returns the current status of the book in string
      * @return
      */
-    public String stringStatus(){ return mStatus.toString(); }
+    public String stringStatus() {
+        return mStatus == null ? "" : mStatus.toString();
+    }
 
     /**
      * Updates the state of the book.
@@ -197,6 +204,15 @@ public class Book {
     }
 
     /**
+     * Sets the unique user ID of the owner of the book
+     *
+     * @param owner updated owner
+     */
+    public void setOwner(String owner) {
+        mOwner = owner;
+    }
+
+    /**
      * Gets the title of the book. Multiple books may have the same title.
      *
      * @return title of the book
@@ -215,7 +231,7 @@ public class Book {
     }
 
     // TODO: Check if there's a better way of holding this information without making another fetch request to the database to retrieve Requests
-    enum Status {
+    public enum Status {
         AVAILABLE,
         REQUESTED,
         ACCEPTED,
