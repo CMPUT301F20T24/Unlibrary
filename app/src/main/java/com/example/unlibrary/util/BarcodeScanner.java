@@ -25,8 +25,9 @@ public class BarcodeScanner {
 
     /**
      * Scan a barcode from an image and return an isbn.
-     * @param context Application context needed to access image
-     * @param uri Uri of the image that should be scanned.
+     *
+     * @param context    Application context needed to access image
+     * @param uri        Uri of the image that should be scanned.
      * @param onFinished Callbacks to invoke when scan succeeds or fails.
      */
     public static void scanBarcode(Context context, Uri uri, OnFinishedScanListener onFinished) {
@@ -73,6 +74,7 @@ public class BarcodeScanner {
 
         /**
          * Build the exception.
+         *
          * @param msg Message for exception.
          */
         public FailedToScan(String msg) {
