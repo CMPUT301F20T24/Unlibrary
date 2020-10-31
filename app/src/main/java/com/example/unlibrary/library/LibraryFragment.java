@@ -12,11 +12,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.example.unlibrary.MainActivity;
+import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
 
 /**
@@ -29,21 +33,17 @@ public class LibraryFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
-
         // Get the activity viewModel
         mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
-        mBinding.fabAdd.setOnClickListener(v -> {
-            // TODO should this be done here?
-            mViewModel.createNewBook();
-            NavDirections action = LibraryFragmentDirections.actionLibraryFragmentToLibraryEditBookFragment();
-            Navigation.findNavController(v).navigate(action);
-        });
+        // Setup data binding
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_library, container, false);
+        mBinding.setViewModel(mViewModel);
+        mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
-        mBinding.fabFilter.setOnClickListener(v -> {
-            // TODO bring up a filter dialog. Don't use navigation here
-        });
+        // Setup observers
+        mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.fabAdd).navigate(navDirections));
+        mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         return mBinding.getRoot();
     }

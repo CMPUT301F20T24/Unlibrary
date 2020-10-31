@@ -8,17 +8,16 @@
 package com.example.unlibrary.library;
 
 import android.os.Bundle;
-
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+
+import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
 
@@ -33,8 +32,9 @@ public class LibraryBookDetailsFragment extends Fragment {
 
     /**
      * Setup the fragment
-     * @param inflater default
-     * @param container default
+     *
+     * @param inflater           default
+     * @param container          default
      * @param savedInstanceState default
      * @return fragment view
      */
@@ -48,15 +48,9 @@ public class LibraryBookDetailsFragment extends Fragment {
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
-        // Setup buttons
-        mBinding.editBook.setOnClickListener(v -> {
-            NavDirections action = LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryEditBookFragment();
-            Navigation.findNavController(v).navigate(action);
-        });
-
-        mBinding.deleteBook.setOnClickListener(v -> {
-            // TODO
-        });
+        // Setup observers
+        mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.editBook).navigate(navDirections));
+        mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         return mBinding.getRoot();
     }

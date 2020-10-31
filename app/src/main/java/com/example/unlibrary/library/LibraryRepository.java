@@ -14,17 +14,16 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.androidnetworking.AndroidNetworking;
-import com.androidnetworking.common.ANRequest;
 import com.androidnetworking.common.Priority;
-import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -78,37 +77,31 @@ public class LibraryRepository {
     /**
      * Save new Book into the database. Assumes book is valid.
      *
-     * @param book book object to be saved in the database.
+     * @param book              book object to be saved in the database
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
      */
-    public void createBook(Book book) {
+    public void createBook(Book book, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener) {
         // TODO check null case
         String uid = mAuth.getCurrentUser().getUid();
         book.setOwner(uid);
         mDb.collection(BOOKS_COLLECTION).add(book)
-                .addOnSuccessListener(documentReference -> {
-                    // TODO
-                    System.out.println("Success");
-                })
-                .addOnFailureListener(e -> {
-                    // TODO
-                    System.out.println("Failure");
-                });
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     /**
      * Update a book document.
      *
      * @param book book object to be updated in the database.
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
      */
-    public void updateBook(Book book) {
+    public void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(BOOKS_COLLECTION).document(book.getId())
                 .set(book)
-                .addOnSuccessListener(documentReference -> {
-                    // TODO
-                })
-                .addOnFailureListener(e -> {
-                    // TODO
-                });
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     /**

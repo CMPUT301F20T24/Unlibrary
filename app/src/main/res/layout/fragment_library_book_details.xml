@@ -33,6 +33,7 @@
             android:layout_margin="16dp"
             android:layout_marginBottom="4dp"
             android:contentDescription="@string/edit_book_fab_description"
+            android:onClick="@{()->viewModel.editCurrentBook()}"
             app:layout_constraintBottom_toBottomOf="@+id/profileImage"
             app:layout_constraintEnd_toStartOf="@+id/delete_book"
             app:srcCompat="@drawable/ic_baseline_edit_24" />
@@ -45,6 +46,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="4dp"
             android:contentDescription="@string/delete_book_fab_description"
+            android:onClick="@{()->viewModel.deleteCurrentBook()}"
             app:layout_constraintBottom_toBottomOf="@+id/profileImage"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_baseline_delete_24" />

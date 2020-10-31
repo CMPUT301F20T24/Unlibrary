@@ -8,13 +8,19 @@
 
 package com.example.unlibrary.library;
 
+import android.util.Log;
+import android.util.Pair;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.navigation.NavDirections;
 
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.util.BarcodeScanner;
+import com.example.unlibrary.util.SingleLiveEvent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,11 +31,21 @@ import java.util.ArrayList;
 /**
  * Manages the Library flow business logic. Connects the library fragments to the repository.
  */
-public class LibraryViewModel extends ViewModel {
+public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFinishedScanListener {
 
+    private static final String TAG = LibraryViewModel.class.getSimpleName();
     private MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private LiveData<ArrayList<Book>> mBooks;
     private LibraryRepository mLibraryRepository;
+
+    public enum InputKey {
+        TITLE,
+        AUTHOR,
+        ISBN
+    }
 
     /**
      * Constructor for the Library ViewModel. Instantiates listener to Firestore.
@@ -50,6 +66,42 @@ public class LibraryViewModel extends ViewModel {
     }
 
     /**
+     * NavigationEvent getter for activity observers.
+     *
+     * @return Event of which fragment to navigate to
+     */
+    public SingleLiveEvent<NavDirections> getNavigationEvent() {
+        if (mNavigationEvent == null) {
+            mNavigationEvent = new SingleLiveEvent<>();
+        }
+        return mNavigationEvent;
+    }
+
+    /**
+     * FailureMsgEvent getter for activity observers.
+     *
+     * @return Event of failure message to display
+     */
+    public SingleLiveEvent<String> getFailureMsgEvent() {
+        if (mFailureMsgEvent == null) {
+            mFailureMsgEvent = new SingleLiveEvent<>();
+        }
+        return mFailureMsgEvent;
+    }
+
+    /**
+     * InvalidInputEvent getter for activity observers.
+     *
+     * @return Event of failure message to display
+     */
+    public SingleLiveEvent<Pair<InputKey, String>> getInvalidInputEvent() {
+        if (mInvalidInputEvent == null) {
+            mInvalidInputEvent = new SingleLiveEvent<>();
+        }
+        return mInvalidInputEvent;
+    }
+
+    /**
      * Getter for the mBooks object.
      *
      * @return LiveData<ArrayList < Book>> This returns the mBooks object
@@ -65,39 +117,87 @@ public class LibraryViewModel extends ViewModel {
         this.mLibraryRepository.detachListener();
     }
 
-    // TODO
-    public void createNewBook() {
+    /**
+     * Prepare model to create a new book.
+     */
+    public void createBook() {
         // Current book becomes empty
         mCurrentBook.setValue(new Book());
+        mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryEditBookFragment());
     }
 
-    // TODO
-    public void saveNewBook() {
-        // TODO validate data
-        Book book = mCurrentBook.getValue();
-        book.setStatus(Book.Status.AVAILABLE);
-        mLibraryRepository.createBook(mCurrentBook.getValue());
-    }
-
-    // TODO
-    public void editCurrentBook() {
+    /**
+     * Filter displayed books.
+     */
+    public void filter() {
         // TODO
     }
 
+    /**
+     * Save the book that is currently being created or edited
+     */
+    public void saveBook() {
+        // TODO validate data
+        Book book = mCurrentBook.getValue();
+        if (book.getId() == null) {
+            // Book is new
+            book.setStatus(Book.Status.AVAILABLE); // A book is by default available
+            mLibraryRepository.createBook(book,
+                    o -> {
+                        mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
+                    },
+                    e -> {
+                        mFailureMsgEvent.setValue("Failed to create new book.");
+                        Log.e(TAG, "Failed to create new book.", e);
+                    });
+        } else {
+            // Pre-existing book
+            mLibraryRepository.updateBook(book,
+                    o -> {
+                        mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
+                    },
+                    e -> {
+                        mFailureMsgEvent.setValue("Failed to update book.");
+                        Log.e(TAG, "Failed to update book.", e);
+                    });
+        }
+    }
+
+    /**
+     * Prepare to edit the current book.
+     */
+    public void editCurrentBook() {
+        mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryEditBookFragment());
+    }
+
+    /**
+     * Delete the current book.
+     */
     public void deleteCurrentBook() {
         // TODO
     }
 
-    // TODO
-    public void autoFill(String isbn) {
+    /**
+     * Code to be called when a barcode scan is finished successfully.
+     *
+     * @param isbn isbn from successful scan
+     */
+    @Override
+    public void onFinishedScanSuccess(String isbn) {
+        if (isbn == null || isbn.isEmpty()) {
+            mFailureMsgEvent.setValue("Invalid ISBN found");
+            return;
+        }
+
+        // Use the ISBN to search up book details
         mLibraryRepository.fetchBookDataFromIsbn(isbn, new JSONObjectRequestListener() {
             @Override
             public void onResponse(JSONObject response) {
-                // TODO parse out author and title
                 String title = "";
                 String author = "";
-                JSONArray items = null;
+                JSONArray items;
                 try {
+                    // Grunge through JSON and grab the first valid values we find.
                     items = response.getJSONArray("items");
                     JSONObject firstItem = items.getJSONObject(0);
                     JSONObject volumeInfo = firstItem.getJSONObject("volumeInfo");
@@ -105,23 +205,36 @@ public class LibraryViewModel extends ViewModel {
                     JSONArray authors = volumeInfo.getJSONArray("authors");
                     author = authors.getString(0);
                 } catch (JSONException e) {
-                    e.printStackTrace();
-                    // TODO handle
+                    Log.e(TAG, "Failed to grab values from json.", e);
+                } finally {
+                    Book book = mCurrentBook.getValue();
+                    book.setIsbn(isbn);
+                    book.setTitle(title);
+                    book.setAuthor(author);
+                    mCurrentBook.setValue(book);
                 }
-                Book book = mCurrentBook.getValue();
-                book.setIsbn(isbn);
-                book.setTitle(title);
-                book.setAuthor(author);
-                mCurrentBook.setValue(book);
             }
 
             @Override
             public void onError(ANError error) {
-                // TODO share error that it failed to get author or title
+                mFailureMsgEvent.setValue("Failed to find title or author from ISBN.");
+                Log.e(TAG, "Failed to get title or author.", error);
                 Book book = mCurrentBook.getValue();
                 book.setIsbn(isbn);
                 mCurrentBook.setValue(book);
             }
         });
     }
+
+    /**
+     * Code to be called when a barcode scan fails.
+     *
+     * @param e Throwable
+     */
+    @Override
+    public void onFinishedScanFailure(Throwable e) {
+        mFailureMsgEvent.setValue("Failed to scan barcode.");
+        Log.e(TAG, "Failed to scan barcode.", e);
+    }
+
 }
