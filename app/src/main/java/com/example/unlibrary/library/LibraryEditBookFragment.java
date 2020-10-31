@@ -40,8 +40,7 @@ public class LibraryEditBookFragment extends Fragment implements BarcodeScanner.
     private LibraryViewModel mViewModel;
     private FragmentLibraryEditBookBinding mBinding;
     private Uri autofillUri;
-    private final ActivityResultLauncher<Uri> mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), (ActivityResultCallback<Boolean>) result -> {
-        // TODO
+    private final ActivityResultLauncher<Uri> mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
         if (result) {
             BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), autofillUri, this);
         } else {

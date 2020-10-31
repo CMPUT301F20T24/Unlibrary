@@ -67,12 +67,19 @@ public class MainActivity extends AuthenticatedActivity {
         }
     }
 
-    // TODO
+    /**
+     * Utility function to show toast.
+     * @param msg Message to show
+     */
     public void showToast(String msg) {
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
 
-    // TODO
+    /**
+     * Utility function to generate a Uri to store an image in.
+     * @return A Uri where an image can be stored
+     * @throws IOException Thrown when it fails to generate the Uri
+     */
     public Uri buildFileUri() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date());
@@ -84,7 +91,6 @@ public class MainActivity extends AuthenticatedActivity {
                 storageDir      /* directory */
         );
 
-        // TODO this line is hack. Try to improve. Like it is because not guarenteed to own packagename
         return FileProvider.getUriForFile(getApplicationContext(), getPackageName() + ".fileprovider", image);
     }
 }
