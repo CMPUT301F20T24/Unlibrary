@@ -180,6 +180,10 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             book.setStatus(Book.Status.AVAILABLE); // A book is by default available
             mLibraryRepository.createBook(book,
                     o -> {
+                        System.out.println(o.getId());
+                        Book bookWithId = mCurrentBook.getValue();
+                        bookWithId.setId(o.getId());
+                        mCurrentBook.setValue(bookWithId);
                         mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
                     },
                     e -> {
@@ -210,7 +214,13 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * Delete the current book.
      */
     public void deleteCurrentBook() {
-        // TODO
+        mLibraryRepository.deleteBook(mCurrentBook.getValue(),
+                o -> {
+                    mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
+                },
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to delete book.");
+                });
     }
 
     /**

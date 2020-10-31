@@ -110,17 +110,15 @@ public class LibraryRepository {
     /**
      * Delete book from the database.
      *
-     * @param book book object to be deleted from the database.
+     * @param book              book object to be deleted from the database.
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
      */
-    public void deleteObject(Book book) {
+    public void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(BOOKS_COLLECTION).document(book.getId())
                 .delete()
-                .addOnSuccessListener(aVoid -> {
-                    // TODO
-                })
-                .addOnFailureListener(e -> {
-                    // TODO
-                });
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     /**
