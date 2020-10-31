@@ -92,7 +92,7 @@ public class LibraryRepository {
     /**
      * Update a book document.
      *
-     * @param book book object to be updated in the database.
+     * @param book              book object to be updated in the database.
      * @param onSuccessListener code to call on success
      * @param onFailureListener code to call on failure
      */
@@ -121,7 +121,8 @@ public class LibraryRepository {
 
     /**
      * Fetch the title and author of a book with Google Books API via ISBN.
-     * @param isbn ISBN of book
+     *
+     * @param isbn     ISBN of book
      * @param listener code to call on completion
      */
     public void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener) {

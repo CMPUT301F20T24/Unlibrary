@@ -18,7 +18,6 @@ import androidx.navigation.NavDirections;
 
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.example.unlibrary.auth.AuthViewModel;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
@@ -152,7 +151,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             invalid = true;
         }
         try {
-             validateAuthor(book.getAuthor());
+            validateAuthor(book.getAuthor());
             mInvalidInputEvent.setValue(new Pair<>(InputKey.AUTHOR, null));
         } catch (InvalidInputException e) {
             mInvalidInputEvent.setValue(new Pair<>(InputKey.AUTHOR, e.getMessage()));
@@ -236,6 +235,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     author = authors.getString(0);
                 } catch (JSONException e) {
                     Log.e(TAG, "Failed to grab values from json.", e);
+                    mFailureMsgEvent.setValue("No relevant title or author found.");
                 } finally {
                     Book book = mCurrentBook.getValue();
                     book.setIsbn(isbn);
