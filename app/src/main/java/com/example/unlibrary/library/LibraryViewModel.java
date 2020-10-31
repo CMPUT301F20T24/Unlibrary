@@ -8,6 +8,7 @@
 
 package com.example.unlibrary.library;
 
+import android.net.Uri;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
@@ -260,6 +261,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 mCurrentBook.setValue(book);
             }
         });
+    }
+
+    // TODO
+    public void takePhoto(Uri uri) {
+        // TODO
     }
 
     /**
