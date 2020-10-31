@@ -119,7 +119,11 @@ public class LibraryRepository {
                 });
     }
 
-    // TODO
+    /**
+     * Fetch the title and author of a book with Google Books API via ISBN.
+     * @param isbn ISBN of book
+     * @param listener code to call on completion
+     */
     public void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener) {
         AndroidNetworking.get("https://www.googleapis.com/books/v1/volumes")
                 .addQueryParameter("q", "ISBN:" + isbn)
