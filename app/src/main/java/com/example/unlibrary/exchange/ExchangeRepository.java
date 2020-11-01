@@ -26,7 +26,7 @@ import java.util.Arrays;
  */
 public class ExchangeRepository {
     private static final String BOOKS_COLLECTION = "Books";
-    private static final String TAG = "EXCHANGE_REPOSITORY";
+    private static final String TAG = ExchangeRepository.class.getSimpleName();
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<ArrayList<Book>> mBooks;
@@ -56,6 +56,7 @@ public class ExchangeRepository {
                     }
 
                     // Update the list to reflect changes in the database
+                    // TODO: use getDocumentChanges instead to minimize payload from Firestore
                     ArrayList<Book> dbBooks = new ArrayList<>();
                     for (DocumentSnapshot doc : value.getDocuments()) {
                         // Only show the book with AVAILABLE or REQUESTED status for exchange
