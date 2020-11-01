@@ -9,22 +9,22 @@
 package com.example.unlibrary.models;
 
 import com.google.firebase.firestore.DocumentId;
-import com.google.firebase.firestore.Exclude;
 
 import java.util.ArrayList;
 
 /**
- * Represents a book in our application domain.
+ * Represents a book in our application domain. Book is a pure POJO class (getters and setters only)
+ * so that it can be used as a custom object when interacting with Firestore.
  * <p>
- * TODO: Link and retrieve ID from Firestore
  */
 public class Book {
+
     private String mId;
     private String mIsbn;
     private String mTitle;
     private String mAuthor;
     private String mOwner;
-    private ArrayList<String> mPhotos;
+    private String mPhoto;
     private Status mStatus;
 
     /**
@@ -35,43 +35,21 @@ public class Book {
     }
 
     /**
-     * TODO: delete this constructor once determined how to store images taken by the camera
-     * TODO: link logged in user with the owner of books to modify the book lists in each fragment
-     * Constructor a book for cardviews
-     * @param isbn
-     * @param mTitle
-     * @param mAuthor
-     * @param mStatus
-     */
-
-    public Book(String isbn, String mTitle, String mAuthor, String mStatus) {
-        this.mIsbn = isbn;
-        this.mTitle = mTitle;
-        this.mAuthor = mAuthor;
-        this.mStatus = Status.valueOf(mStatus);
-    }
-
-    /**
      * Construct a book and initialize it with a list of photos.
      *
      * @param isbn   of book
      * @param title  of book
      * @param author of book
      * @param owner  unique user identifier of the owner of the book
-     * @param photos URL of photos to add, can be null if no photos are added
+     * @param photo URL of photo to add, can be null if no photo was added on creation
      */
-    public Book(String isbn, String title, String author, String owner, ArrayList<String> photos) {
+    public Book(String isbn, String title, String author, String owner, String photo) {
         mIsbn = isbn;
         mTitle = title;
         mAuthor = author;
         mOwner = owner;
         mStatus = Status.AVAILABLE;
-
-        if (photos != null) {
-            mPhotos = photos;
-        } else {
-            mPhotos = new ArrayList<>();
-        }
+        mPhoto = photo;
     }
 
     /**
@@ -79,10 +57,24 @@ public class Book {
      *
      * @return book's unique identifier
      */
-    @Exclude
     @DocumentId
     public String getId() {
         return mId;
+    }
+
+    /**
+     * Updates the unique identifier of the book. Should not be called explicitly in code. This is
+     * called automatically when {@link com.google.firebase.firestore.DocumentSnapshot#toObject(Class)}
+     * is called when retrieving documents from Firestore.
+     *
+     * @param id updated unique identifier of book
+     */
+    public void setId(String id) {
+        if (mId != null) {
+            throw new IllegalArgumentException("ID has already been initialized");
+        }
+
+        mId = id;
     }
 
     /**
@@ -108,36 +100,17 @@ public class Book {
      *
      * @return list of photo URLs that can be fetched
      */
-    public ArrayList<String> getPhotos() {
-        return mPhotos;
+    public String getPhotos() {
+        return mPhoto;
     }
 
     /**
-     * Adds a single photo to the list of photos associated with the book.
+     * Updates the photo URL associated with this book. Can only be done by the book owner.
      *
-     * @param photo url to add
+     * @param photo updated photo URL
      */
-    public void addPhoto(String photo) {
-        mPhotos.add(photo);
-    }
-
-    /**
-     * Adds multiple photos tot he list of photos associated with the book.
-     *
-     * @param photos list of photo urls to add
-     */
-    public void addPhotos(ArrayList<String> photos) {
-        mPhotos.addAll(photos);
-    }
-
-    /**
-     * Dissociates the given photo from the book if it is already associated with the book,
-     * does nothing otherwise.
-     *
-     * @param photo url to remove
-     */
-    public void removePhoto(String photo) {
-        mPhotos.remove(photo);
+    public void setPhoto(String photo) {
+        mPhoto = photo;
     }
 
     /**
@@ -152,14 +125,6 @@ public class Book {
      */
     public Status getStatus() {
         return mStatus;
-    }
-
-    /**
-     * Returns the current status of the book in string
-     * @return
-     */
-    public String stringStatus() {
-        return mStatus == null ? "" : mStatus.toString();
     }
 
     /**

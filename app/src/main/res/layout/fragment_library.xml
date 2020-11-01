@@ -11,19 +11,23 @@
 
     </data>
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/frameLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".library.LibraryFragment">
 
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/list"
-            android:name="com.example.unlibrary.library.LibraryBooksFragment"
-            style="@style/FullScreenFragment"
+            android:id="@+id/library_book_list"
+            android:name="com.example.unlibrary.book_list.BooksFragment"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.fragment.app.FragmentContainerView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabFilter"
@@ -31,12 +35,14 @@
             android:layout_height="wrap_content"
             android:layout_above="@id/fabAdd"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:backgroundTint="@color/Red"
-            android:src="@drawable/ic_search"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/fab_add_book_description"
             android:onClick="@{()->viewModel.filter()}"
-            app:fabSize="normal" />
+            android:src="@drawable/ic_search"
+            app:fabSize="normal"
+            app:layout_constraintBottom_toTopOf="@id/fabAdd"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabAdd"
@@ -44,13 +50,15 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:backgroundTint="@color/Red"
-            android:src="@drawable/ic_add"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/fab_filter_description"
             android:onClick="@{()->viewModel.createBook()}"
-            app:fabSize="normal" />
+            android:src="@drawable/ic_add"
+            app:fabSize="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
 

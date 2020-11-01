@@ -27,7 +27,8 @@
             android:layout_height="150dp"
             android:orientation="horizontal"
             android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingBottom="10dp"
+            android:baselineAligned="false">
 
             <RelativeLayout
                 android:layout_width="0dp"
@@ -53,9 +54,7 @@
                     android:layout_marginTop="15dp"
                     android:padding="5dp"
                     android:text="@{book.title}"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:textColor="@android:color/black"
-                    android:textSize="25dp" />
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
                 <TextView
                     android:id="@+id/bookAuthor"
@@ -64,9 +63,7 @@
                     android:layout_below="@id/bookTitle"
                     android:padding="5dp"
                     android:text="@{book.author}"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:textColor="@android:color/black"
-                    android:textSize="15dp" />
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip"
@@ -74,10 +71,9 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentBottom="true"
-                    android:layout_marginRight="5dp"
-                    android:text="@{book.stringStatus()}"
+                    android:layout_marginEnd="5dp"
+                    android:text="@{book.getStatus().toString()}"
                     android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     app:chipIcon="@drawable/status_color"
                     app:chipIconSize="16dp"
                     app:iconStartPadding="3dp" />

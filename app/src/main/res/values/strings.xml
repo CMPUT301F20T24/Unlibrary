@@ -14,6 +14,8 @@
     <string name="unlibrary_nav">Unlibrary</string>
     <string name="exchange_nav">Exchange</string>
     <string name="profile_nav">Profile</string>
+    <string name="fab_add_book_description">Add book</string>
+    <string name="fab_filter_description">Filter</string>
     <string name="search_bar_hint">Search for books to borrow...</string>
     <string name="title_hint">Title</string>
     <string name="author_hint">Author</string>
