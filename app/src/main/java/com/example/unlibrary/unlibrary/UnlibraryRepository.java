@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * Manages all the database interaction for {@link UnlibraryViewModel}
  */
 public class UnlibraryRepository {
-    private final static String TAG = "UNLIBRARY_REPOSITORY";
+    private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOK_COLLECTION = "Books";
 
     private final FirebaseFirestore mDb;
@@ -31,11 +31,12 @@ public class UnlibraryRepository {
 
     /**
      * Constructor for UnlibraryRepository. Sets up Firestore
-     *
+     * <p>
      * TODO: Add querying logic to return only books that have been requested or borrowed by the user
      */
     public UnlibraryRepository() {
         mDb = FirebaseFirestore.getInstance();
+        // TODO: Get document changes only to minimize payload from Firestore
         mListenerRegistration = mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshot, error) -> {
             if (error != null) {
                 Log.w(TAG, error);
@@ -60,34 +61,6 @@ public class UnlibraryRepository {
      */
     public MutableLiveData<ArrayList<Book>> getBooks() {
         return mBooks;
-    }
-
-    /**
-     * Adds a new book entry in Firestore. This book entry does not need to have an id, this id
-     * will be automatically generated in Firestore backend.
-     *
-     * @param book new book to add
-     */
-    public void addBook(Book book) {
-        mDb.collection(BOOK_COLLECTION).add(book).addOnSuccessListener(documentReference -> {
-            Log.d(TAG, "Success uploading book " + book.getTitle());
-        }).addOnFailureListener(e -> {
-            Log.w(TAG, "Unable to upload book " + book.getTitle(), e);
-        });
-
-    }
-
-    /**
-     * Removes a book entry from Firestore.
-     *
-     * @param book book to delete
-     */
-    public void removeBook(Book book) {
-        mDb.collection(BOOK_COLLECTION).document(book.getId()).delete().addOnSuccessListener(aVoid -> {
-            Log.d(TAG, "Successfully removed book " + book.getTitle());
-        }).addOnFailureListener(e -> {
-            Log.w(TAG, "Unable to remove book " + book.getTitle());
-        });
     }
 
     /**
