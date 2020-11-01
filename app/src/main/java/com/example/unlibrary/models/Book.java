@@ -24,7 +24,7 @@ public class Book {
     private String mTitle;
     private String mAuthor;
     private String mOwner;
-    private ArrayList<String> mPhotos;
+    private String mPhoto;
     private Status mStatus;
 
     /**
@@ -41,20 +41,15 @@ public class Book {
      * @param title  of book
      * @param author of book
      * @param owner  unique user identifier of the owner of the book
-     * @param photos URL of photos to add, can be null if no photos are added
+     * @param photo URL of photo to add, can be null if no photo was added on creation
      */
-    public Book(String isbn, String title, String author, String owner, ArrayList<String> photos) {
+    public Book(String isbn, String title, String author, String owner, String photo) {
         mIsbn = isbn;
         mTitle = title;
         mAuthor = author;
         mOwner = owner;
         mStatus = Status.AVAILABLE;
-
-        if (photos != null) {
-            mPhotos = photos;
-        } else {
-            mPhotos = new ArrayList<>();
-        }
+        mPhoto = photo;
     }
 
     /**
@@ -105,17 +100,17 @@ public class Book {
      *
      * @return list of photo URLs that can be fetched
      */
-    public ArrayList<String> getPhotos() {
-        return mPhotos;
+    public String getPhotos() {
+        return mPhoto;
     }
 
     /**
-     * Updates the list of photo URLs associated with this book. Can only be done by the book owner.
+     * Updates the photo URL associated with this book. Can only be done by the book owner.
      *
-     * @param photos updated list of photo URLs
+     * @param photo updated photo URL
      */
-    public void setPhotos(ArrayList<String> photos) {
-        mPhotos = photos;
+    public void setPhoto(String photo) {
+        mPhoto = photo;
     }
 
     /**
