@@ -34,7 +34,7 @@ public class LibraryFragment extends Fragment {
      * Initialize ViewModel of the fragment that will be retained when the fragment is
      * paused or stopped, then resumed.
      *
-     * @param savedInstanceState
+     * @param savedInstanceState bundle used to restore its previous state
      */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,10 +46,10 @@ public class LibraryFragment extends Fragment {
      * Sets up listeners to binding variables and sends {@link com.example.unlibrary.book_list.BooksSource}
      * to child {@link BooksFragment} to display.
      *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
+     * @param inflater {@link LayoutInflater} that can be used to inflate any view in the fragment
+     * @param container {@link ViewGroup} possibly null parent view that this fragment will attach to
+     * @param savedInstanceState bundle used to restore its previous state
+     * @return {@link View} for this fragment
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
