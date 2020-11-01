@@ -26,7 +26,7 @@ import java.util.ArrayList;
  */
 public class LibraryRepository {
     private static final String BOOK_COLLECTION = "Books";
-    private static final String TAG = "LIBRARY_REPOSITORY";
+    private static final String TAG = LibraryRepository.class.getSimpleName();
 
     private FirebaseFirestore mDb;
     private ListenerRegistration mListenerRegistration;
@@ -51,7 +51,7 @@ public class LibraryRepository {
                 .whereEqualTo("owner", FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) {
-                        Log.w("LIBRARY_REPOSITORY", error);
+                        Log.w(TAG, error);
                     }
 
                     ArrayList<Book> books = new ArrayList<>();
@@ -68,7 +68,7 @@ public class LibraryRepository {
     /**
      * Getter for the books object.
      *
-     * @return LiveData<ArrayList < Book>> This returns the books object.
+     * @return the books object.
      */
     public LiveData<ArrayList<Book>> getBooks() {
         return this.mBooks;
@@ -82,10 +82,10 @@ public class LibraryRepository {
     public void addBook(Book book) {
         mDb.collection(BOOK_COLLECTION).add(book)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("Create", "Document succesfully written");
+                    Log.d(TAG, "Document succesfully written");
                 })
                 .addOnFailureListener(e -> {
-                    Log.w("Create", "DocumentSnapshot not written", e);
+                    Log.w(TAG, "DocumentSnapshot not written", e);
                 });
     }
 
@@ -114,10 +114,10 @@ public class LibraryRepository {
                 .document(book.getId())
                 .delete()
                 .addOnSuccessListener(aVoid ->
-                        Log.d("Delete", "Data has been deleted successfully!")
+                        Log.d(TAG, "Data has been deleted successfully!")
                 )
                 .addOnFailureListener(e ->
-                        Log.d("Delete", "Data could not be deleted!" + e.toString())
+                        Log.d(TAG, "Data could not be deleted!" + e.toString())
                 );
     }
 
