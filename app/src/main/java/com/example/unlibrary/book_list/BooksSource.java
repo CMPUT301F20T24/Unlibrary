@@ -12,7 +12,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.unlibrary.models.Book;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Interface that must be implemented by book source passed to BooksFragment
@@ -23,5 +23,5 @@ public interface BooksSource {
      *
      * @return list of observable books
      */
-    LiveData<ArrayList<Book>> getBooks();
+    LiveData<List<Book>> getBooks();
 }
