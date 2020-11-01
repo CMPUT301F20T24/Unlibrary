@@ -6,15 +6,12 @@
     <data>
 
         <variable
-            name="fabAddOnClickListener"
-            type="android.view.View.OnClickListener" />
+            name="viewModel"
+            type="com.example.unlibrary.library.LibraryViewModel" />
 
-        <variable
-            name="fabFilterOnClickListener"
-            type="android.view.View.OnClickListener" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:id="@+id/frameLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -41,7 +38,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:contentDescription="@string/fab_add_book_description"
-            android:onClick="@{fabFilterOnClickListener}"
+            android:onClick="@{()->viewModel.filter()}"
             android:src="@drawable/ic_search"
             app:fabSize="normal"
             app:layout_constraintBottom_toTopOf="@id/fabAdd"
@@ -56,7 +53,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:contentDescription="@string/fab_filter_description"
-            android:onClick="@{fabAddOnClickListener}"
+            android:onClick="@{()->viewModel.createBook()}"
             android:src="@drawable/ic_add"
             app:fabSize="normal"
             app:layout_constraintBottom_toBottomOf="parent"

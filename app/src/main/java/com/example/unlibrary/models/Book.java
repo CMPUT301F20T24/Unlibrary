@@ -169,9 +169,9 @@ public class Book {
     }
 
     /**
-     * Updates the owner of the book
+     * Sets the unique user ID of the owner of the book
      *
-     * @param owner unique id associated with the owner
+     * @param owner updated owner
      */
     public void setOwner(String owner) {
         mOwner = owner;

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: "androidx.navigation.safeargs"
 
 android {
     compileSdkVersion 30
@@ -71,4 +72,14 @@ dependencies {
     implementation "androidx.navigation:navigation-ui:$nav_version"
     implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+
+    // ActivityResultContracts for camera
+    implementation 'androidx.activity:activity:1.2.0-alpha05'
+    implementation 'androidx.fragment:fragment:1.3.0-alpha05'
+
+    // MLKit for scanning barcode
+    implementation 'com.google.mlkit:barcode-scanning:16.0.3'
+
+    // Helper for REST API calls. See https://medium.com/@filswino/making-rest-calls-download-upload-files-with-one-line-of-code-on-android-no-retrofit-needed-5c0574f41476
+    implementation 'com.amitshekhar.android:android-networking:1.0.2'
 }

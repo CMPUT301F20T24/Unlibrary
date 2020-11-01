@@ -18,6 +18,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.book_list.BooksFragment;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+
+import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
 import com.example.unlibrary.models.Book;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,12 +57,13 @@ public class LibraryFragment extends Fragment {
      * @return {@link View} for this fragment
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Get the activity viewModel
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+
+        // Setup data binding
         mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
-
-        bindListeners();
 
         // Child fragments are can only be accessed on view creation, so this is the earliest
         // point where we can specify the data source
@@ -67,25 +73,13 @@ public class LibraryFragment extends Fragment {
                 bookFragment.setBooksSource(mViewModel);
             }
         }
+        mBinding.setViewModel(mViewModel);
+        mBinding.setLifecycleOwner(getViewLifecycleOwner());
+
+        // Setup observers
+        mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.fabAdd).navigate(navDirections));
+        mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         return mBinding.getRoot();
-    }
-
-    /**
-     * Binds listeners to binding variables in {@link LibraryFragment}
-     */
-    public void bindListeners() {
-        // TODO: Implement new book dialog
-        mBinding.setFabAddOnClickListener(view -> {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            mViewModel.addBook(
-                    new Book("abcd-1234", user.getEmail() + "'s book", user.getEmail(), user.getUid(), null)
-            );
-        });
-
-        // TODO: Implement filter dialog
-        mBinding.setFabFilterOnClickListener(view -> {
-            Toast.makeText(getContext(), "Filter button clicked", Toast.LENGTH_LONG).show();
-        });
     }
 }
