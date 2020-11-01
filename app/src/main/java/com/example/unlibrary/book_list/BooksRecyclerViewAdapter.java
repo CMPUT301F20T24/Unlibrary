@@ -20,7 +20,6 @@ import com.example.unlibrary.util.BookViewHolder;
 
 import java.util.ArrayList;
 
-
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Book}
  */
@@ -50,9 +49,9 @@ public class BooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolde
      * Inflate fragment_book_card and bind it with the {@link BookViewHolder} class. OnClickListeners
      * can be passed here as well.
      *
-     * @param parent
-     * @param viewType
-     * @return
+     * @param parent ViewGroup of which this View will be added after binding
+     * @param viewType layout ID
+     * @return a new ViewHolder that holds a View for a {@link Book}
      */
     @NonNull
     @Override
