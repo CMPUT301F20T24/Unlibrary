@@ -18,20 +18,20 @@ import com.example.unlibrary.databinding.FragmentBookCardBinding;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.util.BookViewHolder;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Book}
  */
 public class BooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentBookCardBinding>> {
-    protected ArrayList<Book> mBooks;
+    protected List<Book> mBooks;
 
     /**
      * Constructs the RecyclerAdapter with an initial list of books (may be null).
      *
      * @param books initial list of books
      */
-    public BooksRecyclerViewAdapter(ArrayList<Book> books) {
+    public BooksRecyclerViewAdapter(List<Book> books) {
         mBooks = books;
     }
 
@@ -40,7 +40,7 @@ public class BooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolde
      *
      * @param books new books to be displayed
      */
-    public void setData(ArrayList<Book> books) {
+    public void setData(List<Book> books) {
         mBooks = books;
         notifyDataSetChanged();
     }

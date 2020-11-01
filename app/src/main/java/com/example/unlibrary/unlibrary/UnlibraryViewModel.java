@@ -14,13 +14,13 @@ import androidx.lifecycle.ViewModel;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages the Unlibrary flow business logic. Connects the  fragments to the repository.
  */
 public class UnlibraryViewModel extends ViewModel implements BooksSource {
-    private final LiveData<ArrayList<Book>> mBooks;
+    private final LiveData<List<Book>> mBooks;
     private final UnlibraryRepository mUnlibraryRepository;
 
     /**
@@ -37,7 +37,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
      *
      * @return list of observable books
      */
-    public LiveData<ArrayList<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return mBooks;
     }
 

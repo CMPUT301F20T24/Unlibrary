@@ -17,16 +17,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages all the database interaction for {@link UnlibraryViewModel}
  */
 public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
-    private final static String BOOK_COLLECTION = "Books";
+    private final static String BOOK_COLLECTION = "books";
 
     private final FirebaseFirestore mDb;
-    private final MutableLiveData<ArrayList<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
     private final ListenerRegistration mListenerRegistration;
 
     /**
@@ -59,7 +60,7 @@ public class UnlibraryRepository {
      *
      * @return observable list of books
      */
-    public MutableLiveData<ArrayList<Book>> getBooks() {
+    public MutableLiveData<List<Book>> getBooks() {
         return mBooks;
     }
 

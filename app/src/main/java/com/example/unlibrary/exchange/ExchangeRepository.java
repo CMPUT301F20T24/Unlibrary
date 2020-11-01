@@ -20,16 +20,17 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Manages all the database interaction for the ExchangeViewModel.
  */
 public class ExchangeRepository {
-    private static final String BOOKS_COLLECTION = "Books";
+    private static final String BOOKS_COLLECTION = "books";
     private static final String TAG = ExchangeRepository.class.getSimpleName();
 
     private final FirebaseFirestore mDb;
-    private final MutableLiveData<ArrayList<Book>> mBooks;
+    private final MutableLiveData<List<Book>> mBooks;
     private ListenerRegistration mListenerRegistration;
 
     /**
@@ -72,7 +73,7 @@ public class ExchangeRepository {
      *
      * @return LiveData<ArrayList < Book>> This returns the books object.
      */
-    public LiveData<ArrayList<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return this.mBooks;
     }
 

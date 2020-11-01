@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages all the database interaction for the Library ViewModel.
@@ -39,7 +40,7 @@ public class LibraryRepository {
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
     private ListenerRegistration mListenerRegistration;
-    private MutableLiveData<ArrayList<Book>> mBooks;
+    private MutableLiveData<List<Book>> mBooks;
 
     /**
      * Constructor for the Library Repository. Sets up the database snapshot listener.
@@ -142,7 +143,7 @@ public class LibraryRepository {
      * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
-        listenerRegistration.remove();
+        mListenerRegistration.remove();
     }
 
     /**
@@ -150,7 +151,7 @@ public class LibraryRepository {
      *
      * @return LiveData<ArrayList < Book>> This returns the books object.
      */
-    public LiveData<ArrayList<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return this.mBooks;
     }
 }

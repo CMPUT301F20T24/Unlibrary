@@ -15,12 +15,13 @@ import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages the Exchange flow business logic. Connects the exchange fragment to the repository.
  */
 public class ExchangeViewModel extends ViewModel implements BooksSource {
-    private final LiveData<ArrayList<Book>> mBooks;
+    private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
 
     /**
@@ -36,7 +37,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      *
      * @return LiveData<ArrayList < Book>> This returns the mBooks object
      */
-    public LiveData<ArrayList<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return this.mBooks;
     }
 
