@@ -8,15 +8,15 @@
 
 package com.example.unlibrary.models;
 
+import com.google.firebase.firestore.DocumentId;
+
 /**
  * Represents a user in our application domain. This user information is stored in Firestore and is
  * related to a user entry in Firebase.
  * <p>
- * TODO: Link with Firebase
- * TODO: Add authorization to secure allowed methods (e.g. editing user data)
  */
 public class User {
-    private String mId;
+    private String mUID;
     private String mUsername;
     private String mEmail;
 
@@ -34,18 +34,34 @@ public class User {
      * @param email    of the user
      */
     public User(String id, String username, String email) {
-        mId = id;
+        mUID = id;
         mUsername = username;
         mEmail = email;
     }
 
     /**
-     * Gets the unique identifier of the user.
+     * Gets the unique identifier of the user. Retrieved from Firestore.
      *
      * @return unique user id associated with the user
      */
-    public String getId() {
-        return mId;
+    @DocumentId
+    public String getUID() {
+        return mUID;
+    }
+
+    /**
+     * Updates the unique identifier of the user. Should not be called explicitly in code. This is
+     * called automatically when {@link com.google.firebase.firestore.DocumentSnapshot#toObject(Class)}
+     * is called when retrieving documents from Firestore.
+     *
+     * @param id unique identifier of user
+     */
+    public void setUID(String id) {
+        if (mUID != null) {
+            throw new IllegalArgumentException("ID has already been initialized");
+        }
+
+        mUID = id;
     }
 
     /**
