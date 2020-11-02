@@ -17,13 +17,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.book_list.BooksFragment;
-import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentUnlibraryBinding;
 
 /**
  * Host fragment for Unlibrary feature
  */
-public class UnlibraryFragment extends Fragment implements BooksRecyclerViewAdapter.OnItemClickListener {
+public class UnlibraryFragment extends Fragment {
     private UnlibraryViewModel mViewModel;
     private FragmentUnlibraryBinding mBinding;
 
@@ -31,7 +30,7 @@ public class UnlibraryFragment extends Fragment implements BooksRecyclerViewAdap
      * Initialize ViewModel of the fragment that will be retained when the fragment is
      * paused or stopped, then resumed.
      *
-     * @param savedInstanceState
+     * @param savedInstanceState default
      */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,10 +42,10 @@ public class UnlibraryFragment extends Fragment implements BooksRecyclerViewAdap
      * Draws the fragment UI. Sets the {@link com.example.unlibrary.book_list.BooksSource} to the
      * child {@link BooksFragment}.
      *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
+     * @param inflater           default
+     * @param container          default
+     * @param savedInstanceState default
+     * @return View
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,16 +64,5 @@ public class UnlibraryFragment extends Fragment implements BooksRecyclerViewAdap
         }
 
         return mBinding.getRoot();
-    }
-
-    /**
-     * Called when a book card is clicked on.
-     *
-     * @param v        View object of the card
-     * @param position Position of the card in the list
-     */
-    @Override
-    public void onItemClicked(View v, int position) {
-        // TODO
     }
 }

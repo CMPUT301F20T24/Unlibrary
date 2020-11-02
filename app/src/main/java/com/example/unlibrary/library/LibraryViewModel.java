@@ -268,7 +268,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      *
      * @param position Position of book in list of books that is chosen
      */
-    public void selectCurrentBook(int position) {
+    public void selectCurrentBook(View v, int position) {
         if (mBooks.getValue() == null) {
             mFailureMsgEvent.setValue("Failed show details for book.");
         } else {

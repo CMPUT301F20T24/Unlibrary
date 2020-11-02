@@ -24,12 +24,13 @@ import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
+import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
 
 /**
  * Host fragment for Library feature
  */
-public class LibraryFragment extends Fragment implements BooksRecyclerViewAdapter.OnItemClickListener {
+public class LibraryFragment extends Fragment {
     private LibraryViewModel mViewModel;
     private FragmentLibraryBinding mBinding;
 
@@ -80,16 +81,5 @@ public class LibraryFragment extends Fragment implements BooksRecyclerViewAdapte
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         return mBinding.getRoot();
-    }
-
-    /**
-     * Called when a book card is clicked on.
-     *
-     * @param v        View object of the card
-     * @param position Position of the card in the list
-     */
-    @Override
-    public void onItemClicked(View v, int position) {
-        mViewModel.selectCurrentBook(position);
     }
 }
