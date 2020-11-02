@@ -45,7 +45,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profileImage"
-            app:title="@{`Username`}" />
+            app:title="@{@string/username_hint}" />
 
         <include
             android:id="@+id/email"
@@ -59,7 +59,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/username"
-            app:title="@{`Email`}" />
+            app:title="@{@string/email_hint}" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/password"
