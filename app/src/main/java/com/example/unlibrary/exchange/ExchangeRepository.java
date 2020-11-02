@@ -35,6 +35,8 @@ import java.util.List;
 public class ExchangeRepository {
     private static final String REQUEST_COLLECTION = "requests";
     private static final String BOOK_COLLECTION = "books";
+    private static final String OWNER = "owner";
+    private static final String STATUS = "status";
 
     private static final String TAG = ExchangeRepository.class.getSimpleName();
 
@@ -51,7 +53,7 @@ public class ExchangeRepository {
         mDb = FirebaseFirestore.getInstance();
         mBooks = new MutableLiveData<>(new ArrayList<>());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        
+
         // TODO: make sure user is authenticated
         mUID = user.getUid();
         attachListener();
@@ -72,8 +74,8 @@ public class ExchangeRepository {
      */
     public void attachListener() {
         mListenerRegistration = mDb.collection(BOOK_COLLECTION)
-                .whereIn("status", Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED))
-                .whereNotEqualTo("owner", FirebaseAuth.getInstance().getUid())
+                .whereIn(STATUS, Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED))
+                .whereNotEqualTo(OWNER, FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.w(TAG, error);
@@ -120,6 +122,5 @@ public class ExchangeRepository {
     public void detachListener() {
         mListenerRegistration.remove();
     }
-
 }
 

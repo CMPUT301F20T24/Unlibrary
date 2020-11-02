@@ -47,7 +47,7 @@ public class ExchangeBookDetailsFragment extends Fragment {
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
-        //Setup observer
+        // Setup observer
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.addRequest).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 

@@ -105,12 +105,14 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     public void selectCurrentBook(View view, int position) {
         if (mBooks.getValue() == null) {
             mFailureMsgEvent.setValue("Failed show details for book");
-        } else {
-            Book book = mBooks.getValue().get(position);
-            mCurrentBook.setValue(book);
-            NavDirections direction = ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment();
-            Navigation.findNavController(view).navigate(direction);
+            return;
         }
+
+        Book book = mBooks.getValue().get(position);
+        mCurrentBook.setValue(book);
+        NavDirections direction = ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment();
+        Navigation.findNavController(view).navigate(direction);
+
     }
 
     /**
