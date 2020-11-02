@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentExchangeBinding;
@@ -51,13 +52,16 @@ public class ExchangeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentExchangeBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
+        int direction = ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment().getActionId();
 
         // Child fragments are can only be accessed on view creation, so this is the earliest
         // point where we can specify the data source
         for (Fragment f : getChildFragmentManager().getFragments()) {
             if (f instanceof BooksFragment) {
                 BooksFragment bookFragment = (BooksFragment) f;
+
                 bookFragment.setBooksSource(mViewModel);
+                bookFragment.setDirection(direction);
             }
         }
 

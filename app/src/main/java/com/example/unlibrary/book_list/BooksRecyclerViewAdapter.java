@@ -8,10 +8,13 @@
 
 package com.example.unlibrary.book_list;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.databinding.FragmentBookCardBinding;
@@ -25,13 +28,15 @@ import java.util.List;
  */
 public class BooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolder<FragmentBookCardBinding>> {
     protected List<Book> mBooks;
+    private int mDirection;
 
     /**
      * Constructs the RecyclerAdapter with an initial list of books (may be null).
      *
      * @param books initial list of books
      */
-    public BooksRecyclerViewAdapter(List<Book> books) {
+    public BooksRecyclerViewAdapter(List<Book> books, int direction) {
+        mDirection = direction;
         mBooks = books;
     }
 
@@ -69,6 +74,16 @@ public class BooksRecyclerViewAdapter extends RecyclerView.Adapter<BookViewHolde
      */
     @Override
     public void onBindViewHolder(final BookViewHolder<FragmentBookCardBinding> holder, int position) {
+
+        // TODO: remove when they are done
+        if (mDirection != 0) {
+            holder.itemView.setOnClickListener(view -> {
+                Bundle bundle = new Bundle();
+                bundle.putInt("position", position);
+                Navigation.findNavController(view).navigate(mDirection, bundle);
+            });
+        }
+
         Book book = mBooks.get(position);
         holder.bind(book);
     }

@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +30,7 @@ import com.example.unlibrary.databinding.FragmentBookListBinding;
 public class BooksFragment extends Fragment {
     private BooksSource mBooksSource;
     private FragmentBookListBinding mBinding;
+    private int mDirection;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -49,6 +51,17 @@ public class BooksFragment extends Fragment {
     }
 
     /**
+     * Sets the direction source for the current fragment instantiation. Should be called during
+     * {@link Fragment#onCreateView(LayoutInflater, ViewGroup, Bundle)} in the parent or
+     * containing fragment.
+     *
+     * @param direction object that implements {@link BooksSource#getBooks()} usually a view model
+     */
+    public void setDirection(int direction) {
+        mDirection = direction;
+    }
+
+    /**
      * Draws the fragment UI
      *
      * @param inflater
@@ -65,7 +78,7 @@ public class BooksFragment extends Fragment {
 
         view.setLayoutManager(new LinearLayoutManager(context));
 
-        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue());
+        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue(), mDirection);
 
         // Bind ViewModel books to RecyclerViewAdapter
         view.setAdapter(adapter);
