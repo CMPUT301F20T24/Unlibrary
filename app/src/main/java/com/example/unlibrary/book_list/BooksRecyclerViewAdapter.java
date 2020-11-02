@@ -20,7 +20,6 @@ import com.example.unlibrary.BR;
 import com.example.unlibrary.databinding.FragmentBookCardBinding;
 import com.example.unlibrary.models.Book;
 
-
 import java.util.List;
 
 /**

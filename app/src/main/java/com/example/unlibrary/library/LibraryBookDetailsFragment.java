@@ -8,7 +8,6 @@
 package com.example.unlibrary.library;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,12 +57,7 @@ public class LibraryBookDetailsFragment extends Fragment {
                     .setTitle("Delete " + mViewModel.getCurrentBook().getValue().getTitle())
                     .setMessage("Do you really want to delete this book?")
                     .setIcon(android.R.drawable.ic_delete)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mViewModel.deleteCurrentBook();
-                        }
-                    })
+                    .setPositiveButton("Yes", (dialog, which) -> mViewModel.deleteCurrentBook())
                     .setNegativeButton("No", null)
                     .show();
         });

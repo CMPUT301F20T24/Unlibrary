@@ -25,7 +25,7 @@ import com.example.unlibrary.databinding.FragmentExchangeBinding;
 /**
  * Host fragment for Exchange feature
  */
-public class ExchangeFragment extends Fragment {
+public class ExchangeFragment extends Fragment implements BooksRecyclerViewAdapter.OnItemClickListener {
     private ExchangeViewModel mViewModel;
     private FragmentExchangeBinding mBinding;
 
@@ -67,5 +67,16 @@ public class ExchangeFragment extends Fragment {
         }
 
         return mBinding.getRoot();
+    }
+
+    /**
+     * Called when a book card is clicked on.
+     *
+     * @param v        View object of the card
+     * @param position Position of the card in the list
+     */
+    @Override
+    public void onItemClicked(View v, int position) {
+        // TODO
     }
 }

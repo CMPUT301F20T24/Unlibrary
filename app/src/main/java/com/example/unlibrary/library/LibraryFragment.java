@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -26,14 +25,11 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
-import com.example.unlibrary.models.Book;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Host fragment for Library feature
  */
-public class LibraryFragment extends Fragment {
+public class LibraryFragment extends Fragment implements BooksRecyclerViewAdapter.OnItemClickListener {
     private LibraryViewModel mViewModel;
     private FragmentLibraryBinding mBinding;
 
@@ -84,5 +80,16 @@ public class LibraryFragment extends Fragment {
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         return mBinding.getRoot();
+    }
+
+    /**
+     * Called when a book card is clicked on.
+     *
+     * @param v        View object of the card
+     * @param position Position of the card in the list
+     */
+    @Override
+    public void onItemClicked(View v, int position) {
+        mViewModel.selectCurrentBook(position);
     }
 }

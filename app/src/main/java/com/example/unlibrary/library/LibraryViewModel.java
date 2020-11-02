@@ -31,7 +31,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -200,6 +199,17 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                         mFailureMsgEvent.setValue("Failed to update book.");
                         Log.e(TAG, "Failed to update book.", e);
                     });
+        }
+    }
+
+    // TODO
+    public void selectCurrentBook(int position) {
+        if (mBooks.getValue() == null) {
+            mFailureMsgEvent.setValue("Failed show details for book.");
+        } else {
+            Book book = mBooks.getValue().get(position);
+            mCurrentBook.setValue(book);
+            mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
         }
     }
 

@@ -28,6 +28,7 @@ import com.example.unlibrary.databinding.FragmentBookListBinding;
  */
 public class BooksFragment extends Fragment {
     private BooksSource mBooksSource;
+    private BooksRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
     private FragmentBookListBinding mBinding;
     private BooksRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
 

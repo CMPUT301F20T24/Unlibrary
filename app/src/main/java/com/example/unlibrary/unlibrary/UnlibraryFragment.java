@@ -23,7 +23,7 @@ import com.example.unlibrary.databinding.FragmentUnlibraryBinding;
 /**
  * Host fragment for Unlibrary feature
  */
-public class UnlibraryFragment extends Fragment {
+public class UnlibraryFragment extends Fragment implements BooksRecyclerViewAdapter.OnItemClickListener {
     private UnlibraryViewModel mViewModel;
     private FragmentUnlibraryBinding mBinding;
 
@@ -65,5 +65,16 @@ public class UnlibraryFragment extends Fragment {
         }
 
         return mBinding.getRoot();
+    }
+
+    /**
+     * Called when a book card is clicked on.
+     *
+     * @param v        View object of the card
+     * @param position Position of the card in the list
+     */
+    @Override
+    public void onItemClicked(View v, int position) {
+        // TODO
     }
 }
