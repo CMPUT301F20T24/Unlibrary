@@ -14,7 +14,6 @@ import com.google.firebase.firestore.DocumentId;
  * Represents a user in our application domain. This user information is stored in Firestore and is
  * related to a user entry in Firebase.
  * <p>
- * TODO: Add authorization to secure allowed methods (e.g. editing user data)
  */
 public class User {
     private String mUID;
