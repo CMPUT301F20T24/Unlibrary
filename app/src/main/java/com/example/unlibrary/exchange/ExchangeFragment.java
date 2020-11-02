@@ -16,14 +16,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksFragment;
+import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentExchangeBinding;
 
 /**
  * Host fragment for Exchange feature
  */
-public class ExchangeFragment extends Fragment {
+public class ExchangeFragment extends Fragment implements BooksRecyclerViewAdapter.OnItemClickListener {
     private ExchangeViewModel mViewModel;
     private FragmentExchangeBinding mBinding;
 
@@ -52,7 +54,7 @@ public class ExchangeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentExchangeBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
-        int direction = ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment().getActionId();
+
 
         // Child fragments are can only be accessed on view creation, so this is the earliest
         // point where we can specify the data source
@@ -61,10 +63,21 @@ public class ExchangeFragment extends Fragment {
                 BooksFragment bookFragment = (BooksFragment) f;
 
                 bookFragment.setBooksSource(mViewModel);
-                bookFragment.setDirection(direction);
+                bookFragment.setOnItemClickListener(this);
             }
         }
 
         return mBinding.getRoot();
+    }
+
+    /**
+     * Called when a book card is clicked on.
+     *
+     * @param v        View object of the card
+     * @param position Position of the card in the list
+     */
+    @Override
+    public void onItemClicked(View v, int position) {
+        mViewModel.selectCurrentBook(v, position);
     }
 }

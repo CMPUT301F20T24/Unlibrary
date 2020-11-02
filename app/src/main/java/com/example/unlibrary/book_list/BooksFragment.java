@@ -30,7 +30,7 @@ import com.example.unlibrary.databinding.FragmentBookListBinding;
 public class BooksFragment extends Fragment {
     private BooksSource mBooksSource;
     private FragmentBookListBinding mBinding;
-    private int mDirection;
+    private BooksRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -51,14 +51,14 @@ public class BooksFragment extends Fragment {
     }
 
     /**
-     * Sets the direction source for the current fragment instantiation. Should be called during
+     * Sets the OnItemClickListener for the current fragment instantiation. Should be called during
      * {@link Fragment#onCreateView(LayoutInflater, ViewGroup, Bundle)} in the parent or
      * containing fragment.
      *
-     * @param direction object that implements {@link BooksSource#getBooks()} usually a view model
+     * @param onItemClickListener implementation of BooksFragment.OnItemClickListener
      */
-    public void setDirection(int direction) {
-        mDirection = direction;
+    public void setOnItemClickListener(BooksRecyclerViewAdapter.OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     /**
@@ -78,7 +78,7 @@ public class BooksFragment extends Fragment {
 
         view.setLayoutManager(new LinearLayoutManager(context));
 
-        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue(), mDirection);
+        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue(), mOnItemClickListener);
 
         // Bind ViewModel books to RecyclerViewAdapter
         view.setAdapter(adapter);

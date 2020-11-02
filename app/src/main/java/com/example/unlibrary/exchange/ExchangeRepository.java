@@ -33,7 +33,7 @@ import java.util.List;
  * Manages all the database interaction for the ExchangeViewModel.
  */
 public class ExchangeRepository {
-    private static final String REQUEST_COLLECTION = "test_request";
+    private static final String REQUEST_COLLECTION = "Requests";
     private static final String BOOK_COLLECTION = "books";
 
     private static final String TAG = ExchangeRepository.class.getSimpleName();

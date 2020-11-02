@@ -9,11 +9,13 @@
 package com.example.unlibrary.exchange;
 
 import android.util.Log;
+import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
@@ -86,14 +88,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     }
 
     /**
-     * Setter for the mCurrentBook live data object
-     *
-     */
-    public void setCurrentBook(Book book) {
-        mCurrentBook.setValue(book);
-    }
-
-    /**
      * Getter for the description of the book.
      *
      * @return String This returns book description
@@ -118,6 +112,17 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
                 });
     }
 
+    public void selectCurrentBook (View view, int position) {
+        if (mBooks.getValue() == null) {
+            mFailureMsgEvent.setValue("Failed show details for book");
+        }
+        else{
+            Book book = mBooks.getValue().get(position);
+            mCurrentBook.setValue(book);
+            NavDirections direction = ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment();
+            Navigation.findNavController(view).navigate(direction);
+        }
+    }
     /**
      * Cleans up resources, removes the snapshot listener from the repository.
      */

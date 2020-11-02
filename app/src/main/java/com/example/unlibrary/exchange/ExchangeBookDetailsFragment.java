@@ -42,11 +42,6 @@ public class ExchangeBookDetailsFragment extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Get the activity viewModel
         ExchangeViewModel mViewModel = new ViewModelProvider(requireActivity()).get(ExchangeViewModel.class);
-
-        int position = getArguments().getInt("position");
-        Book currentBook = mViewModel.getBooks().getValue().get(position);
-        mViewModel.setCurrentBook(currentBook);
-
         // Setup data binding
         mBinding = FragmentExchangeBookDetailsBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
@@ -54,6 +49,7 @@ public class ExchangeBookDetailsFragment extends Fragment {
 
         //set up observer
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.addRequest).navigate(navDirections));
+        mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         return mBinding.getRoot();
     }
