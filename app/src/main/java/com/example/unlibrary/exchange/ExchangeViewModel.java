@@ -11,24 +11,25 @@ package com.example.unlibrary.exchange;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages the Exchange flow business logic. Connects the exchange fragment to the repository.
  */
-public class ExchangeViewModel extends ViewModel {
-    private LiveData<ArrayList<Book>> mBooks;
-    private ExchangeRepository mExchangeRepository;
+public class ExchangeViewModel extends ViewModel implements BooksSource {
+    private final LiveData<List<Book>> mBooks;
+    private final ExchangeRepository mExchangeRepository;
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
      */
     public ExchangeViewModel() {
-        this.mExchangeRepository = new ExchangeRepository();
-        this.mExchangeRepository.attachListener();
-        this.mBooks = this.mExchangeRepository.getBooks();
+        mExchangeRepository = new ExchangeRepository();
+        mBooks = mExchangeRepository.getBooks();
     }
 
     /**
@@ -36,14 +37,16 @@ public class ExchangeViewModel extends ViewModel {
      *
      * @return LiveData<ArrayList < Book>> This returns the mBooks object
      */
-    public LiveData<ArrayList<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return this.mBooks;
     }
 
     /**
-     * Detach listener when fragment is no longer being viewed.
+     * Cleans up resources, removes the snapshot listener from the repository.
      */
-    public void detachListeners() {
-        this.mExchangeRepository.detachListener();
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mExchangeRepository.detachListener();
     }
 }

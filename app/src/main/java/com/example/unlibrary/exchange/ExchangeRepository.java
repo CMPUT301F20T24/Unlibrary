@@ -13,34 +13,33 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Manages all the database interaction for the ExchangeViewModel.
  */
 public class ExchangeRepository {
-    private static final String BOOKS_COLLECTION = "Books";
-    private static final String STATUS = "mStatus";
-    private static final String TITLE = "mTitle";
-    private static final String AUTHOR = "mAuthor";
+    private static final String BOOKS_COLLECTION = "books";
+    private static final String TAG = ExchangeRepository.class.getSimpleName();
 
-    FirebaseFirestore mdb;
-    Query mQuery;
-    ListenerRegistration registration;
-    MutableLiveData<ArrayList<Book>> mBooks;
+    private final FirebaseFirestore mDb;
+    private final MutableLiveData<List<Book>> mBooks;
+    private ListenerRegistration mListenerRegistration;
 
     /**
      * Constructor for the Exchange Repository.
      */
     public ExchangeRepository() {
-        mdb = FirebaseFirestore.getInstance();
-        mQuery = mdb.collection(BOOKS_COLLECTION);
-        mBooks = new MutableLiveData<>(new ArrayList<Book>());
+        mDb = FirebaseFirestore.getInstance();
+        mBooks = new MutableLiveData<>(new ArrayList<>());
+        attachListener();
     }
 
     /**
@@ -48,29 +47,25 @@ public class ExchangeRepository {
      * and updates books object
      */
     public void attachListener() {
-        registration = mQuery.addSnapshotListener((value, error) -> {
-            if (error != null) {
-                Log.w("LISTEN:ERROR", error);
-                return;
-            }
-            //update the list to reflect changes in the database
-            ArrayList<Book> dbBooks = new ArrayList<>();
-            for (DocumentSnapshot doc : value.getDocuments()) {
-                // only show the book with AVAILABLE or REQUESTED status for exchange
-                // TODO: change this to get image urls and user ids to customize the exchange list
-                if (doc.getData().get(STATUS).equals("AVAILABLE") || doc.getData().get(STATUS).equals("REQUESTED")) {
-                    dbBooks.add(new Book(doc.getId(), (String) doc.getData().get(TITLE), (String) doc.getData().get(AUTHOR), (String) doc.getData().get(STATUS)));
-                }
-            }
-            mBooks.setValue(dbBooks);
-        });
-    }
+        mListenerRegistration = mDb.collection(BOOKS_COLLECTION)
+                .whereIn("status", Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED))
+                .whereNotEqualTo("owner", FirebaseAuth.getInstance().getUid())
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.w(TAG, error);
+                        return;
+                    }
 
-    /**
-     * Detach listener when fragment is no longer being viewed.
-     */
-    public void detachListener() {
-        registration.remove();
+                    // Update the list to reflect changes in the database
+                    // TODO: use getDocumentChanges instead to minimize payload from Firestore
+                    ArrayList<Book> dbBooks = new ArrayList<>();
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        // Only show the book with AVAILABLE or REQUESTED status for exchange
+                        dbBooks.add(doc.toObject(Book.class));
+                    }
+
+                    mBooks.setValue(dbBooks);
+                });
     }
 
     /**
@@ -78,8 +73,15 @@ public class ExchangeRepository {
      *
      * @return LiveData<ArrayList < Book>> This returns the books object.
      */
-    public LiveData<ArrayList<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return this.mBooks;
+    }
+
+    /**
+     * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
+     */
+    public void detachListener() {
+        mListenerRegistration.remove();
     }
 }
 

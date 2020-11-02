@@ -18,6 +18,8 @@
     <string name="logout">Logout</string>
     <string name="enter_password_to_confirm_changes">Password</string>
     <string name="password_confirmation_dialog_title">Enter Password to confirm changes</string>
+    <string name="fab_add_book_description">Add book</string>
+    <string name="fab_filter_description">Filter</string>
     <string name="search_bar_hint">Search for books to borrow...</string>
     <string name="title_hint">Title</string>
     <string name="author_hint">Author</string>

@@ -16,6 +16,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
 
+import com.example.unlibrary.book_list.BooksSource;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
@@ -27,11 +28,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages the Library flow business logic. Connects the library fragments to the repository.
  */
-public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFinishedScanListener {
+public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFinishedScanListener, BooksSource {
 
     private static final String TAG = LibraryViewModel.class.getSimpleName();
     private static final int MAX_TITLE_LENGTH = 100;
@@ -41,7 +43,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
-    private LiveData<ArrayList<Book>> mBooks;
+    private LiveData<List<Book>> mBooks;
     private LibraryRepository mLibraryRepository;
 
     public enum InputKey {
@@ -55,7 +57,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LibraryViewModel() {
         this.mLibraryRepository = new LibraryRepository();
-        this.mLibraryRepository.attachListener();
         this.mBooks = this.mLibraryRepository.getBooks();
     }
 
@@ -109,15 +110,17 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      *
      * @return LiveData<ArrayList < Book>> This returns the mBooks object
      */
-    public LiveData<ArrayList<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return this.mBooks;
     }
 
     /**
-     * Detach listener when fragment is no longer being viewed.
+     * Cleans up resources, removes the snapshot listener from the repository.
      */
-    public void detachListeners() {
-        this.mLibraryRepository.detachListener();
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mLibraryRepository.detachListener();
     }
 
     /**

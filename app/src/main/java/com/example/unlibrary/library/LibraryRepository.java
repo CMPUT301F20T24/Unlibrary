@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages all the database interaction for the Library ViewModel.
@@ -36,18 +37,19 @@ public class LibraryRepository {
     private static final String BOOKS_COLLECTION = "books";
     private static final String TAG = LibraryRepository.class.getSimpleName();
 
-    FirebaseFirestore mDb;
-    FirebaseAuth mAuth;
-    ListenerRegistration listenerRegistration;
-    MutableLiveData<ArrayList<Book>> mBooks;
+    private FirebaseFirestore mDb;
+    private FirebaseAuth mAuth;
+    private ListenerRegistration mListenerRegistration;
+    private MutableLiveData<List<Book>> mBooks;
 
     /**
-     * Constructor for the Library Repository.
+     * Constructor for the Library Repository. Sets up the database snapshot listener.
      */
     public LibraryRepository() {
         mDb = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mBooks = new MutableLiveData<>(new ArrayList<>());
+        attachListener();
     }
 
     /**
@@ -55,7 +57,9 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
-        listenerRegistration = mDb.collection(BOOKS_COLLECTION).addSnapshotListener((snapshot, error) -> {
+        mListenerRegistration = mDb.collection(BOOKS_COLLECTION)
+                .whereEqualTo("owner", FirebaseAuth.getInstance().getUid())
+                .addSnapshotListener((snapshot, error) -> {
             if (error != null) {
                 Log.w(TAG, "Error listening", error);
                 return;
@@ -136,10 +140,10 @@ public class LibraryRepository {
     }
 
     /**
-     * Detach listener when fragment is no longer being viewed.
+     * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
-        listenerRegistration.remove();
+        mListenerRegistration.remove();
     }
 
     /**
@@ -147,7 +151,7 @@ public class LibraryRepository {
      *
      * @return LiveData<ArrayList < Book>> This returns the books object.
      */
-    public LiveData<ArrayList<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return this.mBooks;
     }
 }

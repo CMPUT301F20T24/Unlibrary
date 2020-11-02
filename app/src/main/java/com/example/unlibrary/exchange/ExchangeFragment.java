@@ -8,26 +8,39 @@
 package com.example.unlibrary.exchange;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.unlibrary.R;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentExchangeBinding;
-import com.example.unlibrary.databinding.FragmentLibraryBinding;
 
 /**
  * Host fragment for Exchange feature
  */
 public class ExchangeFragment extends Fragment {
-
+    private ExchangeViewModel mViewModel;
     private FragmentExchangeBinding mBinding;
 
     /**
-     * TODO: Finalize comment header when more this method is further developed
+     * Initialize ViewModel of the fragment that will be retained when the fragment is
+     * paused or stopped, then resumed.
+     *
+     * @param savedInstanceState
+     */
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mViewModel = new ViewModelProvider(requireActivity()).get(ExchangeViewModel.class);
+    }
+
+    /**
+     * Draws the fragment UI. Sets the {@link com.example.unlibrary.book_list.BooksSource} to the
+     * child {@link BooksFragment}.
      *
      * @param inflater
      * @param container
@@ -37,6 +50,17 @@ public class ExchangeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentExchangeBinding.inflate(inflater, container, false);
+        mBinding.setLifecycleOwner(getViewLifecycleOwner());
+
+        // Child fragments are can only be accessed on view creation, so this is the earliest
+        // point where we can specify the data source
+        for (Fragment f : getChildFragmentManager().getFragments()) {
+            if (f instanceof BooksFragment) {
+                BooksFragment bookFragment = (BooksFragment) f;
+                bookFragment.setBooksSource(mViewModel);
+            }
+        }
+
         return mBinding.getRoot();
     }
 }
