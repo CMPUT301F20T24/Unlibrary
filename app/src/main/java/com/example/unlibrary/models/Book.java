@@ -35,7 +35,7 @@ public class Book {
     }
 
     /**
-     * Construct a book and initialize it with a list of photos.
+     * Construct a book.
      *
      * @param isbn   of book
      * @param title  of book
@@ -100,7 +100,7 @@ public class Book {
      *
      * @return list of photo URLs that can be fetched
      */
-    public String getPhotos() {
+    public String getPhoto() {
         return mPhoto;
     }
 

@@ -202,7 +202,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         }
     }
 
-    // TODO
+    /**
+     * Choose the current book that will be displayed then navigate to the details screen.
+     *
+     * @param position Position of book in list of books that is chosen
+     */
     public void selectCurrentBook(int position) {
         if (mBooks.getValue() == null) {
             mFailureMsgEvent.setValue("Failed show details for book.");
@@ -224,13 +228,17 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * Delete the current book.
      */
     public void deleteCurrentBook() {
-        mLibraryRepository.deleteBook(mCurrentBook.getValue(),
-                o -> {
-                    mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
-                },
-                e -> {
-                    mFailureMsgEvent.setValue("Failed to delete book.");
-                });
+        if (mCurrentBook.getValue() == null) {
+            mFailureMsgEvent.setValue("Failed to get current book.");
+        } else {
+            mLibraryRepository.deleteBook(mCurrentBook.getValue(),
+                    o -> {
+                        mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
+                    },
+                    e -> {
+                        mFailureMsgEvent.setValue("Failed to delete book.");
+                    });
+        }
     }
 
     /**

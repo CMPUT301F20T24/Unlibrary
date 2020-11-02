@@ -122,9 +122,4 @@ public class LibraryEditBookFragment extends Fragment {
     private void showToast(String msg) {
         ((MainActivity) requireActivity()).showToast(msg);
     }
-
-    // TODO
-    private void setPicture() {
-        // TODO
-    }
 }

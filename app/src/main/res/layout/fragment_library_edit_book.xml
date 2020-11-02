@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
 
     <data>
 
@@ -13,18 +14,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <include
-            android:id="@+id/profileImage"
-            layout="@layout/fragment_image_holder"
+t
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/bookImage"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:scaleType="centerCrop"
             app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:subtitle=""
-            app:title="" />
+            bind:imageUri="@{viewModel.currentBook.photo}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_book_photo"
@@ -34,7 +33,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="4dp"
             android:contentDescription="Add photo of book"
-            app:layout_constraintBottom_toBottomOf="@+id/profileImage"
+            app:layout_constraintBottom_toBottomOf="@+id/bookImage"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_baseline_photo_camera_24" />
 
@@ -47,7 +46,7 @@
             app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage">
+            app:layout_constraintTop_toBottomOf="@+id/bookImage">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"

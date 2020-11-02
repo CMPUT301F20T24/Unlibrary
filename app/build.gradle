@@ -82,4 +82,8 @@ dependencies {
 
     // Helper for REST API calls. See https://medium.com/@filswino/making-rest-calls-download-upload-files-with-one-line-of-code-on-android-no-retrofit-needed-5c0574f41476
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
+
+    // Glide for image loading
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 }
