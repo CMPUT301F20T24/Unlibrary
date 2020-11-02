@@ -26,12 +26,16 @@ import com.example.unlibrary.exchange.ExchangeFragmentDirections;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Manages the Library flow business logic. Connects the library fragments to the repository.
@@ -42,12 +46,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private static final int MAX_TITLE_LENGTH = 100;
     private static final int MAX_AUTHOR_LENGTH = 100;
     private static final int ISBN_LENGTH = 13;
-    private MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private static final String BOOK_PHOTO_STORE = "book_photos/";
+    private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final MutableLiveData<Uri> mTakenPhoto = new MutableLiveData<>();
     private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
-    private LiveData<List<Book>> mBooks;
-    private LibraryRepository mLibraryRepository;
+    private final LiveData<List<Book>> mBooks;
+    private final LibraryRepository mLibraryRepository;
 
     public enum InputKey {
         TITLE,
@@ -70,6 +76,15 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public MutableLiveData<Book> getCurrentBook() {
         return this.mCurrentBook;
+    }
+
+    /**
+     * Getter for the mTakenPhoto object.
+     *
+     * @return TakenPhoto LiveData
+     */
+    public LiveData<Uri> getTakenPhoto() {
+        return this.mTakenPhoto;
     }
 
     /**
@@ -130,8 +145,9 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * Prepare model to create a new book.
      */
     public void createBook() {
-        // Current book becomes empty
+        // Current book and taken photo become empty
         mCurrentBook.setValue(new Book());
+        mTakenPhoto.setValue(null);
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryEditBookFragment());
     }
 
@@ -174,31 +190,61 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             return;
         }
 
-        if (book.getId() == null) {
-            // Book is new
-            book.setStatus(Book.Status.AVAILABLE); // A book is by default available
-            mLibraryRepository.createBook(book,
-                    o -> {
-                        System.out.println(o.getId());
-                        Book bookWithId = mCurrentBook.getValue();
-                        bookWithId.setId(o.getId());
-                        mCurrentBook.setValue(bookWithId);
-                        mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
-                    },
-                    e -> {
-                        mFailureMsgEvent.setValue("Failed to create new book.");
-                        Log.e(TAG, "Failed to create new book.", e);
-                    });
+        Runnable uploadBook = () -> {
+            if (book.getId() == null) {
+                // Book is new
+                book.setStatus(Book.Status.AVAILABLE); // A book is by default available
+                mLibraryRepository.createBook(book,
+                        o -> {
+                            Book bookWithId = mCurrentBook.getValue();
+                            bookWithId.setId(o.getId());
+                            mCurrentBook.setValue(bookWithId);
+                            mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
+                        },
+                        e -> {
+                            mFailureMsgEvent.setValue("Failed to create new book.");
+                            Log.e(TAG, "Failed to create new book.", e);
+                        });
+            } else {
+                // Pre-existing book
+                mLibraryRepository.updateBook(book,
+                        o -> {
+                            mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
+                        },
+                        e -> {
+                            mFailureMsgEvent.setValue("Failed to update book.");
+                            Log.e(TAG, "Failed to update book.", e);
+                        });
+            }
+        };
+
+        if (mTakenPhoto.getValue() != null) {
+            // If a photo was taken upload it to Firebase storage
+            final StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+            UUID uuid = UUID.randomUUID();
+            String uniquePhotoName = uuid.toString();
+            StorageReference photoRef = storageRef.child(BOOK_PHOTO_STORE + uniquePhotoName + ".jpg");
+
+            UploadTask uploadTask = photoRef.putFile(mTakenPhoto.getValue());
+            uploadTask.addOnFailureListener(e -> {
+                mFailureMsgEvent.setValue("Failed to upload taken photo.");
+            });
+            uploadTask.continueWithTask(task -> {
+                if (!task.isSuccessful()) {
+                    return null;
+                }
+                // Continue with the task to get the download URL
+                return photoRef.getDownloadUrl();
+            }).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    System.out.println(downloadUri.toString());
+                    book.setPhoto(downloadUri.toString());
+                    uploadBook.run();
+                }
+            });
         } else {
-            // Pre-existing book
-            mLibraryRepository.updateBook(book,
-                    o -> {
-                        mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
-                    },
-                    e -> {
-                        mFailureMsgEvent.setValue("Failed to update book.");
-                        Log.e(TAG, "Failed to update book.", e);
-                    });
+            uploadBook.run();
         }
     }
 
@@ -221,6 +267,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * Prepare to edit the current book.
      */
     public void editCurrentBook() {
+        // Empty out the taken photo
+        mTakenPhoto.setValue(null);
         mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryEditBookFragment());
     }
 
@@ -291,9 +339,13 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         });
     }
 
-    // TODO
+    /**
+     * Update the taken photo. This photo will then be displayed.
+     *
+     * @param uri Uri of the taken photo.
+     */
     public void takePhoto(Uri uri) {
-        // TODO
+        mTakenPhoto.setValue(uri);
     }
 
     /**

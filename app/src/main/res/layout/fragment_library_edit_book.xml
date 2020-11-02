@@ -14,7 +14,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-t
+        t
+
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/bookImage"
             android:layout_width="match_parent"
@@ -23,7 +24,8 @@ t
             app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            bind:imageUri="@{viewModel.currentBook.photo}" />
+            bind:imagePath="@{viewModel.currentBook.photo}"
+            bind:imageUri="@{viewModel.takenPhoto}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_book_photo"
@@ -51,10 +53,10 @@ t
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="text"
+                android:lines="1"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:lines="1"
-                android:inputType="text"
                 android:text="@={viewModel.currentBook.title}" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -73,10 +75,10 @@ t
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:lines="1"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:lines="1"
-                android:inputType="textPersonName"
                 android:text="@={viewModel.currentBook.author}" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -96,10 +98,10 @@ t
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="number"
+                android:lines="1"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:lines="1"
-                android:inputType="number"
                 android:text="@={viewModel.currentBook.isbn}" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -111,17 +113,17 @@ t
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
             android:text="@string/auto_fill_button"
+            app:icon="@drawable/ic_baseline_qr_code_scanner_24"
             app:layout_constraintEnd_toStartOf="@+id/save_button"
-            app:layout_constraintTop_toBottomOf="@+id/book_isbn_input"
-            app:icon="@drawable/ic_baseline_qr_code_scanner_24"/>
+            app:layout_constraintTop_toBottomOf="@+id/book_isbn_input" />
 
         <Button
             android:id="@+id/save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="@string/save_button"
             android:onClick="@{()->viewModel.saveBook()}"
+            android:text="@string/save_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/book_isbn_input" />
 

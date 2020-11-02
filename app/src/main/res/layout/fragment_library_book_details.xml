@@ -24,7 +24,7 @@
             app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            bind:imageUri="@{viewModel.currentBook.photo}" />
+            bind:imagePath="@{viewModel.currentBook.photo}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_book"
