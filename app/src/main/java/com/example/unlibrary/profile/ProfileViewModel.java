@@ -26,7 +26,7 @@ public class ProfileViewModel extends ViewModel {
 
     private MutableLiveData<User> mUser = new MutableLiveData<>();
     private MutableLiveData<String> mPassword = new MutableLiveData<>("");
-    private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<Pair<AuthUtil.InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Boolean> mProfileUpdateEvent = new SingleLiveEvent<>();
     private ProfileRepository mProfileRepository = new ProfileRepository();
 
@@ -69,7 +69,7 @@ public class ProfileViewModel extends ViewModel {
      *
      * @return Event of failure message to display
      */
-    public SingleLiveEvent<Pair<InputKey, String>> getInvalidInputEvent() {
+    public SingleLiveEvent<Pair<AuthUtil.InputKey, String>> getInvalidInputEvent() {
         if (mInvalidInputEvent == null) {
             mInvalidInputEvent = new SingleLiveEvent<>();
         }
@@ -103,9 +103,9 @@ public class ProfileViewModel extends ViewModel {
     public void resetUserInfo() {
         mUser.setValue(new User(mUser.getValue().getId(), mOldUserName, mOldEmail));
         mPassword.setValue("");
-        mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
-        mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
-        mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, null));
+        mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, null));
+        mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, null));
+        mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.USERNAME, null));
     }
 
     /**
@@ -126,9 +126,9 @@ public class ProfileViewModel extends ViewModel {
      */
     public void attemptUpdateProfile() {
         // Clear all TextView's of error messages
-        mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
-        mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
-        mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, null));
+        mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, null));
+        mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, null));
+        mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.USERNAME, null));
 
         // First validate updated info
         String email = "", username = "";
@@ -136,19 +136,19 @@ public class ProfileViewModel extends ViewModel {
         try {
             email = validateEmail(mUser.getValue().getEmail());
         } catch (AuthUtil.InvalidInputException e) {
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, e.getMessage()));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, e.getMessage()));
             invalid = true;
         }
 
         try {
             username = validateUsername(mUser.getValue().getUsername());
         } catch (AuthUtil.InvalidInputException e) {
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, e.getMessage()));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.USERNAME, e.getMessage()));
             invalid = true;
         }
 
         if (mPassword.getValue() == null || mPassword.getValue().equals("")) {
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, "Enter Password"));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, "Enter Password"));
             invalid = true;
         }
 
@@ -161,21 +161,15 @@ public class ProfileViewModel extends ViewModel {
             mPassword.setValue("");
             if (isLoggedIn) {
                 mProfileRepository.updateUserProfile(mUser.getValue(),
-                        () -> mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, "Invalid Email")),
-                        () -> mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, "Username taken")),
+                        () -> mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, "Invalid Email")),
+                        () -> mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.USERNAME, "Username taken")),
                         (isProfileUpdated) -> mProfileUpdateEvent.setValue(isProfileUpdated)
                 );
 
             } else {
-                mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, "Incorrect Password"));
+                mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, "Incorrect Password"));
                 mProfileUpdateEvent.setValue(false);
             }
         });
-    }
-
-    public enum InputKey {
-        EMAIL,
-        PASSWORD,
-        USERNAME
     }
 }

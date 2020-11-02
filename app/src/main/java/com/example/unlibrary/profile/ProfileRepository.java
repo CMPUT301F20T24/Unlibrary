@@ -7,7 +7,6 @@
  */
 package com.example.unlibrary.profile;
 
-
 import com.example.unlibrary.models.User;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -17,7 +16,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-
 
 /**
  * Manages all the database interaction for the Profile ViewModel
@@ -29,12 +27,10 @@ public class ProfileRepository {
     private final static String USERNAME_FIELD = "username";
     private final static String EMAIL_FIELD = "email";
 
-
     private FirebaseFirestore mDB;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private String mUID;
-
 
     /**
      * Get instances of firestore database and firebase auth
@@ -43,7 +39,6 @@ public class ProfileRepository {
         mDB = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
     }
-
 
     /**
      * Gets the current user email and username from firestore
@@ -63,7 +58,6 @@ public class ProfileRepository {
                     onFinished.finished(true, user);
                 });
     }
-
 
     /**
      * Updating user's email requires re-authentication.

@@ -14,14 +14,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.unlibrary.util.SingleLiveEvent;
 import com.example.unlibrary.util.AuthUtil;
+import com.example.unlibrary.util.SingleLiveEvent;
 
 import static com.example.unlibrary.util.AuthUtil.validateEmail;
 import static com.example.unlibrary.util.AuthUtil.validatePassword;
 import static com.example.unlibrary.util.AuthUtil.validateUsername;
-
-
 
 /**
  * Manages the authentication flow business logic. Controls both login and registration.
@@ -32,17 +30,11 @@ public class AuthViewModel extends ViewModel {
     private MutableLiveData<String> mPassword = new MutableLiveData<>();
     private MutableLiveData<String> mUsername = new MutableLiveData<>();
     private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
-    private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<Pair<AuthUtil.InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Fragment> mFragmentNavigationEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Void> mAuthenticatedEvent = new SingleLiveEvent<>();
 
     private final AuthRepository mAuthRepository;
-
-    public enum InputKey {
-        EMAIL,
-        PASSWORD,
-        USERNAME
-    }
 
     public AuthViewModel() {
         this.mAuthRepository = new AuthRepository();
@@ -113,7 +105,7 @@ public class AuthViewModel extends ViewModel {
      *
      * @return Event of failure message to display
      */
-    public SingleLiveEvent<Pair<InputKey, String>> getInvalidInputEvent() {
+    public SingleLiveEvent<Pair<AuthUtil.InputKey, String>> getInvalidInputEvent() {
         if (mInvalidInputEvent == null) {
             mInvalidInputEvent = new SingleLiveEvent<>();
         }
@@ -153,16 +145,16 @@ public class AuthViewModel extends ViewModel {
         boolean invalid = false;
         try {
             email = validateEmail(mEmail.getValue());
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, null));
         } catch (AuthUtil.InvalidInputException e) {
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, e.getMessage()));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, e.getMessage()));
             invalid = true;
         }
         try {
             password = validatePassword(mPassword.getValue());
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, null));
         } catch (AuthUtil.InvalidInputException e) {
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, e.getMessage()));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, e.getMessage()));
             invalid = true;
         }
         if (invalid) {
@@ -203,23 +195,23 @@ public class AuthViewModel extends ViewModel {
         boolean invalid = false;
         try {
             email = validateEmail(mEmail.getValue());
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, null));
         } catch (AuthUtil.InvalidInputException e) {
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, e.getMessage()));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, e.getMessage()));
             invalid = true;
         }
         try {
             password = validatePassword(mPassword.getValue());
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, null));
         } catch (AuthUtil.InvalidInputException e) {
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, e.getMessage()));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, e.getMessage()));
             invalid = true;
         }
         try {
             username = validateUsername(mUsername.getValue());
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, null));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.USERNAME, null));
         } catch (AuthUtil.InvalidInputException e) {
-            mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, e.getMessage()));
+            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.USERNAME, e.getMessage()));
             invalid = true;
         }
         if (invalid) {

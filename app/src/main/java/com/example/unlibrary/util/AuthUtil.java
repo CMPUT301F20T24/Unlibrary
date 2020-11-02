@@ -1,5 +1,16 @@
+/*
+ * AuthUtil
+ *
+ * November 1, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.util;
 
+/**
+ * Util functions for auth related actions
+ */
 public class AuthUtil {
 
     /**
@@ -77,5 +88,11 @@ public class AuthUtil {
         public InvalidInputException(String errorMessage) {
             super(errorMessage);
         }
+    }
+
+    public enum InputKey {
+        EMAIL,
+        PASSWORD,
+        USERNAME
     }
 }
