@@ -53,9 +53,7 @@ public class ProfileRepository {
                 .get()
                 .addOnSuccessListener(task -> {
                     DocumentSnapshot document = task.getDocuments().get(0);
-                    // TODO: Remove explicit User object creation when User model is refactored
-                    User user = new User(document.getId(), (String) document.get(USERNAME_FIELD), (String) document.get(EMAIL_FIELD));
-                    onFinished.finished(true, user);
+                    onFinished.finished(true, document.toObject(User.class));
                 });
     }
 
