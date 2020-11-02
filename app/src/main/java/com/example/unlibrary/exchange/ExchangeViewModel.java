@@ -33,9 +33,9 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
 
     private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
-    private MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
-    private SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
-    private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
+    private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
@@ -51,9 +51,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      * @return Event of failure message to display
      */
     public SingleLiveEvent<String> getFailureMsgEvent() {
-        if (mFailureMsgEvent == null) {
-            mFailureMsgEvent = new SingleLiveEvent<>();
-        }
         return mFailureMsgEvent;
     }
 
@@ -63,9 +60,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      * @return Event of which fragment to navigate to
      */
     public SingleLiveEvent<NavDirections> getNavigationEvent() {
-        if (mNavigationEvent == null) {
-            mNavigationEvent = new SingleLiveEvent<>();
-        }
         return mNavigationEvent;
     }
 
@@ -85,16 +79,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public LiveData<Book> getCurrentBook() {
         return this.mCurrentBook;
-    }
-
-    /**
-     * Getter for the description of the book.
-     *
-     * @return String This returns book description
-     */
-    public String getDescription() {
-        Book currentBook = mCurrentBook.getValue();
-        return String.format("%s %s %s", currentBook.getIsbn(), currentBook.getTitle(), currentBook.getAuthor());
     }
 
     /**

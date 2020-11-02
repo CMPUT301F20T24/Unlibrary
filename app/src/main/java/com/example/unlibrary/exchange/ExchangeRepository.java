@@ -51,6 +51,8 @@ public class ExchangeRepository {
         mDb = FirebaseFirestore.getInstance();
         mBooks = new MutableLiveData<>(new ArrayList<>());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        
+        // TODO: make sure user is authenticated
         mUID = user.getUid();
         attachListener();
     }
