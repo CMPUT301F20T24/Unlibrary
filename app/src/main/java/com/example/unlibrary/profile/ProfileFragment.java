@@ -37,7 +37,6 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel = new ProfileViewModel();
-        mViewModel.fetchUser();
     }
 
     /**
@@ -75,6 +74,7 @@ public class ProfileFragment extends Fragment {
 
             }
         });
+
         return mBinding.getRoot();
     }
 
@@ -93,13 +93,13 @@ public class ProfileFragment extends Fragment {
      */
     public class EditingState {
 
-        private MutableLiveData<Boolean> isEditing;
+        private MutableLiveData<Boolean> isEditing = new MutableLiveData<>(false);
+        private MutableLiveData<Boolean> isUpdating = new MutableLiveData<>(false);
 
         /**
          * Initially, user should not be editing profile
          */
         public EditingState() {
-            isEditing = new MutableLiveData<>(false);
         }
 
         /**
@@ -115,10 +115,22 @@ public class ProfileFragment extends Fragment {
         }
 
         /**
+         * Used for data binding in UI, toggles spinner when updating Firebase Auth and Firestore
+         *
+         * @return isEditing
+         */
+        public LiveData<Boolean> getIsUpdating() {
+            if (isUpdating == null) {
+                isUpdating = new MutableLiveData<>(false);
+            }
+            return isUpdating;
+        }
+
+        /**
          * Bound to the edit_button in profile fragment
          */
         public void editContent() {
-            mViewModel.saveTextFields();
+            mViewModel.saveUserInfo();
             isEditing.setValue(true);
         }
 
@@ -126,17 +138,21 @@ public class ProfileFragment extends Fragment {
          * Bound to cancel_button in profile fragment
          */
         public void cancelUpdate() {
-            mViewModel.resetTextFields();
+            mViewModel.resetUserInfo();
             isEditing.setValue(false);
+            isUpdating.setValue(false);
         }
 
         /**
          * Bound to confirm_button in profile fragment
          */
         public void confirmUpdate() {
-            mViewModel.getUpdatedProfileEvent().observe(getViewLifecycleOwner(), (s) -> {
-                mViewModel.clearPassword();
-                isEditing.setValue(false);
+            isUpdating.setValue(true);
+            mViewModel.getProfileUpdateEvent().observe(getViewLifecycleOwner(), (s) -> {
+                if (s) {
+                    isEditing.setValue(false);
+                }
+                isUpdating.setValue(false);
             });
             mViewModel.attemptUpdateProfile();
         }

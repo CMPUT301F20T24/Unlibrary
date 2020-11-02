@@ -8,6 +8,7 @@
 package com.example.unlibrary.profile;
 
 
+import com.example.unlibrary.models.User;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,8 +18,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-import java.util.List;
-
 
 /**
  * Manages all the database interaction for the Profile ViewModel
@@ -27,13 +26,15 @@ public class ProfileRepository {
 
     private final static String USERS_COLLECTION = "users";
     private final static String UID_FIELD = "id";
-    private final static String EMAIL_FIELD = "email";
     private final static String USERNAME_FIELD = "username";
+    private final static String EMAIL_FIELD = "email";
+
 
     private FirebaseFirestore mDB;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private String mUID;
+
 
     /**
      * Get instances of firestore database and firebase auth
@@ -42,6 +43,7 @@ public class ProfileRepository {
         mDB = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
     }
+
 
     /**
      * Gets the current user email and username from firestore
@@ -55,67 +57,58 @@ public class ProfileRepository {
                 .whereEqualTo(UID_FIELD, mUID)
                 .get()
                 .addOnSuccessListener(task -> {
-                    List<DocumentSnapshot> document = task.getDocuments();
-                    DocumentSnapshot userInfo = document.get(0);
-                    String email = (String) userInfo.get(EMAIL_FIELD);
-                    String username = (String) userInfo.get(USERNAME_FIELD);
-                    onFinished.finished(true, username, email);
+                    DocumentSnapshot document = task.getDocuments().get(0);
+                    // TODO: Remove explicit User object creation when User model is refactored
+                    User user = new User(document.getId(), (String) document.get(USERNAME_FIELD), (String) document.get(EMAIL_FIELD));
+                    onFinished.finished(true, user);
                 });
     }
 
-    /**
-     * Updates the users email in firebase auth and firestore
-     *
-     * @param email      new email to update
-     * @param onFinished callback to notify completed task
-     */
-    public void updateEmail(String email, OnFinishedListener onFinished) {
-        mAuth.getCurrentUser().updateEmail(email).addOnCompleteListener(authTask -> {
-            if (authTask.isSuccessful()) {
-                mDB.collection(USERS_COLLECTION)
-                        .document(mUID)
-                        .update(EMAIL_FIELD, email)
-                        .addOnCompleteListener(dbTask -> onFinished.finished(dbTask.isSuccessful()));
-            } else {
-                onFinished.finished(false);
-            }
-        });
-    }
-
-    /**
-     * First check if updated username is globally unique (i.e. not taken)
-     * if so, updates the user's username in firestore
-     *
-     * @param username   new username to update
-     * @param onFinished callback to notify completed task
-     */
-    public void updateUserName(String username, OnFinishedListener onFinished) {
-        // Verify username is globally unique
-        CollectionReference usersRef = mDB.collection(USERS_COLLECTION);
-        Query query = usersRef.whereEqualTo(USERNAME_FIELD, username);
-        query.get().addOnCompleteListener(task -> {
-            if (task.getResult().isEmpty()) {
-                mDB.collection(USERS_COLLECTION)
-                        .document(mUID)
-                        .update(USERNAME_FIELD, username)
-                        .addOnCompleteListener(dbTask -> onFinished.finished(dbTask.isSuccessful()));
-            } else {
-                onFinished.finished(false);
-            }
-        });
-    }
 
     /**
      * Updating user's email requires re-authentication.
      *
-     * @param email      users email
-     * @param password   users password
-     * @param onFinished callback function to facilitate updating profile
+     * @param email              users original email
+     * @param password           users password
+     * @param onFinishedListener callback to notify viewmodel
      */
-    public void reAuthenticateUser(String email, String password, OnFinishedListener onFinished) {
+    public void reAuthenticateUser(String email, String password, OnFinishedListener onFinishedListener) {
         AuthCredential credential = EmailAuthProvider.getCredential(email, password);
         mUser.reauthenticate(credential).addOnCompleteListener(task -> {
-            onFinished.finished(task.isSuccessful());
+            onFinishedListener.finished(task.isSuccessful());
+        });
+    }
+
+    /**
+     * Updating user's profile in firestore and firebase auth
+     *
+     * @param user                    updated user information
+     * @param onEmailErrorListener    callback for errors regarding updating the email
+     * @param onUsernameErrorListener callback for errors regarding updating the username
+     * @param onFinished              callback used when updates are finished
+     */
+    public void updateUserProfile(User user, OnErrorListener onEmailErrorListener, OnErrorListener onUsernameErrorListener, OnFinishedListener onFinished) {
+        mAuth.getCurrentUser().updateEmail(user.getEmail()).addOnCompleteListener(authTask -> {
+            if (authTask.isSuccessful()) {
+                CollectionReference usersRef = mDB.collection(USERS_COLLECTION);
+                Query query = usersRef.whereEqualTo(USERNAME_FIELD, user.getUsername());
+                query.get().addOnCompleteListener(task -> {
+                    // Checks if it's a unique username OR if the username is unchanged
+                    if (task.getResult().isEmpty() || task.getResult().getDocuments().get(0).getId().equals(mUID)) {
+                        mDB.collection(USERS_COLLECTION)
+                                .document(mUID)
+                                .set(user)
+                                .addOnCompleteListener(dbTask -> {
+                                    onFinished.finished(dbTask.isSuccessful());
+                                });
+                    } else {
+                        onUsernameErrorListener.error();
+                    }
+
+                });
+            } else {
+                onEmailErrorListener.error();
+            }
         });
     }
 
@@ -123,13 +116,20 @@ public class ProfileRepository {
      * Callback interface for asynchronous nature of fetching user
      */
     public interface OnFinishedFetchListener {
-        void finished(Boolean succeeded, String userName, String email);
+        void finished(Boolean succeeded, User user);
     }
 
     /**
-     * Callback interface for simple completion
+     * Simple callback interface for asynchronous events
      */
     public interface OnFinishedListener {
         void finished(Boolean succeeded);
+    }
+
+    /**
+     * Callback interface for errors with asynchronous events
+     */
+    public interface OnErrorListener {
+        void error();
     }
 }

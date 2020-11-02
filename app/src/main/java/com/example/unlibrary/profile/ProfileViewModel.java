@@ -12,19 +12,24 @@ import android.util.Pair;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.unlibrary.models.User;
+import com.example.unlibrary.util.AuthUtil;
 import com.example.unlibrary.util.SingleLiveEvent;
+
+import static com.example.unlibrary.util.AuthUtil.validateEmail;
+import static com.example.unlibrary.util.AuthUtil.validateUsername;
 
 /**
  * Manages updating user profile information
  */
 public class ProfileViewModel extends ViewModel {
 
-    private MutableLiveData<String> mUserName = new MutableLiveData<>("");
-    private MutableLiveData<String> mEmail = new MutableLiveData<>("");
+    private MutableLiveData<User> mUser = new MutableLiveData<>();
     private MutableLiveData<String> mPassword = new MutableLiveData<>("");
     private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
-    private SingleLiveEvent<Void> mUpdatedProfileEvent = new SingleLiveEvent<>();
+    private SingleLiveEvent<Boolean> mProfileUpdateEvent = new SingleLiveEvent<>();
     private ProfileRepository mProfileRepository = new ProfileRepository();
+
     private String mOldUserName;
     private String mOldEmail;
 
@@ -32,30 +37,19 @@ public class ProfileViewModel extends ViewModel {
      * Constructs Profile ViewModel
      */
     public ProfileViewModel() {
+        fetchUser();
     }
 
     /**
-     * Gets mutable live data to facilitate two way binding username
+     * Gets Mutable live data to facilitate two
      *
-     * @return username
+     * @return user
      */
-    public MutableLiveData<String> getUserName() {
-        if (mUserName == null) {
-            mUserName = new MutableLiveData<>();
+    public MutableLiveData<User> getUser() {
+        if (mUser == null) {
+            mUser = new MutableLiveData<>();
         }
-        return mUserName;
-    }
-
-    /**
-     * Gets mutable live data to facilitate two way binding email
-     *
-     * @return email
-     */
-    public MutableLiveData<String> getEmail() {
-        if (mEmail == null) {
-            mEmail = new MutableLiveData<>();
-        }
-        return mEmail;
+        return mUser;
     }
 
     /**
@@ -83,45 +77,44 @@ public class ProfileViewModel extends ViewModel {
     }
 
     /**
-     * UpdatedProfileEvent getter for activity observers
+     * ProfileUpdateEvent getter for activity observers
      *
-     * @return Event of successful profile update
+     * @return Event for successful profile update
      */
-    public SingleLiveEvent<Void> getUpdatedProfileEvent() {
-        if (mUpdatedProfileEvent == null) {
-            mUpdatedProfileEvent = new SingleLiveEvent<>();
+    public SingleLiveEvent<Boolean> getProfileUpdateEvent() {
+        if (mProfileUpdateEvent == null) {
+            mProfileUpdateEvent = new SingleLiveEvent<>();
         }
-        return mUpdatedProfileEvent;
+        return mProfileUpdateEvent;
     }
+
 
     /**
      * Save current state of profile information
      */
-    public void saveTextFields() {
-        mOldEmail = mEmail.getValue();
-        mOldUserName = mUserName.getValue();
+    public void saveUserInfo() {
+        mOldEmail = mUser.getValue().getEmail();
+        mOldUserName = mUser.getValue().getUsername();
     }
 
     /**
      * Reset text fields to previous state
      */
-    public void resetTextFields() {
-        mEmail.setValue(mOldEmail);
-        mUserName.setValue(mOldUserName);
-    }
-
-    public void clearPassword() {
+    public void resetUserInfo() {
+        mUser.setValue(new User(mUser.getValue().getId(), mOldUserName, mOldEmail));
         mPassword.setValue("");
+        mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
+        mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
+        mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, null));
     }
 
     /**
      * Fetches the current user and sets the username and email
      */
     public void fetchUser() {
-        mProfileRepository.fetchCurrentUser((s, userName, email) -> {
+        mProfileRepository.fetchCurrentUser((s, user) -> {
             if (s) {
-                mUserName.setValue(userName);
-                mEmail.setValue(email);
+                mUser.setValue(user);
             }
         });
     }
@@ -132,50 +125,57 @@ public class ProfileViewModel extends ViewModel {
      * Needs to re-authenticate the user then update the database and firebase auth
      */
     public void attemptUpdateProfile() {
-        if (mPassword.getValue().equals("")) {
+        // Clear all TextView's of error messages
+        mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
+        mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
+        mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, null));
+
+        // First validate updated info
+        String email = "", username = "";
+        boolean invalid = false;
+        try {
+            email = validateEmail(mUser.getValue().getEmail());
+        } catch (AuthUtil.InvalidInputException e) {
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, e.getMessage()));
+            invalid = true;
+        }
+
+        try {
+            username = validateUsername(mUser.getValue().getUsername());
+        } catch (AuthUtil.InvalidInputException e) {
+            mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, e.getMessage()));
+            invalid = true;
+        }
+
+        if (mPassword.getValue() == null || mPassword.getValue().equals("")) {
             mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, "Enter Password"));
+            invalid = true;
+        }
+
+        if (invalid) {
+            mProfileUpdateEvent.setValue(false);
             return;
         }
-        mProfileRepository.reAuthenticateUser(mOldEmail, mPassword.getValue(), isLoggedIn -> {
-            if (isLoggedIn) {
-                mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, null));
-                mProfileRepository.updateEmail(mEmail.getValue(), isEmailUpdated -> {
-                    if (isEmailUpdated) {
-                        mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, null));
-                        if (mOldUserName != mUserName.getValue()) {
-                            mProfileRepository.updateUserName(mUserName.getValue(), isUserNameUpdated -> {
-                                if (isUserNameUpdated) {
-                                    mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, null));
-                                    mUpdatedProfileEvent.call();
-                                } else {
-                                    mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, "Username taken"));
-                                }
-                            });
-                        } else {
-                            mUpdatedProfileEvent.call();
-                        }
 
-                    } else {
-                        mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, "Invalid Email"));
-                    }
-                });
+        mProfileRepository.reAuthenticateUser(mOldEmail, mPassword.getValue(), isLoggedIn -> {
+            mPassword.setValue("");
+            if (isLoggedIn) {
+                mProfileRepository.updateUserProfile(mUser.getValue(),
+                        () -> mInvalidInputEvent.setValue(new Pair<>(InputKey.EMAIL, "Invalid Email")),
+                        () -> mInvalidInputEvent.setValue(new Pair<>(InputKey.USERNAME, "Username taken")),
+                        (isProfileUpdated) -> mProfileUpdateEvent.setValue(isProfileUpdated)
+                );
+
             } else {
                 mInvalidInputEvent.setValue(new Pair<>(InputKey.PASSWORD, "Incorrect Password"));
+                mProfileUpdateEvent.setValue(false);
             }
         });
     }
-
 
     public enum InputKey {
         EMAIL,
         PASSWORD,
         USERNAME
-    }
-
-    /**
-     * Callback interface for simple completion
-     */
-    public interface OnFinishedListener {
-        void finished(Boolean succeeded);
     }
 }
