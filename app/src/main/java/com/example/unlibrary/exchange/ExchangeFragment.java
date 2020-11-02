@@ -15,8 +15,11 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksFragment;
+import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentExchangeBinding;
 
 /**
@@ -57,7 +60,9 @@ public class ExchangeFragment extends Fragment {
         for (Fragment f : getChildFragmentManager().getFragments()) {
             if (f instanceof BooksFragment) {
                 BooksFragment bookFragment = (BooksFragment) f;
+
                 bookFragment.setBooksSource(mViewModel);
+                bookFragment.setOnItemClickListener(mViewModel::selectCurrentBook);
             }
         }
 

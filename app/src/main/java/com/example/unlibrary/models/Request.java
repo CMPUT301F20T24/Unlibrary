@@ -10,12 +10,13 @@ package com.example.unlibrary.models;
 
 import androidx.core.util.Pair;
 
+import com.google.firebase.firestore.DocumentId;
+
 import java.util.List;
 
 /**
  * Represents a borrow request in our application domain.
  * <p>
- * TODO: Link and retrieve ID from Firestore
  */
 public class Request {
     private String mId;
@@ -47,8 +48,22 @@ public class Request {
      *
      * @return unique identifier of request
      */
+    @DocumentId
     public String getId() {
         return mId;
+    }
+
+    /**
+     * Sets the unique identifier of a request obtained from Firestore.
+     *
+     * @return unique identifier of request
+     */
+    public void setId(String id) {
+        if (mId != null) {
+            throw new IllegalArgumentException("ID has already been initialized");
+        }
+
+        mId = id;
     }
 
     /**

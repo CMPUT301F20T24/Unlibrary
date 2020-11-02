@@ -18,11 +18,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.book_list.BooksFragment;
+
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
+import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
 import com.example.unlibrary.models.Book;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,8 +53,8 @@ public class LibraryFragment extends Fragment {
      * Sets up listeners to binding variables and sends {@link com.example.unlibrary.book_list.BooksSource}
      * to child {@link BooksFragment} to display.
      *
-     * @param inflater {@link LayoutInflater} that can be used to inflate any view in the fragment
-     * @param container {@link ViewGroup} possibly null parent view that this fragment will attach to
+     * @param inflater           {@link LayoutInflater} that can be used to inflate any view in the fragment
+     * @param container          {@link ViewGroup} possibly null parent view that this fragment will attach to
      * @param savedInstanceState bundle used to restore its previous state
      * @return {@link View} for this fragment
      */
@@ -71,6 +73,7 @@ public class LibraryFragment extends Fragment {
             if (f instanceof BooksFragment) {
                 BooksFragment bookFragment = (BooksFragment) f;
                 bookFragment.setBooksSource(mViewModel);
+                bookFragment.setOnItemClickListener(mViewModel::selectCurrentBook);
             }
         }
         mBinding.setViewModel(mViewModel);

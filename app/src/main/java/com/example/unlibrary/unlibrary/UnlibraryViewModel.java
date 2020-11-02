@@ -8,10 +8,15 @@
 
 package com.example.unlibrary.unlibrary;
 
+import android.view.View;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksSource;
+import com.example.unlibrary.exchange.ExchangeFragmentDirections;
 import com.example.unlibrary.models.Book;
 
 import java.util.List;
@@ -47,5 +52,15 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
     @Override
     protected void onCleared() {
         mUnlibraryRepository.detachListeners();
+    }
+
+    /**
+     * Sets mCurrentBook and navigates to detailed book view.
+     *
+     * @param view     view to navigate from.
+     * @param position list position of selected book.
+     */
+    public void selectCurrentBook(View view, int position) {
+        //TODO
     }
 }

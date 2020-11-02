@@ -30,4 +30,5 @@
     <string name="delete_book_fab_description">Delete book</string>
     <string name="isbn">ISBN</string>
     <string name="request_status">Request Status</string>
+    <string name="book_description">Book Description</string>
 </resources>

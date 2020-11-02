@@ -12,8 +12,15 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.unlibrary.auth.AuthRepository;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -26,12 +33,18 @@ import java.util.List;
  * Manages all the database interaction for the ExchangeViewModel.
  */
 public class ExchangeRepository {
-    private static final String BOOKS_COLLECTION = "books";
+    private static final String REQUEST_COLLECTION = "requests";
+    private static final String BOOK_COLLECTION = "books";
+    private static final String OWNER = "owner";
+    private static final String STATUS = "status";
+
     private static final String TAG = ExchangeRepository.class.getSimpleName();
 
     private final FirebaseFirestore mDb;
+
     private final MutableLiveData<List<Book>> mBooks;
     private ListenerRegistration mListenerRegistration;
+    private String mUID;
 
     /**
      * Constructor for the Exchange Repository.
@@ -39,7 +52,20 @@ public class ExchangeRepository {
     public ExchangeRepository() {
         mDb = FirebaseFirestore.getInstance();
         mBooks = new MutableLiveData<>(new ArrayList<>());
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // TODO: make sure user is authenticated
+        mUID = user.getUid();
         attachListener();
+    }
+
+    /**
+     * Returns id of currently logged on user.
+     *
+     * @return unique identifier of user
+     */
+    public String getUid() {
+        return mUID;
     }
 
     /**
@@ -47,9 +73,9 @@ public class ExchangeRepository {
      * and updates books object
      */
     public void attachListener() {
-        mListenerRegistration = mDb.collection(BOOKS_COLLECTION)
-                .whereIn("status", Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED))
-                .whereNotEqualTo("owner", FirebaseAuth.getInstance().getUid())
+        mListenerRegistration = mDb.collection(BOOK_COLLECTION)
+                .whereIn(STATUS, Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED))
+                .whereNotEqualTo(OWNER, FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.w(TAG, error);
@@ -66,6 +92,19 @@ public class ExchangeRepository {
 
                     mBooks.setValue(dbBooks);
                 });
+    }
+
+    /**
+     * Save new Request into the database. Assumes Request is valid.
+     *
+     * @param request           request object to be saved in the database
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener) {
+        mDb.collection(REQUEST_COLLECTION).add(request)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     /**

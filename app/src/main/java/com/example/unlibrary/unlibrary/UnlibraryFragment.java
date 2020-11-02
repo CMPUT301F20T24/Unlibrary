@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.book_list.BooksFragment;
+import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentUnlibraryBinding;
 
 /**
@@ -59,6 +60,7 @@ public class UnlibraryFragment extends Fragment {
             if (f instanceof BooksFragment) {
                 BooksFragment bookFragment = (BooksFragment) f;
                 bookFragment.setBooksSource(mViewModel);
+                bookFragment.setOnItemClickListener(mViewModel::selectCurrentBook);
             }
         }
 

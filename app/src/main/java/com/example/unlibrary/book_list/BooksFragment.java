@@ -29,6 +29,7 @@ import com.example.unlibrary.databinding.FragmentBookListBinding;
 public class BooksFragment extends Fragment {
     private BooksSource mBooksSource;
     private FragmentBookListBinding mBinding;
+    private BooksRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -49,6 +50,17 @@ public class BooksFragment extends Fragment {
     }
 
     /**
+     * Sets the OnItemClickListener for the current fragment instantiation. Should be called during
+     * {@link Fragment#onCreateView(LayoutInflater, ViewGroup, Bundle)} in the parent or
+     * containing fragment.
+     *
+     * @param onItemClickListener implementation of BooksFragment.OnItemClickListener
+     */
+    public void setOnItemClickListener(BooksRecyclerViewAdapter.OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
+    }
+
+    /**
      * Draws the fragment UI
      *
      * @param inflater
@@ -65,7 +77,7 @@ public class BooksFragment extends Fragment {
 
         view.setLayoutManager(new LinearLayoutManager(context));
 
-        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue());
+        BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue(), mOnItemClickListener);
 
         // Bind ViewModel books to RecyclerViewAdapter
         view.setAdapter(adapter);
