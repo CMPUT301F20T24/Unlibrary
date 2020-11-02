@@ -79,7 +79,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     }
 
     /**
-     * Getter for themCurrentBook live data object
+     * Getter for mCurrentBook live data object
      *
      * @return LiveData<Book> This returns the mBooks object
      */
@@ -112,17 +112,23 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
                 });
     }
 
-    public void selectCurrentBook (View view, int position) {
+    /**
+     * Sets mCurrentBook and navigates to detailed book view.
+     *
+     * @param view     view to navigate from.
+     * @param position list position of selected book.
+     */
+    public void selectCurrentBook(View view, int position) {
         if (mBooks.getValue() == null) {
             mFailureMsgEvent.setValue("Failed show details for book");
-        }
-        else{
+        } else {
             Book book = mBooks.getValue().get(position);
             mCurrentBook.setValue(book);
             NavDirections direction = ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment();
             Navigation.findNavController(view).navigate(direction);
         }
     }
+
     /**
      * Cleans up resources, removes the snapshot listener from the repository.
      */

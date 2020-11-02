@@ -7,8 +7,6 @@
         <variable
             name="viewModel"
             type="com.example.unlibrary.exchange.ExchangeViewModel" />
-
-        <import type="android.view.View" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,8 +21,8 @@
             app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="@{viewModel.currentBook.title}"
-            app:subtitle="@{viewModel.currentBook.author}" />
+            app:subtitle="@{viewModel.currentBook.author}"
+            app:title="@{viewModel.currentBook.title}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_request"

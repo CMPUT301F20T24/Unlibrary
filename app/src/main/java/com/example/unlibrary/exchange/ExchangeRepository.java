@@ -33,7 +33,7 @@ import java.util.List;
  * Manages all the database interaction for the ExchangeViewModel.
  */
 public class ExchangeRepository {
-    private static final String REQUEST_COLLECTION = "Requests";
+    private static final String REQUEST_COLLECTION = "requests";
     private static final String BOOK_COLLECTION = "books";
 
     private static final String TAG = ExchangeRepository.class.getSimpleName();
@@ -60,7 +60,7 @@ public class ExchangeRepository {
      *
      * @return unique identifier of user
      */
-    public String getUid () {
+    public String getUid() {
         return mUID;
     }
 
@@ -93,7 +93,7 @@ public class ExchangeRepository {
     /**
      * Save new Request into the database. Assumes Request is valid.
      *
-     * @param request              request object to be saved in the database
+     * @param request           request object to be saved in the database
      * @param onSuccessListener code to call on success
      * @param onFailureListener code to call on failure
      */

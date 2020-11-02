@@ -14,14 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.BR;
 import com.example.unlibrary.databinding.FragmentBookCardBinding;
 import com.example.unlibrary.models.Book;
-import com.example.unlibrary.util.BookViewHolder;
+
 
 import java.util.List;
 
@@ -56,7 +54,7 @@ public class BooksRecyclerViewAdapter extends RecyclerView.Adapter<BooksRecycler
      * Inflate fragment_book_card and bind it with the {@link BookViewHolder} class. OnClickListeners
      * can be passed here as well.
      *
-     * @param parent ViewGroup of which this View will be added after binding
+     * @param parent   ViewGroup of which this View will be added after binding
      * @param viewType layout ID
      * @return a new ViewHolder that holds a View for a {@link Book}
      */
