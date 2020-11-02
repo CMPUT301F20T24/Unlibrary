@@ -101,7 +101,7 @@ public class ProfileViewModel extends ViewModel {
      * Reset text fields to previous state
      */
     public void resetUserInfo() {
-        mUser.setValue(new User(mUser.getValue().getId(), mOldUserName, mOldEmail));
+        mUser.setValue(new User(mUser.getValue().getUID(), mOldUserName, mOldEmail));
         mPassword.setValue("");
         mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.PASSWORD, null));
         mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, null));
