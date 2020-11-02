@@ -49,6 +49,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private static final String BOOK_PHOTO_STORE = "book_photos/";
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
     private final MutableLiveData<Uri> mTakenPhoto = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mIsLoading = new MutableLiveData<>();
     private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
@@ -85,6 +86,15 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LiveData<Uri> getTakenPhoto() {
         return this.mTakenPhoto;
+    }
+
+    /**
+     * Getter for the mIsLoading.
+     *
+     * @return IsLoading LiveData
+     */
+    public LiveData<Boolean> getIsLoading() {
+        return this.mIsLoading;
     }
 
     /**
@@ -199,9 +209,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                             Book bookWithId = mCurrentBook.getValue();
                             bookWithId.setId(o.getId());
                             mCurrentBook.setValue(bookWithId);
+                            mIsLoading.setValue(false);
                             mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
                         },
                         e -> {
+                            mIsLoading.setValue(false);
                             mFailureMsgEvent.setValue("Failed to create new book.");
                             Log.e(TAG, "Failed to create new book.", e);
                         });
@@ -209,15 +221,18 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 // Pre-existing book
                 mLibraryRepository.updateBook(book,
                         o -> {
+                            mIsLoading.setValue(false);
                             mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
                         },
                         e -> {
+                            mIsLoading.setValue(false);
                             mFailureMsgEvent.setValue("Failed to update book.");
                             Log.e(TAG, "Failed to update book.", e);
                         });
             }
         };
 
+        mIsLoading.setValue(true);
         if (mTakenPhoto.getValue() != null) {
             // If a photo was taken upload it to Firebase storage
             final StorageReference storageRef = FirebaseStorage.getInstance().getReference();
@@ -279,11 +294,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         if (mCurrentBook.getValue() == null) {
             mFailureMsgEvent.setValue("Failed to get current book.");
         } else {
+            mIsLoading.setValue(true);
             mLibraryRepository.deleteBook(mCurrentBook.getValue(),
                     o -> {
+                        mIsLoading.setValue(false);
                         mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
                     },
                     e -> {
+                        mIsLoading.setValue(false);
                         mFailureMsgEvent.setValue("Failed to delete book.");
                     });
         }
@@ -302,6 +320,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         }
 
         // Use the ISBN to search up book details
+        mIsLoading.setValue(true);
         mLibraryRepository.fetchBookDataFromIsbn(isbn, new JSONObjectRequestListener() {
             @Override
             public void onResponse(JSONObject response) {
@@ -325,6 +344,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     book.setTitle(title);
                     book.setAuthor(author);
                     mCurrentBook.setValue(book);
+                    mIsLoading.setValue(false);
                 }
             }
 
