@@ -49,11 +49,10 @@ public class ProfileRepository {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mUID = mUser.getUid();
         mDB.collection(USERS_COLLECTION)
-                .whereEqualTo(UID_FIELD, mUID)
+                .document(mUID)
                 .get()
                 .addOnSuccessListener(task -> {
-                    DocumentSnapshot document = task.getDocuments().get(0);
-                    onFinished.finished(true, document.toObject(User.class));
+                    onFinished.finished(true, task.toObject(User.class));
                 });
     }
 
