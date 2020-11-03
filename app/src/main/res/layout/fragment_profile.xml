@@ -19,16 +19,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp">
+        android:layout_marginTop="24dp">
 
         <include
             android:id="@+id/username"
             layout="@layout/fragment_editable_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="24dp"
             app:content="@={viewmodel.user.username}"
             app:isEditing="@{editstate.isEditing}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -42,7 +42,9 @@
             layout="@layout/fragment_editable_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
             app:content="@={viewmodel.user.email}"
             app:isEditing="@{editstate.isEditing}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -55,11 +57,15 @@
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
             android:hint="@string/enter_password_to_confirm_changes"
             android:visibility="@{editstate.isEditing ? View.VISIBLE : View.GONE}"
             app:endIconMode="password_toggle"
             app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/email">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -89,11 +95,10 @@
             android:id="@+id/edit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:onClick="@{() -> editstate.editContent()}"
             android:src="@drawable/ic_edit_24px"
-            android:translationY="-30dp"
             android:visibility="@{editstate.isEditing ? View.GONE : View.VISIBLE }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -102,11 +107,10 @@
             android:id="@+id/confirm_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:onClick="@{() -> editstate.confirmUpdate()}"
             android:src="@drawable/ic_done_24px"
-            android:translationY="-30dp"
             android:visibility="@{editstate.isEditing &amp;&amp; !editstate.isUpdating ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -115,11 +119,10 @@
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:onClick="@{() -> editstate.cancelUpdate()}"
             android:src="@drawable/ic_close_24px"
-            android:translationY="-30dp"
             android:visibility="@{editstate.isEditing &amp;&amp; !editstate.isUpdating ? View.VISIBLE : View.GONE }"
             app:layout_constraintBottom_toTopOf="@+id/confirm_button"
             app:layout_constraintEnd_toEndOf="parent" />
