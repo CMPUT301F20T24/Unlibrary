@@ -12,8 +12,6 @@ import androidx.core.util.Pair;
 
 import com.google.firebase.firestore.DocumentId;
 
-import java.util.List;
-
 /**
  * Represents a borrow request in our application domain.
  * <p>

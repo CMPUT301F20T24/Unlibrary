@@ -8,7 +8,6 @@
 
 package com.example.unlibrary.book_list;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

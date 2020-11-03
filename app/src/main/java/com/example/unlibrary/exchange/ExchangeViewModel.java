@@ -22,7 +22,6 @@ import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.util.SingleLiveEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

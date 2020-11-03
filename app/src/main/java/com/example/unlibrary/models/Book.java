@@ -10,8 +10,6 @@ package com.example.unlibrary.models;
 
 import com.google.firebase.firestore.DocumentId;
 
-import java.util.ArrayList;
-
 /**
  * Represents a book in our application domain. Book is a pure POJO class (getters and setters only)
  * so that it can be used as a custom object when interacting with Firestore.
@@ -41,7 +39,7 @@ public class Book {
      * @param title  of book
      * @param author of book
      * @param owner  unique user identifier of the owner of the book
-     * @param photo URL of photo to add, can be null if no photo was added on creation
+     * @param photo  URL of photo to add, can be null if no photo was added on creation
      */
     public Book(String isbn, String title, String author, String owner, String photo) {
         mIsbn = isbn;

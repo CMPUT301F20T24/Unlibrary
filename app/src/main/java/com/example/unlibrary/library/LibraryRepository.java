@@ -60,19 +60,19 @@ public class LibraryRepository {
         mListenerRegistration = mDb.collection(BOOKS_COLLECTION)
                 .whereEqualTo("owner", FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((snapshot, error) -> {
-            if (error != null) {
-                Log.w(TAG, "Error listening", error);
-                return;
-            }
+                    if (error != null) {
+                        Log.w(TAG, "Error listening", error);
+                        return;
+                    }
 
-            // TODO only use getDocumentChanges instead of rebuilding the entire list
-            // Rebuild the list
-            ArrayList<Book> newBooks = new ArrayList<>();
-            for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                newBooks.add(doc.toObject(Book.class));
-            }
-            mBooks.setValue(newBooks);
-        });
+                    // TODO only use getDocumentChanges instead of rebuilding the entire list
+                    // Rebuild the list
+                    ArrayList<Book> newBooks = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        newBooks.add(doc.toObject(Book.class));
+                    }
+                    mBooks.setValue(newBooks);
+                });
     }
 
     /**

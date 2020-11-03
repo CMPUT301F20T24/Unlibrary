@@ -7,16 +7,16 @@
  */
 package com.example.unlibrary;
 
-import androidx.core.content.FileProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 
 import com.androidnetworking.AndroidNetworking;
 import com.example.unlibrary.databinding.ActivityMainBinding;
@@ -69,6 +69,7 @@ public class MainActivity extends AuthenticatedActivity {
 
     /**
      * Utility function to show toast.
+     *
      * @param msg Message to show
      */
     public void showToast(String msg) {
@@ -77,6 +78,7 @@ public class MainActivity extends AuthenticatedActivity {
 
     /**
      * Utility function to generate a Uri to store an image in.
+     *
      * @return A Uri where an image can be stored
      * @throws IOException Thrown when it fails to generate the Uri
      */

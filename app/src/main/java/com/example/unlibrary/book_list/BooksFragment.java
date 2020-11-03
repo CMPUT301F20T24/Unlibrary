@@ -30,7 +30,6 @@ public class BooksFragment extends Fragment {
     private BooksSource mBooksSource;
     private BooksRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
     private FragmentBookListBinding mBinding;
-    private BooksRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -64,9 +63,9 @@ public class BooksFragment extends Fragment {
     /**
      * Draws the fragment UI
      *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
+     * @param inflater Default
+     * @param container Default
+     * @param savedInstanceState Default
      * @return View root of the fragment's layout
      */
     @Override
