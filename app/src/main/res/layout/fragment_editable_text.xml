@@ -31,8 +31,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="5dp"
             android:text="@={title}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             android:visibility="@{isEditing ? View.GONE : View.VISIBLE }" />
@@ -41,7 +39,6 @@
             android:id="@+id/input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
             android:hint="@{title}"
             android:visibility="@{!isEditing ? View.GONE : View.VISIBLE }"
             app:errorContentDescription="@{errorMessage}"
