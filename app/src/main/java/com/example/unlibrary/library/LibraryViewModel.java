@@ -269,11 +269,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public void selectCurrentBook(View v, int position) {
         if (mBooks.getValue() == null) {
             mFailureMsgEvent.setValue("Failed show details for book.");
-        } else {
-            Book book = mBooks.getValue().get(position);
-            mCurrentBook.setValue(book);
-            mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
+            return;
         }
+        Book book = mBooks.getValue().get(position);
+        mCurrentBook.setValue(book);
+        mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
     }
 
     /**

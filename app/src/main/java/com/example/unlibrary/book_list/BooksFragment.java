@@ -63,8 +63,8 @@ public class BooksFragment extends Fragment {
     /**
      * Draws the fragment UI
      *
-     * @param inflater Default
-     * @param container Default
+     * @param inflater           Default
+     * @param container          Default
      * @param savedInstanceState Default
      * @return View root of the fragment's layout
      */
