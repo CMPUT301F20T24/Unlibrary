@@ -11,24 +11,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-
-import com.example.unlibrary.book_list.BooksFragment;
-
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
-import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
+import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
-import com.example.unlibrary.models.Book;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Host fragment for Library feature

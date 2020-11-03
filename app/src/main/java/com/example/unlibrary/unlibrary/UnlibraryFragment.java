@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.book_list.BooksFragment;
-import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentUnlibraryBinding;
 
 /**
@@ -31,7 +30,7 @@ public class UnlibraryFragment extends Fragment {
      * Initialize ViewModel of the fragment that will be retained when the fragment is
      * paused or stopped, then resumed.
      *
-     * @param savedInstanceState
+     * @param savedInstanceState default
      */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,10 +42,10 @@ public class UnlibraryFragment extends Fragment {
      * Draws the fragment UI. Sets the {@link com.example.unlibrary.book_list.BooksSource} to the
      * child {@link BooksFragment}.
      *
-     * @param inflater
-     * @param container
-     * @param savedInstanceState
-     * @return
+     * @param inflater           default
+     * @param container          default
+     * @param savedInstanceState default
+     * @return View
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

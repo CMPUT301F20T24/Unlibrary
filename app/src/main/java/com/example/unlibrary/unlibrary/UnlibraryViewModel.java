@@ -12,11 +12,8 @@ import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksSource;
-import com.example.unlibrary.exchange.ExchangeFragmentDirections;
 import com.example.unlibrary.models.Book;
 
 import java.util.List;

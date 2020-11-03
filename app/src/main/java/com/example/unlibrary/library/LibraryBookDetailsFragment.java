@@ -7,6 +7,7 @@
  */
 package com.example.unlibrary.library;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,17 @@ public class LibraryBookDetailsFragment extends Fragment {
         // Setup observers
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.editBook).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
+
+        // Setup delete button. This is done in fragment because a confirmation dialog should be displayed first
+        mBinding.deleteBook.setOnClickListener(v -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete " + mViewModel.getCurrentBook().getValue().getTitle())
+                    .setMessage("Do you really want to delete this book?")
+                    .setIcon(android.R.drawable.ic_delete)
+                    .setPositiveButton("Yes", (dialog, which) -> mViewModel.deleteCurrentBook())
+                    .setNegativeButton("No", null)
+                    .show();
+        });
 
         return mBinding.getRoot();
     }

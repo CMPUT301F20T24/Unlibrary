@@ -57,7 +57,7 @@
             android:id="@+id/action_libraryEditBookFragment_to_libraryBookDetailsFragment"
             app:destination="@id/libraryBookDetailsFragment"
             app:popUpTo="@+id/libraryFragment"
-            app:popUpToInclusive="false"/>
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/libraryBookDetailsFragment"
@@ -67,6 +67,11 @@
         <action
             android:id="@+id/action_libraryBookDetailsFragment_to_libraryEditBookFragment"
             app:destination="@id/libraryEditBookFragment" />
+        <action
+            android:id="@+id/action_libraryBookDetailsFragment_to_libraryFragment"
+            app:destination="@id/libraryFragment"
+            app:popUpTo="@+id/libraryFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

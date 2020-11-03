@@ -60,19 +60,19 @@ public class LibraryRepository {
         mListenerRegistration = mDb.collection(BOOKS_COLLECTION)
                 .whereEqualTo("owner", FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((snapshot, error) -> {
-            if (error != null) {
-                Log.w(TAG, "Error listening", error);
-                return;
-            }
+                    if (error != null) {
+                        Log.w(TAG, "Error listening", error);
+                        return;
+                    }
 
-            // TODO only use getDocumentChanges instead of rebuilding the entire list
-            // Rebuild the list
-            ArrayList<Book> newBooks = new ArrayList<>();
-            for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                newBooks.add(doc.toObject(Book.class));
-            }
-            mBooks.setValue(newBooks);
-        });
+                    // TODO only use getDocumentChanges instead of rebuilding the entire list
+                    // Rebuild the list
+                    ArrayList<Book> newBooks = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        newBooks.add(doc.toObject(Book.class));
+                    }
+                    mBooks.setValue(newBooks);
+                });
     }
 
     /**
@@ -110,17 +110,15 @@ public class LibraryRepository {
     /**
      * Delete book from the database.
      *
-     * @param book book object to be deleted from the database.
+     * @param book              book object to be deleted from the database.
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
      */
-    public void deleteObject(Book book) {
+    public void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(BOOKS_COLLECTION).document(book.getId())
                 .delete()
-                .addOnSuccessListener(aVoid -> {
-                    // TODO
-                })
-                .addOnFailureListener(e -> {
-                    // TODO
-                });
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     /**

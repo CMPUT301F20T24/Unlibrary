@@ -8,7 +8,6 @@
 
 package com.example.unlibrary.book_list;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.unlibrary.BR;
 import com.example.unlibrary.databinding.FragmentBookCardBinding;
 import com.example.unlibrary.models.Book;
-
 
 import java.util.List;
 
