@@ -17,15 +17,12 @@ import com.example.unlibrary.auth.AuthActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import dagger.hilt.android.AndroidEntryPoint;
-
 /**
  * This abstract activity locks any activities that extend it behind a layer of Firebase authentication.
  * That is, if the phone does not have an active user session it will reroute the user to the auth
  * activity immediately. This design means that any possible entry points into (launcher, notifications, etc.)
  * will be protected by the authentication.
  */
-@AndroidEntryPoint
 public abstract class AuthenticatedActivity extends AppCompatActivity {
 
     private FirebaseUser mUser;
@@ -39,7 +36,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null) {
             goToAuth();
         }
