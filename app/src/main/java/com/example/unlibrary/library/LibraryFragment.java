@@ -77,12 +77,12 @@ public class LibraryFragment extends Fragment {
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         // Setup OnClickListener for filter button. Done in fragment because a dialog needs to be shown.
-        mUpdateFilter = new FilterMap();
+        // TODO theme filter button to be active/highlighted when it is filtering
+        mUpdateFilter = mViewModel.getFilter();
         mBinding.fabFilter.setOnClickListener(v -> {
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Select status to filter by.")
-                    .setNeutralButton("Cancel", (dialog, which) -> {
-                    })
+                    .setNeutralButton("Cancel", null)
                     .setPositiveButton("Filter", (dialog, which) -> mViewModel.setFilter(mUpdateFilter))
                     .setOnDismissListener(dialog -> mUpdateFilter.setMap(mViewModel.getFilter().getMap()))
                     .setMultiChoiceItems(mUpdateFilter.itemStrings(), mUpdateFilter.itemBooleans(), (dialog, which, isChecked) -> mUpdateFilter.set(mUpdateFilter.itemStrings()[which], isChecked))
