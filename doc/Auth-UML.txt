@@ -15,7 +15,11 @@ class RegisterFragment {
 }
 
 class MainActivity {
+-ActivityMainBinding mBinding
 #void onCreate()
++void setUpBottomNavigation()
++void showToast(String msg)
++Uri buildFileUri()
 }
 
 class AuthenticatedActivity {
@@ -32,13 +36,35 @@ AuthActivity *.. RegisterFragment
 '------------------- ViewModel and Repositories (Login / Register)  -------------------------------
 class AuthViewModel {
 -LoginRepository loginRepository
-+LoginViewModel(LoginRepository loginRepository)
+-MutableLiveData<String> mEmail
+-MutableLiveData<String> mPassword
+-MutableLiveData<String> mUsername
+-SingleLiveEvent<String> mFailureMsgEvent
+-SingleLiveEvent<Pair<AuthUtil.InputKey, String>> mInvalidInputEvent
+-SingleLiveEvent<Fragment> mFragmentNavigationEvent
+-SingleLiveEvent<Void> mAuthenticatedEvent
+
++AuthViewModel()
++MutableLiveData<String> getEmail()
++MutableLiveData<String> getPassword()
++MutableLiveData<String> getUsername()
++SingleLiveEvent<Fragment> getFragmentNavigationEvent()
++SingleLiveEvent<String> getFailureMsgEvent()
++SingleLiveEvent<Pair<AuthUtil.InputKey, String>> getInvalidInputEvent()
++SingleLiveEvent<Void> getAuthenticatedEvent()
++void createAccount()
++void login()
 }
 
 class AuthRepository {
--FirebaseFirestore  loginRepository
-+LiveData<User> getUserData()
-+void createUser()
+-String USER_COLLECTION
+-String USERNAME_FIELD
+-FirebaseFirestore mDB
+-FirebaseAuth mAuth
+
++AuthRepository()
++void signIn(String email, String password, OnFinishedListener onFinished)
++void register(String email, String password, String username, OnFinishedListener onFinished)
 }
 
 package Firestore {}

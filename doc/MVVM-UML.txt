@@ -1,16 +1,54 @@
 @startuml
 '------------------- Navigation Host Fragment and Individual Fragment  -------------------------------
 class LibraryFragment {
+-LibraryViewModel mViewModel
+-FragmentLibraryBinding mBinding
+-FilterMap mUpdateFilter
+
++void onCreate(@Nullable Bundle savedInstanceState)
++View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 }
 
 class UnlibraryFragment {
+-UnlibraryViewModel mViewModel
+-FragmentUnlibraryBinding mBinding
+
++void onCreate(@Nullable Bundle savedInstanceState) 
++View onCreateView(LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState)
 }
 
 class ExchangeFragment {
+-ExchangeViewModel mViewModel
+-FragmentExchangeBinding mBinding
+
+void onCreate(@Nullable Bundle savedInstanceState)
+View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 }
 
 class ProfileFragment {
+-FragmentProfileBinding mBinding
+-ProfileViewModel mViewModel
+-EditingState mEditingState
+
++void onCreate(Bundle savedInstanceState)
++View onCreateView(LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState)
++void logout()
 }
+
+class EditingState {
+-MutableLiveData<Boolean> isEditing
+-MutableLiveData<Boolean> isUpdating
++EditingState()
++LiveData<Boolean> getIsEditing()
++LiveData<Boolean> getIsUpdating()
++void editContent()
++void cancelUpdate()
++void confirmUpdate()
+}
+
+EditingState ..* ProfileFragment
 
 
 '------------------- Model Classes + Firestore -------------------------------
@@ -151,11 +189,8 @@ LibraryFragment *.. BookFragment
 UnlibraryFragment *.. BookFragment
 ExchangeFragment *.. BookFragment
 
-ExchangeViewModel ..|> BookSource: <<implements>>
-LibraryViewModel ..|> BookSource: <<implements>>
-UnlibraryViewModel ..|> BookSource: <<implements>>
-
-ExchangeViewModel ..o BookFragment
-LibraryViewModel ..o BookFragment
-UnlibraryViewModel ..o BookFragment
+ExchangeViewModel ..|> BooksSource: <<implements>>
+LibraryViewModel ..|> BooksSource: <<implements>>
+UnlibraryViewModel ..|> BooksSource: <<implements>>
+BooksSource ..o BookFragment
 @enduml
