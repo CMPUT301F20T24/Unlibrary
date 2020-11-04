@@ -24,7 +24,7 @@ class AuthenticatedActivity {
 #FirebaseUser getUser()
 }
 
-MainActivity --|> AuthenticatedActivity: <<extends>>
+AuthenticatedActivity <|-- MainActivity: <<extends>>
 AuthenticatedActivity ..> AuthActivity: <<launches>>
 AuthActivity *.. LoginFragment
 AuthActivity *.. RegisterFragment
