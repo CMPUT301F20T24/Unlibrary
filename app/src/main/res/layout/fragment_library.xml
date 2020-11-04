@@ -39,6 +39,7 @@
             android:layout_marginBottom="16dp"
             android:contentDescription="@string/fab_add_book_description"
             android:src="@drawable/ic_search"
+            app:backgroundTint="@color/colorAccent"
             app:fabSize="normal"
             app:layout_constraintBottom_toTopOf="@id/fabAdd"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -54,6 +55,7 @@
             android:contentDescription="@string/fab_filter_description"
             android:onClick="@{()->viewModel.createBook()}"
             android:src="@drawable/ic_add"
+            app:backgroundTint="@color/colorAccent"
             app:fabSize="normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
