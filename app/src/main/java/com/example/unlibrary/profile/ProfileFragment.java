@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.databinding.FragmentProfileBinding;
 
 /**
@@ -80,12 +81,11 @@ public class ProfileFragment extends Fragment {
 
     /**
      * User logs out of account and will re-launch AuthActivity to initiate login again
-     * TODO Implement Logout
      */
     public void logout() {
-        System.out.println("logged out");
-    }
+        ((MainActivity) getActivity()).logout();
 
+    }
 
     /**
      * Abstract editing state of profile fragment.
