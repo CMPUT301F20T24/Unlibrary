@@ -55,7 +55,7 @@ public class CreateAccountTest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText.perform(replaceText("test1"), closeSoftKeyboard());
+        textInputEditText.perform(replaceText("test"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText2 = onView(
                 allOf(childAtPosition(
@@ -64,7 +64,7 @@ public class CreateAccountTest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText2.perform(replaceText("test1@ualberta.ca"), closeSoftKeyboard());
+        textInputEditText2.perform(replaceText("test@ualberta.ca"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText3 = onView(
                 allOf(childAtPosition(
