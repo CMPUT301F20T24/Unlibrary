@@ -24,9 +24,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manages all the database interaction for the Library ViewModel.
@@ -41,6 +43,7 @@ public class LibraryRepository {
     private FirebaseAuth mAuth;
     private ListenerRegistration mListenerRegistration;
     private MutableLiveData<List<Book>> mBooks;
+    private FilterMap mFilter;
 
     /**
      * Constructor for the Library Repository. Sets up the database snapshot listener.
@@ -49,6 +52,7 @@ public class LibraryRepository {
         mDb = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mBooks = new MutableLiveData<>(new ArrayList<>());
+        this.mFilter = new FilterMap();
         attachListener();
     }
 
@@ -57,22 +61,31 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
-        mListenerRegistration = mDb.collection(BOOKS_COLLECTION)
-                .whereEqualTo("owner", FirebaseAuth.getInstance().getUid())
-                .addSnapshotListener((snapshot, error) -> {
-                    if (error != null) {
-                        Log.w(TAG, "Error listening", error);
-                        return;
-                    }
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo("owner", FirebaseAuth.getInstance().getUid());
+        List<String> statusValues = new ArrayList<>();
+        for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
+            if (f.getValue()) {
+                statusValues.add(f.getKey().toString());
+            }
+        }
+        if (!statusValues.isEmpty()) {
+            query = query.whereIn("status", statusValues);
+        }
 
-                    // TODO only use getDocumentChanges instead of rebuilding the entire list
-                    // Rebuild the list
-                    ArrayList<Book> newBooks = new ArrayList<>();
-                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        newBooks.add(doc.toObject(Book.class));
-                    }
-                    mBooks.setValue(newBooks);
-                });
+        mListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.w(TAG, "Error listening", error);
+                return;
+            }
+
+            // TODO only use getDocumentChanges instead of rebuilding the entire list
+            // Rebuild the list
+            ArrayList<Book> newBooks = new ArrayList<>();
+            for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                newBooks.add(doc.toObject(Book.class));
+            }
+            mBooks.setValue(newBooks);
+        });
     }
 
     /**
@@ -151,5 +164,16 @@ public class LibraryRepository {
      */
     public LiveData<List<Book>> getBooks() {
         return this.mBooks;
+    }
+
+    /**
+     * Filter the results of the books query.
+     *
+     * @param filter What to filter for
+     */
+    public void setFilter(FilterMap filter) {
+        mFilter = filter;
+        detachListener();
+        attachListener();
     }
 }

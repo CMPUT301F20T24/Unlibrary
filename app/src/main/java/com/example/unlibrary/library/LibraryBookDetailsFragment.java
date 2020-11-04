@@ -19,6 +19,7 @@ import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,12 +54,11 @@ public class LibraryBookDetailsFragment extends Fragment {
 
         // Setup delete button. This is done in fragment because a confirmation dialog should be displayed first
         mBinding.deleteBook.setOnClickListener(v -> {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Delete " + mViewModel.getCurrentBook().getValue().getTitle())
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Delete " + mViewModel.getCurrentBook().getValue().getTitle() + "?")
                     .setMessage("Do you really want to delete this book?")
-                    .setIcon(android.R.drawable.ic_delete)
-                    .setPositiveButton("Yes", (dialog, which) -> mViewModel.deleteCurrentBook())
                     .setNegativeButton("No", null)
+                    .setPositiveButton("Yes", (dialog, which) -> mViewModel.deleteCurrentBook())
                     .show();
         });
 
