@@ -20,6 +20,7 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 /**
  * Host fragment for Library feature
@@ -27,6 +28,7 @@ import com.example.unlibrary.databinding.FragmentLibraryBinding;
 public class LibraryFragment extends Fragment {
     private LibraryViewModel mViewModel;
     private FragmentLibraryBinding mBinding;
+    private FilterMap mUpdateFilter;
 
     /**
      * Initialize ViewModel of the fragment that will be retained when the fragment is
@@ -73,6 +75,19 @@ public class LibraryFragment extends Fragment {
         // Setup observers
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.fabAdd).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
+
+        // Setup OnClickListener for filter button. Done in fragment because a dialog needs to be shown.
+        mUpdateFilter = new FilterMap();
+        mBinding.fabFilter.setOnClickListener(v -> {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Select status to filter by.")
+                    .setNeutralButton("Cancel", (dialog, which) -> {
+                    })
+                    .setPositiveButton("Filter", (dialog, which) -> mViewModel.setFilter(mUpdateFilter))
+                    .setOnDismissListener(dialog -> mUpdateFilter.setMap(mViewModel.getFilter().getMap()))
+                    .setMultiChoiceItems(mUpdateFilter.itemStrings(), mUpdateFilter.itemBooleans(), (dialog, which, isChecked) -> mUpdateFilter.set(mUpdateFilter.itemStrings()[which], isChecked))
+                    .show();
+        });
 
         return mBinding.getRoot();
     }

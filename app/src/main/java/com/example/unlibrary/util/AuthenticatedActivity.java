@@ -44,7 +44,6 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
-        System.out.println(mUser == null);
     }
 
     // TODO improve this, it's not great because theoretically the user could be logged out and we would get a null exception error
