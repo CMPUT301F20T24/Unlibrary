@@ -1,0 +1,49 @@
+@startuml
+'------------------- Main Activity, Auth Activity, and Authenticated Activty -------------------------------
+class AuthActivity {
+#void onCreate()
++void showFragment()
++void showToast()
+}
+
+class LoginFragment {
++View onCreateView()
+}
+
+class RegisterFragment {
++View onCreateView()
+}
+
+class MainActivity {
+#void onCreate()
+}
+
+class AuthenticatedActivity {
+#void onCreate()
+-void goToAuth()
+#FirebaseUser getUser()
+}
+
+MainActivity --|> AuthenticatedActivity: <<extends>>
+AuthenticatedActivity ..> AuthActivity: <<launches>>
+AuthActivity *.. LoginFragment
+AuthActivity *.. RegisterFragment
+
+'------------------- ViewModel and Repositories (Login / Register)  -------------------------------
+class AuthViewModel {
+-LoginRepository loginRepository
++LoginViewModel(LoginRepository loginRepository)
+}
+
+class AuthRepository {
+-FirebaseFirestore  loginRepository
++LiveData<User> getUserData()
++void createUser()
+}
+
+package Firestore {}
+
+AuthRepository ..> Firestore: <<accesses>
+AuthViewModel ..> AuthRepository: <<uses>>
+AuthActivity ..> AuthViewModel: <<uses>>
+@enduml

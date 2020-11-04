@@ -1,0 +1,161 @@
+@startuml
+'------------------- Navigation Host Fragment and Individual Fragment  -------------------------------
+class LibraryFragment {
+}
+
+class UnlibraryFragment {
+}
+
+class ExchangeFragment {
+}
+
+class ProfileFragment {
+}
+
+
+'------------------- Model Classes + Firestore -------------------------------
+class User {
+-int id
+-string name
+-string username
++void setId(int id)
++void setName(string name)
++void setUsername (string username)
++int getId()
++string gettName()
++string getUsername ()
+}
+
+class Book {
+-int id
+-string title
+-string author
+-string isbn
+-string status
+-Image photo
+-User owner
++void setId(int id)
++void setTitle(string title)
++void setAuthor (string author)
++void setIsbn (string isbn)
++void setStatus(string status)
++void setPhoto(Image photo)
++void setOwner (User owner)
++int getId ()
++string getTitle ()
++string getAuthor ()
++string getIsbn ()
++string getStatus ()
++Image getPhoto ()
++User getOwner ()
+}
+
+ class Request {
+-int id
+-User requester
+-Book book
+-string state
+-Pair<Double, Double> location
++void setId(int id)
++void setRequester(User requester)
++void setBook(Book book)
++void setState(string state)
++void setLocation (Pair<Double, Double> location)
++int getId()
++User getRequester()
++Book getBook()
++string getState()
++Pair<Double, Double> getLocation()
+}
+
+User ..o ProfileRepository
+
+Book ..o LibraryRepository
+Book ..o UnlibraryRepository
+Book ..o ExchangeRepository
+
+Request ..o ExchangeRepository
+
+
+'------------------- ViewModel and Repositories (4 main pages)  -------------------------------
+class ExchangeViewModel{
+-ExchangeRepository exchangeRepository
++ExchangeViewModel(ExchangeRepository exchangeRepository)
++bookRequest()
+}
+
+class ExchangeRepository{
+-FirebaseFirestore  exchangeRepository
+-LiveData<ArrayList<Request>> requestData
++LiveData<ArrayList<Request>> getStoreExchangeData()
++LiveData<ArrayList<Request>> getExchangeData()
++void updateExchangeData()
+}
+
+class LibraryViewModel {
+-LibraryRepository libraryRepository
++LibraryViewModel(LibraryRepository libraryRepository)
++ void setTitle(String newTitle)
++ void setDescription(String newDescription)
++ void setISBN(String newISBN)
++ void takePictures()
++ void sendApproval()
++ void sendDecline()
++ initiateBorrowHandoff(Book book)
++ completeReturnHandoff(Book book)
+}
+
+class LibraryRepository {
+-FirebaseFirestore  LibraryRepository
+-LiveData<ArrayList<Book>> booksData
++LiveData<ArrayList<Book>> getStoreLibraryData()
++LiveData<ArrayList<Book>> getLibraryData()
++void updateLibrary(Book book)
+}
+
+class UnlibraryRepository {
+-FirebaseFirestore  UnlibraryRepository
+-LiveData<ArrayList<Book>> booksData
++LiveData<ArrayList<Book>> getStoreUnlibraryData()
++LiveData<ArrayList<Book>> getUnlibraryData()
++void updateUnlibrary(Book book)
+}
+
+class UnlibraryViewModel {
+-UnlibraryRepository UnlibraryRepository
++UnlibraryViewModel(UnlibraryRepository UnlibraryRepository)
++void deleteBook(Book toDelete)
++completeBorrowHandoff(Book book)
++initiateReturnHandoff(Book book)
+}
+
+LibraryRepository <.. LibraryViewModel: <<uses>>
+UnlibraryRepository <.. UnlibraryViewModel: <<uses>>
+ExchangeRepository <.. ExchangeViewModel: <<uses>>
+ProfileRepository <.. ProfileViewModel: <<uses>>
+
+LibraryViewModel <.. LibraryFragment: <<uses>>
+UnlibraryViewModel <.. UnlibraryFragment: <<uses>>
+ExchangeViewModel <.. ExchangeFragment: <<uses>>
+ProfileViewModel <.. ProfileFragment: <<uses>>
+
+'------------------- BookFragment  -------------------------------
+class BookFragment {
+}
+
+interface BookSource {
+LiveData<List<Book>> getBooks()
+}
+
+LibraryFragment *.. BookFragment
+UnlibraryFragment *.. BookFragment
+ExchangeFragment *.. BookFragment
+
+ExchangeViewModel ..|> BookSource: <<implements>>
+LibraryViewModel ..|> BookSource: <<implements>>
+UnlibraryViewModel ..|> BookSource: <<implements>>
+
+ExchangeViewModel ..o BookFragment
+LibraryViewModel ..o BookFragment
+UnlibraryViewModel ..o BookFragment
+@enduml
