@@ -143,7 +143,7 @@ ProfileViewModel <.. ProfileFragment: <<uses>>
 class BookFragment {
 }
 
-interface BookSource {
+interface BooksSource {
 LiveData<List<Book>> getBooks()
 }
 
