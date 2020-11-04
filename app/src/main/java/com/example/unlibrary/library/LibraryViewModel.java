@@ -51,7 +51,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
-    private final LiveData<List<Book>> mBooks;
+    private FilterMap mFilter;
+    private LiveData<List<Book>> mBooks;
     private final LibraryRepository mLibraryRepository;
 
     public enum InputKey {
@@ -64,6 +65,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * Constructor for the Library ViewModel. Instantiates listener to Firestore.
      */
     public LibraryViewModel() {
+        // Initialize filter to be false for everything
+        this.mFilter = new FilterMap();
         this.mLibraryRepository = new LibraryRepository();
         this.mBooks = this.mLibraryRepository.getBooks();
     }
@@ -160,11 +163,24 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
-     * Filter displayed books.
+     * Get the current filter settings.
+     *
+     * @return FilterMap object
      */
-    public void filter() {
-        // TODO
+    public FilterMap getFilter() {
+        return mFilter;
     }
+
+    /**
+     * Configure the filter settings and trigger a corresponding update to the books data.
+     *
+     * @param filter FilterMap object
+     */
+    public void setFilter(FilterMap filter) {
+        mFilter.setMap(filter.getMap());
+        mLibraryRepository.setFilter(mFilter);
+    }
+
 
     /**
      * Save the book that is currently being created or edited
@@ -251,7 +267,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             }).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    System.out.println(downloadUri.toString());
                     book.setPhoto(downloadUri.toString());
                     uploadBook.run();
                 }
