@@ -1,5 +1,5 @@
 @startuml
-'------------------- Views  -------------------------------
+'------------------- Fragments -------------------------------
 class LibraryFragment {
 -LibraryViewModel mViewModel
 -FragmentLibraryBinding mBinding
@@ -13,9 +13,9 @@ class UnlibraryFragment {
 -UnlibraryViewModel mViewModel
 -FragmentUnlibraryBinding mBinding
 
-+void onCreate(@Nullable Bundle savedInstanceState) 
++void onCreate(@Nullable Bundle savedInstanceState)
 +View onCreateView(LayoutInflater inflater, ViewGroup container,
-                              Bundle savedInstanceState)
+                          Bundle savedInstanceState)
 }
 
 class ExchangeFragment {
@@ -26,9 +26,36 @@ void onCreate(@Nullable Bundle savedInstanceState)
 View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 }
 
+class ExchangeBookDetailsFragment {
+-FragmentExchangeBookDetailsBinding mBinding
 
++View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
 
-'------------------- Model Classes + Firestore -------------------------------
+class LibraryBookDetailsFragment {
+-FragmentLibraryBookDetailsBinding mBinding;
++View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+class LibraryEditBookFragment {
+-LibraryViewModel mViewModel;
+-FragmentLibraryEditBookBinding mBinding;
+-Uri mAutofillUri;
+-Uri mTakePhotoUri;
+-ActivityResultLauncher<Uri> mScanBarcodeContract;
+-ActivityResultLauncher<Uri> mTakePhotoContract;
+
++View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+-void showToast(String msg)
+}
+
+LibraryFragment <..> LibraryBookDetailsFragment: <<navigates to>>
+LibraryBookDetailsFragment <..> LibraryEditBookFragment: <<navigates to>>
+
+ExchangeFragment <..> ExchangeBookDetailsFragment: <<navigates to>>
+UnlibraryFragment <..> UnlibraryBookDetailsFragment: <<navigates to>>
+
+'------------------- Model Classes  -------------------------------
 class Book {
 -int id
 -string title
@@ -53,7 +80,7 @@ class Book {
 +User getOwner ()
 }
 
- class Request {
+class Request {
 -int id
 -User requester
 -Book book
@@ -131,7 +158,16 @@ class UnlibraryViewModel {
 +initiateReturnHandoff(Book book)
 }
 
-package Firestore {}
+class FilterMap {
+-Map<Book.Status, Boolean> mFilter
+
++FilterMap()
++void set(String status, Boolean enable)
++Map<Book.Status, Boolean> getMap()
++void setMap(Map<Book.Status, Boolean> map)
++String[] itemStrings()
++boolean[] itemBooleans()
+}
 
 LibraryRepository <.. LibraryViewModel: <<uses>>
 UnlibraryRepository <.. UnlibraryViewModel: <<uses>>
@@ -141,55 +177,7 @@ LibraryViewModel <.. LibraryFragment: <<uses>>
 UnlibraryViewModel <.. UnlibraryFragment: <<uses>>
 ExchangeViewModel <.. ExchangeFragment: <<uses>>
 
-Firestore <.. LibraryRepository: <<uses>>
-Firestore <.. UnlibraryRepository: <<uses>>
-Firestore <.. ExchangeRepository: <<uses>>
+FilterMap <.. LibraryViewModel: <<uses>>
+FilterMap <.. LibraryRepository: <<uses>>
 
-
-'------------------- BookFragment, BooksRecyclerViewAdapter -------------------------------
-class BooksFragment {
--BooksSource mBooksSource
--BooksRecyclerViewAdapter.OnItemClickListener mOnItemClickListener
--FragmentBookListBinding mBinding
-
-+BooksFragment()
-+void setBooksSource(BooksSource booksSource)
-+void setOnItemClickListener(BooksRecyclerViewAdapter.OnItemClickListener onItemClickListener)
-+View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-}
-
-class BooksRecyclerViewAdapter {
-#List<Book> mBooks
--OnItemClickListener mOnItemClickListener
-
-+BooksRecyclerViewAdapter(List<Book> books, OnItemClickListener onItemCLickListener)
-+void setData(List<Book> books)
-+BookViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-+void onBindViewHolder(final BookViewHolder holder, int position)
-+int getItemCount()
-}
-
-class BookViewHolder {
--FragmentBookCardBinding mBinding;
-
-+BookViewHolder(FragmentBookCardBinding binding)
-+void bind(Book book)
-+void onClick(View v)
-}
-
-interface BooksSource {
-LiveData<List<Book>> getBooks()
-}
-
-LibraryFragment *.. BooksFragment
-UnlibraryFragment *.. BooksFragment
-ExchangeFragment *.. BooksFragment
-
-BooksSource <|.. ExchangeViewModel: <<implements>>
-BooksSource <|.. LibraryViewModel: <<implements>>
-BooksSource <|.. UnlibraryViewModel: <<implements>>
-BooksSource ..o BooksFragment
-
-BooksRecyclerViewAdapter *.. BookViewHolder
-BooksFragment o.. BooksRecyclerViewAdapter
 @enduml
