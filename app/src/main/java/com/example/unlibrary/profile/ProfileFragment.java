@@ -84,7 +84,6 @@ public class ProfileFragment extends Fragment {
      */
     public void logout() {
         ((MainActivity) getActivity()).logout();
-
     }
 
     /**
