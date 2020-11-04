@@ -19,32 +19,21 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp">
-
-        <include
-            android:id="@+id/profileImage"
-            layout="@layout/fragment_image_holder"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:subtitle=""
-            app:title="" />
+        android:layout_marginTop="24dp">
 
         <include
             android:id="@+id/username"
             layout="@layout/fragment_editable_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="24dp"
             app:content="@={viewmodel.user.username}"
             app:isEditing="@{editstate.isEditing}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage"
             app:title="@{@string/username_hint}" />
 
         <include
@@ -52,7 +41,9 @@
             layout="@layout/fragment_editable_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
             app:content="@={viewmodel.user.email}"
             app:isEditing="@{editstate.isEditing}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -65,11 +56,15 @@
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
             android:hint="@string/enter_password_to_confirm_changes"
             android:visibility="@{editstate.isEditing ? View.VISIBLE : View.GONE}"
             app:endIconMode="password_toggle"
             app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/email">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -78,6 +73,7 @@
                 android:inputType="textPassword"
                 android:maxLines="1"
                 android:text="@={viewmodel.password}" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -85,48 +81,50 @@
             android:id="@+id/logout_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="32dp"
             android:text="@string/logout"
             android:visibility="@{editstate.isEditing ? View.GONE : View.VISIBLE }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/email"
+            app:layout_constraintVertical_bias="0.186" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/edit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="30dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:onClick="@{() -> editstate.editContent()}"
             android:src="@drawable/ic_edit_24px"
-            android:translationY="-30dp"
             android:visibility="@{editstate.isEditing ? View.GONE : View.VISIBLE }"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/confirm_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="28dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:onClick="@{() -> editstate.confirmUpdate()}"
             android:src="@drawable/ic_done_24px"
-            android:translationY="-30dp"
             android:visibility="@{editstate.isEditing &amp;&amp; !editstate.isUpdating ? View.VISIBLE : View.GONE }"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="104dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
             android:onClick="@{() -> editstate.cancelUpdate()}"
             android:src="@drawable/ic_close_24px"
-            android:translationY="-30dp"
             android:visibility="@{editstate.isEditing &amp;&amp; !editstate.isUpdating ? View.VISIBLE : View.GONE }"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage" />
+            app:layout_constraintBottom_toTopOf="@+id/confirm_button"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <ProgressBar
             android:id="@+id/spinner"
@@ -134,10 +132,10 @@
             android:layout_width="73dp"
             android:layout_height="68dp"
             android:visibility="@{editstate.isUpdating ? View.VISIBLE : View.GONE }"
-            app:layout_constraintBottom_toBottomOf="@+id/password"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/profileImage" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
