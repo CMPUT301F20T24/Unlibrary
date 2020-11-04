@@ -40,14 +40,14 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
         if (mUser == null) {
             goToAuth();
         }
-    }
 
-    /**
-     * Logs current user out of the app and goes back to the Auth activity
-     */
-    public void logout() {
-        FirebaseAuth.getInstance().signOut();
-        goToAuth();
+        FirebaseAuth.getInstance().addAuthStateListener((auth) -> {
+            mUser = auth.getCurrentUser();
+
+            if (mUser == null) {
+                goToAuth();
+            }
+        });
     }
 
     /**

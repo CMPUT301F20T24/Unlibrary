@@ -16,8 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.databinding.FragmentProfileBinding;
+import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * Host fragment for Profile feature
@@ -83,7 +83,7 @@ public class ProfileFragment extends Fragment {
      * User logs out of account and will re-launch AuthActivity to initiate login again
      */
     public void logout() {
-        ((MainActivity) getActivity()).logout();
+        FirebaseAuth.getInstance().signOut();
     }
 
     /**
