@@ -55,7 +55,6 @@ LibraryBookDetailsFragment <..> LibraryEditBookFragment: <<navigates to>>
 ExchangeFragment <..> ExchangeBookDetailsFragment: <<navigates to>>
 UnlibraryFragment <..> UnlibraryBookDetailsFragment: <<navigates to>>
 
-
 '------------------- ViewModel and Repositories  -------------------------------
 class ExchangeViewModel{
 -String TAG
@@ -151,4 +150,14 @@ ExchangeViewModel <.. ExchangeFragment: <<uses>>
 
 FilterMap <.. LibraryViewModel: <<uses>>
 FilterMap <.. LibraryRepository: <<uses>>
+
+'LibraryBookDetailsFragment ..> LibraryViewModel: <<uses>>
+'LibraryEditBookFragment ..> LibraryViewModel: <<uses>>
+'ExchangeBookDetailsFragment ..> ExchangeViewModel: <<uses>>
+'UnlibraryBookDetailsFragment ..> UnlibraryViewModel: <<uses>>
+
+LibraryViewModel <.. LibraryBookDetailsFragment: <<uses>>
+LibraryViewModel <.. LibraryEditBookFragment: <<uses>>
+ExchangeViewModel <.. ExchangeBookDetailsFragment: <<uses>>
+UnlibraryViewModel <.. UnlibraryBookDetailsFragment: <<uses>>
 @enduml
