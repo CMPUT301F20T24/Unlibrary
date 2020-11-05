@@ -71,5 +71,6 @@ package Firestore {}
 
 AuthRepository ..> Firestore: <<accesses>
 AuthViewModel ..> AuthRepository: <<uses>>
-AuthActivity ..> AuthViewModel: <<uses>>
+LoginFragment ..> AuthViewModel: <<uses>>
+RegisterFragment  ..> AuthViewModel: <<uses>>
 @enduml
