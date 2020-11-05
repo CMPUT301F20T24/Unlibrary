@@ -93,24 +93,59 @@ class ExchangeRepository{
 
 
 class LibraryViewModel {
--LibraryRepository libraryRepository
-+LibraryViewModel(LibraryRepository libraryRepository)
-+ void setTitle(String newTitle)
-+ void setDescription(String newDescription)
-+ void setISBN(String newISBN)
-+ void takePictures()
-+ void sendApproval()
-+ void sendDecline()
-+ initiateBorrowHandoff(Book book)
-+ completeReturnHandoff(Book book)
++enum InputKey
+-String TAG
+-int MAX_TITLE_LENGTH
+-int MAX_AUTHOR_LENGTH
+-int ISBN_LENGTH
+-String BOOK_PHOTO_STORE
+-MutableLiveData<Book> mCurrentBook
+-MutableLiveData<Uri> mTakenPhoto
+-MutableLiveData<Boolean> mIsLoading
+-SingleLiveEvent<String> mFailureMsgEvent
+-SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent
+-SingleLiveEvent<NavDirections> mNavigationEvent
+-LiveData<List<Book>> mBooks
+-LibraryRepository mLibraryRepository
++LibraryViewModel()
++MutableLiveData<Book> getCurrentBook()
++LiveData<Uri> getTakenPhoto()
++LiveData<Boolean> getIsLoading()
++SingleLiveEvent<NavDirections> getNavigationEvent()
++SingleLiveEvent<String> getFailureMsgEvent()
++SingleLiveEvent<Pair<InputKey, String>> getInvalidInputEvent()
++LiveData<List<Book>> getBooks()
+#void onCleared()
++void createBook()
++void filter()
++void saveBook()
++void selectCurrentBook(View v, int position)
++void editCurrentBook()
++void deleteCurrentBook()
++void onFinishedScanSuccess(String isbn)
++void takePhoto(Uri uri)
++void onFinishedScanFailure(Throwable e)
+-void validateTitle(String title)
+-void validateAuthor(String author)
+-void validateIsbn(String isbn)
 }
 
 class LibraryRepository {
--FirebaseFirestore  LibraryRepository
--LiveData<ArrayList<Book>> booksData
-+LiveData<ArrayList<Book>> getStoreLibraryData()
-+LiveData<ArrayList<Book>> getLibraryData()
-+void updateLibrary(Book book)
+-String ISBN_FETCH_TAG
+-String BOOKS_COLLECTION
+-String TAG
+-FirebaseFirestore mDb
+-FirebaseAuth mAuth
+-ListenerRegistration mListenerRegistration
+-MutableLiveData<List<Book>> mBooks
++LibraryRepository()
++void attachListener()
++void createBook(Book book, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
++void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener)
++void detachListener()
++LiveData<List<Book>> getBooks()
 }
 
 class UnlibraryRepository {
