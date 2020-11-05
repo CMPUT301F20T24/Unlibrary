@@ -61,8 +61,7 @@ class User {
 +string getName()
 +string getUsername ()
 }
-
-ProfileRepository o.. User
+User ..o ProfileRepository
 Firestore <.. ProfileRepository: <<accesses>>
 
 '------------------- Repositories   -------------------------------
