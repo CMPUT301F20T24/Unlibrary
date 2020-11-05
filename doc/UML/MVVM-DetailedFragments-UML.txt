@@ -58,17 +58,38 @@ UnlibraryFragment <..> UnlibraryBookDetailsFragment: <<navigates to>>
 
 '------------------- ViewModel and Repositories  -------------------------------
 class ExchangeViewModel{
--ExchangeRepository exchangeRepository
-+ExchangeViewModel(ExchangeRepository exchangeRepository)
-+bookRequest()
+-String TAG
+-LiveData<List<Book>> mBooks;
+-ExchangeRepository mExchangeRepository;
+-MutableLiveData<Book> mCurrentBook
+-SingleLiveEvent<NavDirections> mNavigationEvent
+-SingleLiveEvent<String> mFailureMsgEvent
++ExchangeViewModel()
++SingleLiveEvent<String> getFailureMsgEvent()
++SingleLiveEvent<NavDirections> getNavigationEvent()
++LiveData<List<Book>> getBooks()
++LiveData<Book> getCurrentBook()
++void sendRequest()
++void selectCurrentBook(View view, int position)
+#void onCleared()
 }
 
 class ExchangeRepository{
--FirebaseFirestore  exchangeRepository
--LiveData<ArrayList<Request>> requestData
-+LiveData<ArrayList<Request>> getStoreExchangeData()
-+LiveData<ArrayList<Request>> getExchangeData()
-+void updateExchangeData()
+-String REQUEST_COLLECTION
+-String BOOK_COLLECTION
+-String OWNER
+-String STATUS
+-String TAG
+-FirebaseFirestore mDb
+-MutableLiveData<List<Book>> mBooks
+-ListenerRegistration mListenerRegistration
+-String mUID
++ExchangeRepository()
++String getUid()
++void attachListener()
++void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
++LiveData<List<Book>> getBooks()
++void detachListener()
 }
 
 
