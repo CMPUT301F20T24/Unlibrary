@@ -10,6 +10,7 @@ package com.example.unlibrary.exchange;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -21,6 +22,7 @@ import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -35,6 +37,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
@@ -60,6 +63,16 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public SingleLiveEvent<NavDirections> getNavigationEvent() {
         return mNavigationEvent;
+    }
+
+
+    /**
+     * SuccessMsgEvent getter for activity observers.
+     *
+     * @return Event of which fragment to navigate to
+     */
+    public SingleLiveEvent<String> getSuccessRequestMsgEvent() {
+        return mSuccessRequestMsgEvent;
     }
 
     /**
@@ -88,6 +101,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         mExchangeRepository.createRequest(request,
                 o -> {
                     mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
+                    mSuccessRequestMsgEvent.setValue("Request successfully sent");
                 },
                 e -> {
                     mFailureMsgEvent.setValue("Failed to send request.");
