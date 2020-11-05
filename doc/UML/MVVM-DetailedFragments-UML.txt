@@ -55,55 +55,6 @@ LibraryBookDetailsFragment <..> LibraryEditBookFragment: <<navigates to>>
 ExchangeFragment <..> ExchangeBookDetailsFragment: <<navigates to>>
 UnlibraryFragment <..> UnlibraryBookDetailsFragment: <<navigates to>>
 
-'------------------- Model Classes  -------------------------------
-class Book {
--int id
--string title
--string author
--string isbn
--string status
--Image photo
--User owner
-+void setId(int id)
-+void setTitle(string title)
-+void setAuthor (string author)
-+void setIsbn (string isbn)
-+void setStatus(string status)
-+void setPhoto(Image photo)
-+void setOwner (User owner)
-+int getId ()
-+string getTitle ()
-+string getAuthor ()
-+string getIsbn ()
-+string getStatus ()
-+Image getPhoto ()
-+User getOwner ()
-}
-
-class Request {
--int id
--User requester
--Book book
--string state
--Pair<Double, Double> location
-+void setId(int id)
-+void setRequester(User requester)
-+void setBook(Book book)
-+void setState(string state)
-+void setLocation (Pair<Double, Double> location)
-+int getId()
-+User getRequester()
-+Book getBook()
-+string getState()
-+Pair<Double, Double> getLocation()
-}
-
-Book ..o LibraryRepository
-Book ..o UnlibraryRepository
-Book ..o ExchangeRepository
-
-Request ..o ExchangeRepository
-
 
 '------------------- ViewModel and Repositories  -------------------------------
 class ExchangeViewModel{
@@ -179,5 +130,4 @@ ExchangeViewModel <.. ExchangeFragment: <<uses>>
 
 FilterMap <.. LibraryViewModel: <<uses>>
 FilterMap <.. LibraryRepository: <<uses>>
-
 @enduml
