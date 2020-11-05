@@ -38,8 +38,8 @@ public class UnlibraryRepository {
      * TODO: Add querying logic to return only books that have been requested or borrowed by the user
      */
     @Inject
-    public UnlibraryRepository() {
-        mDb = FirebaseFirestore.getInstance();
+    public UnlibraryRepository(FirebaseFirestore db) {
+        mDb = db;
         // TODO: Get document changes only to minimize payload from Firestore
         mListenerRegistration = mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshot, error) -> {
             if (error != null) {
