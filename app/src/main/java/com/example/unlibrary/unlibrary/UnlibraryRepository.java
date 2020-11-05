@@ -19,6 +19,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Manages all the database interaction for {@link UnlibraryViewModel}
  */
@@ -35,6 +37,7 @@ public class UnlibraryRepository {
      * <p>
      * TODO: Add querying logic to return only books that have been requested or borrowed by the user
      */
+    @Inject
     public UnlibraryRepository() {
         mDb = FirebaseFirestore.getInstance();
         // TODO: Get document changes only to minimize payload from Firestore
