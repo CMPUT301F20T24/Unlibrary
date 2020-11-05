@@ -53,22 +53,23 @@ class Book {
 +User getOwner ()
 }
 
- class Request {
--int id
--User requester
--Book book
--string state
--Pair<Double, Double> location
-+void setId(int id)
-+void setRequester(User requester)
-+void setBook(Book book)
-+void setState(string state)
-+void setLocation (Pair<Double, Double> location)
-+int getId()
-+User getRequester()
-+Book getBook()
-+string getState()
+class Request {
++enum State
+-String mId
+-String mRequester
+-String mBook
+-State mState
+-Pair<Double, Double> mLocation
++Request()
++Request(String requester, String book)
++String getId()
++void setId(String id)
++String getRequester()
++String getBook()
++State getState()
++void setState(State state)
 +Pair<Double, Double> getLocation()
++void setLocation(Pair<Double, Double> location)
 }
 
 Book ..o LibraryRepository
