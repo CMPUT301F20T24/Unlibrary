@@ -53,8 +53,6 @@ public class Request {
 
     /**
      * Sets the unique identifier of a request obtained from Firestore.
-     *
-     * @return unique identifier of request
      */
     public void setId(String id) {
         if (mId != null) {
