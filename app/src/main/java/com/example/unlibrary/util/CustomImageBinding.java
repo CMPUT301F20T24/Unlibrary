@@ -31,9 +31,9 @@ public class CustomImageBinding {
     @BindingAdapter(value = {"imagePath", "imageUri"}, requireAll = false)
     public static void loadImage(ImageView imageView, String path, Uri uri) {
         if (uri != null) {
-            Glide.with(imageView).load(uri).placeholder(R.mipmap.ic_launcher).into(imageView);
+            Glide.with(imageView).load(uri).placeholder(R.drawable.ic_default_image).into(imageView);
         } else {
-            Glide.with(imageView).load(path).placeholder(R.mipmap.ic_launcher).into(imageView);
+            Glide.with(imageView).load(path).placeholder(R.drawable.ic_default_image).into(imageView);
         }
     }
 }
