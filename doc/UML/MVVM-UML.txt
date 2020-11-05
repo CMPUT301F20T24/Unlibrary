@@ -27,30 +27,32 @@ View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInst
 }
 
 
-
 '------------------- Model Classes + Firestore -------------------------------
 class Book {
--int id
--string title
--string author
--string isbn
--string status
--Image photo
--User owner
-+void setId(int id)
-+void setTitle(string title)
-+void setAuthor (string author)
-+void setIsbn (string isbn)
-+void setStatus(string status)
-+void setPhoto(Image photo)
-+void setOwner (User owner)
-+int getId ()
-+string getTitle ()
-+string getAuthor ()
-+string getIsbn ()
-+string getStatus ()
-+Image getPhoto ()
-+User getOwner ()
++enum Status
+-String mId
+-String mIsbn
+-String mTitle
+-String mAuthor
+-String mOwner
+-String mPhoto
+-Status mStatus
++Book()
++Book(String isbn, String title, String author, String owner, String photo)
++String getId()
++void setId(String id)
++String getAuthor()
++void setAuthor(String author)
++String getPhoto()
++void setPhoto(String photo)
++Status getStatus()
++void setStatus(Status status)
++String getIsbn()
++void setIsbn(String isbn)
++String getOwner()
++void setOwner(String owner)
++String getTitle()
++void setTitle(String title)
 }
 
 class Request {
@@ -138,19 +140,23 @@ class LibraryRepository {
 }
 
 class UnlibraryRepository {
--FirebaseFirestore  UnlibraryRepository
--LiveData<ArrayList<Book>> booksData
-+LiveData<ArrayList<Book>> getStoreUnlibraryData()
-+LiveData<ArrayList<Book>> getUnlibraryData()
-+void updateUnlibrary(Book book)
+-String TAG
+-String BOOK_COLLECTION
+-FirebaseFirestore mDb
+-MutableLiveData<List<Book>> mBooks
+-ListenerRegistration mListenerRegistration
++UnlibraryRepository()
++MutableLiveData<List<Book>> getBooks()
++void detachListeners()
 }
 
 class UnlibraryViewModel {
--UnlibraryRepository UnlibraryRepository
-+UnlibraryViewModel(UnlibraryRepository UnlibraryRepository)
-+void deleteBook(Book toDelete)
-+completeBorrowHandoff(Book book)
-+initiateReturnHandoff(Book book)
+-LiveData<List<Book>> mBooks
+-UnlibraryRepository mUnlibraryRepository
++UnlibraryViewModel()
++LiveData<List<Book>> getBooks()
+#void onCleared()
++void selectCurrentBook(View view, int position)
 }
 
 package Firestore {}

@@ -114,19 +114,23 @@ class LibraryRepository {
 }
 
 class UnlibraryRepository {
--FirebaseFirestore  UnlibraryRepository
--LiveData<ArrayList<Book>> booksData
-+LiveData<ArrayList<Book>> getStoreUnlibraryData()
-+LiveData<ArrayList<Book>> getUnlibraryData()
-+void updateUnlibrary(Book book)
+-String TAG
+-String BOOK_COLLECTION
+-FirebaseFirestore mDb
+-MutableLiveData<List<Book>> mBooks
+-ListenerRegistration mListenerRegistration
++UnlibraryRepository()
++MutableLiveData<List<Book>> getBooks()
++void detachListeners()
 }
 
 class UnlibraryViewModel {
--UnlibraryRepository UnlibraryRepository
-+UnlibraryViewModel(UnlibraryRepository UnlibraryRepository)
-+void deleteBook(Book toDelete)
-+completeBorrowHandoff(Book book)
-+initiateReturnHandoff(Book book)
+-LiveData<List<Book>> mBooks
+-UnlibraryRepository mUnlibraryRepository
++UnlibraryViewModel()
++LiveData<List<Book>> getBooks()
+#void onCleared()
++void selectCurrentBook(View view, int position)
 }
 
 class FilterMap {
