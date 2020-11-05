@@ -28,10 +28,10 @@ class AuthenticatedActivity {
 #FirebaseUser getUser()
 }
 
-AuthenticatedActivity <|-- MainActivity: <<extends>>
-AuthenticatedActivity ..> AuthActivity: <<launches>>
-AuthActivity *.. LoginFragment
-AuthActivity *.. RegisterFragment
+MainActivity --|> AuthenticatedActivity: <<extends>>
+AuthActivity <.. AuthenticatedActivity: <<launches>>
+LoginFragment ..* AuthActivity
+RegisterFragment ..* AuthActivity
 
 '------------------- ViewModel and Repositories (Login / Register)  -------------------------------
 class AuthViewModel {
@@ -69,8 +69,9 @@ class AuthRepository {
 
 package Firestore {}
 
-AuthRepository ..> Firestore: <<accesses>
-AuthViewModel ..> AuthRepository: <<uses>>
-LoginFragment ..> AuthViewModel: <<uses>>
-RegisterFragment  ..> AuthViewModel: <<uses>>
+Firestore <.. AuthRepository: <<accesses>>
+AuthRepository <.. AuthViewModel: <<uses>>
+AuthViewModel <.. LoginFragment: <<uses>>
+AuthViewModel <.. RegisterFragment: <<uses>>
+
 @enduml
