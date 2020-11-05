@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@={title}"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
             android:visibility="@{isEditing ? View.GONE : View.VISIBLE }" />
 
         <com.google.android.material.textfield.TextInputLayout
