@@ -13,10 +13,17 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import org.w3c.dom.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,15 +53,15 @@ public class UnlibraryRepository {
     public UnlibraryRepository(FirebaseFirestore db, FirebaseAuth auth) {
         mDb = db;
         mAuth = auth;
-       attachListeners();
+        attachListeners();
     }
 
     /**
      * Attach a listener to a QuerySnapshot from Firestore. Listen to any changes in the database
      * and update the books object.
-     *
+     * <p>
      * TODO: Get document changes only to minimize payload from Firestore
-     * TODO: Find a way so we can wait until all books are loaded before updating the view
+     * TODO: Find a way so we can fetch all ids in parallel
      */
     public void attachListeners() {
         Query query = mDb.collection(REQUEST_COLLECTION).whereEqualTo(REQUESTER_FIELD, mAuth.getUid());
@@ -62,17 +69,23 @@ public class UnlibraryRepository {
             List<Request> requests = snapshot.toObjects(Request.class);
 
             ArrayList<Book> books = new ArrayList<>();
+            ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
             for (Request request : requests) {
-                mDb.collection(BOOK_COLLECTION).document(request.getBook()).get()
-                        .addOnSuccessListener(documentSnapshot -> {
-                            Book book = documentSnapshot.toObject(Book.class);
-                            books.add(book);
-                            mBooks.setValue(books);
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e(TAG, "UnlibraryRepository: Unable to get book", e);
-                        });
+                addBookTasks.add(
+                        mDb.collection(BOOK_COLLECTION).document(request.getBook()).get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    Book book = documentSnapshot.toObject(Book.class);
+                                    books.add(book);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "UnlibraryRepository: Unable to get book", e);
+                                })
+                );
             }
+
+            Tasks.whenAll(addBookTasks).addOnSuccessListener(aVoid -> {
+                mBooks.setValue(books);
+            });
         });
     }
 
