@@ -1,6 +1,6 @@
 package com.example.unlibrary.util.di;
 
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.FirebaseAuth;
 
 import dagger.Module;
 import dagger.Provides;
@@ -9,9 +9,9 @@ import dagger.hilt.android.components.ApplicationComponent;
 
 @Module
 @InstallIn(ApplicationComponent.class)
-public class FirebaseFirestoreModule {
+public class FirebaseAuthModule {
     @Provides
-    public static FirebaseFirestore provideFirebaseFirestore() {
-        return FirebaseFirestore.getInstance();
+    public static FirebaseAuth provideFirebaseAuth() {
+        return FirebaseAuth.getInstance();
     }
 }
