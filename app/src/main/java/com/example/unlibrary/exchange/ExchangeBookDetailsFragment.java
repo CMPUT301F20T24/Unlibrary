@@ -49,7 +49,7 @@ public class ExchangeBookDetailsFragment extends Fragment {
 
         // Setup observer
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.addRequest).navigate(navDirections));
-        mViewModel.getFailureNavMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
+        mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         return mBinding.getRoot();
     }

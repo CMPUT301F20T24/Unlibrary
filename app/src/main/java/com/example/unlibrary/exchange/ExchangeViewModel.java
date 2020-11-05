@@ -36,7 +36,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final ExchangeRepository mExchangeRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
-    private final SingleLiveEvent<String> mFailureNavMsgEvent = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
 
     /**
@@ -52,8 +52,8 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      *
      * @return Event of failure message to display
      */
-    public SingleLiveEvent<String> getFailureNavMsgEvent() {
-        return mFailureNavMsgEvent;
+    public SingleLiveEvent<String> getFailureMsgEvent() {
+        return mFailureMsgEvent;
     }
 
     /**
@@ -104,7 +104,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
                     mSuccessRequestMsgEvent.setValue("Request successfully sent");
                 },
                 e -> {
-                    mFailureNavMsgEvent.setValue("Failed to send request.");
+                    mFailureMsgEvent.setValue("Failed to send request.");
                     Log.e(TAG, "Failed to send request.", e);
                 });
     }
@@ -117,7 +117,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public void selectCurrentBook(View view, int position) {
         if (mBooks.getValue() == null) {
-            mFailureNavMsgEvent.setValue("Failed show details for book");
+            mFailureMsgEvent.setValue("Failed show details for book");
             return;
         }
 
