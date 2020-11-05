@@ -29,13 +29,13 @@ import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class ManualAddBookTest {
+public class ManualAddLibraryBookTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void manualAddBookTest() {
+    public void manualAddLibraryBookTest() {
         ViewInteraction textInputEditText = onView(
                 allOf(childAtPosition(
                         childAtPosition(
@@ -43,7 +43,7 @@ public class ManualAddBookTest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText.perform(replaceText("golnoush@gmail.cm"), closeSoftKeyboard());
+        textInputEditText.perform(replaceText("golnoush@gmail.com"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText2 = onView(
                 allOf(childAtPosition(
@@ -64,36 +64,6 @@ public class ManualAddBookTest {
                         isDisplayed()));
         materialButton.perform(click());
 
-        ViewInteraction textInputEditText3 = onView(
-                allOf(withText("golnoush@gmail.cm"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.login_email_input),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textInputEditText3.perform(replaceText("golnoush@gmail.com"));
-
-        ViewInteraction textInputEditText4 = onView(
-                allOf(withText("golnoush@gmail.com"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.login_email_input),
-                                        0),
-                                0),
-                        isDisplayed()));
-        textInputEditText4.perform(closeSoftKeyboard());
-
-        ViewInteraction materialButton2 = onView(
-                allOf(withId(R.id.login_button), withText("Login"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.linearLayout),
-                                        3),
-                                1),
-                        isDisplayed()));
-        materialButton2.perform(click());
-
         ViewInteraction floatingActionButton = onView(
                 allOf(withId(R.id.fabAdd), withContentDescription("Filter"),
                         childAtPosition(
@@ -105,34 +75,34 @@ public class ManualAddBookTest {
                         isDisplayed()));
         floatingActionButton.perform(click());
 
-        ViewInteraction textInputEditText5 = onView(
+        ViewInteraction textInputEditText3 = onView(
                 allOf(childAtPosition(
                         childAtPosition(
                                 withId(R.id.book_title_input),
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText5.perform(replaceText("test"), closeSoftKeyboard());
+        textInputEditText3.perform(replaceText("test1"), closeSoftKeyboard());
 
-        ViewInteraction textInputEditText6 = onView(
+        ViewInteraction textInputEditText4 = onView(
                 allOf(childAtPosition(
                         childAtPosition(
                                 withId(R.id.book_author_input),
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText6.perform(replaceText("someone"), closeSoftKeyboard());
+        textInputEditText4.perform(replaceText("some person"), closeSoftKeyboard());
 
-        ViewInteraction textInputEditText7 = onView(
+        ViewInteraction textInputEditText5 = onView(
                 allOf(childAtPosition(
                         childAtPosition(
                                 withId(R.id.book_isbn_input),
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText7.perform(replaceText("9780441016078"), closeSoftKeyboard());
+        textInputEditText5.perform(replaceText("9780441016079"), closeSoftKeyboard());
 
-        ViewInteraction materialButton3 = onView(
+        ViewInteraction materialButton2 = onView(
                 allOf(withId(R.id.save_button), withText("Save"),
                         childAtPosition(
                                 childAtPosition(
@@ -140,17 +110,7 @@ public class ManualAddBookTest {
                                         0),
                                 6),
                         isDisplayed()));
-        materialButton3.perform(click());
-
-        ViewInteraction bottomNavigationItemView = onView(
-                allOf(withId(R.id.libraryFragment), withContentDescription("Library"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.bottom_navigation),
-                                        0),
-                                0),
-                        isDisplayed()));
-        bottomNavigationItemView.perform(click());
+        materialButton2.perform(click());
     }
 
     private static Matcher<View> childAtPosition(
