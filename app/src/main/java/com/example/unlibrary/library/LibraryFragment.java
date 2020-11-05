@@ -78,7 +78,8 @@ public class LibraryFragment extends Fragment {
 
         // Setup OnClickListener for filter button. Done in fragment because a dialog needs to be shown.
         // TODO theme filter button to be active/highlighted when it is filtering
-        mUpdateFilter = mViewModel.getFilter();
+        mUpdateFilter = new FilterMap();
+        mUpdateFilter.setMap(mViewModel.getFilter().getMap());
         mBinding.fabFilter.setOnClickListener(v -> {
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Select status to filter by.")

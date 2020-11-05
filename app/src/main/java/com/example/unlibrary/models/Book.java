@@ -10,6 +10,8 @@ package com.example.unlibrary.models;
 
 import com.google.firebase.firestore.DocumentId;
 
+import java.util.Locale;
+
 /**
  * Represents a book in our application domain. Book is a pure POJO class (getters and setters only)
  * so that it can be used as a custom object when interacting with Firestore.
@@ -198,6 +200,10 @@ public class Book {
         AVAILABLE,
         REQUESTED,
         ACCEPTED,
-        BORROWED
+        BORROWED;
+
+        public String asLower() {
+            return this.toString().substring(0, 1).toUpperCase(Locale.ENGLISH) + this.toString().substring(1).toLowerCase(Locale.ENGLISH);
+        }
     }
 }
