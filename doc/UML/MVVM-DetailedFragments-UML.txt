@@ -190,13 +190,28 @@ ExchangeViewModel <.. ExchangeFragment: <<uses>>
 FilterMap <.. LibraryViewModel: <<uses>>
 FilterMap <.. LibraryRepository: <<uses>>
 
-'LibraryBookDetailsFragment ..> LibraryViewModel: <<uses>>
-'LibraryEditBookFragment ..> LibraryViewModel: <<uses>>
-'ExchangeBookDetailsFragment ..> ExchangeViewModel: <<uses>>
-'UnlibraryBookDetailsFragment ..> UnlibraryViewModel: <<uses>>
-
 LibraryViewModel <.. LibraryBookDetailsFragment: <<uses>>
 LibraryViewModel <.. LibraryEditBookFragment: <<uses>>
 ExchangeViewModel <.. ExchangeBookDetailsFragment: <<uses>>
 UnlibraryViewModel <.. UnlibraryBookDetailsFragment: <<uses>>
+
+
+'------------------- Utils -------------------------------
+class BarcodeScanner{
++void scanBarcode(Context context, Uri uri, OnFinishedScanListener onFinished)
+}
+
+class FailedToScan{
++FailedToScan(String msg)
+}
+
+class CustomImageBinding{
++void loadImage(ImageView imageView, String path, Uri uri)
+}
+
+
+LibraryEditBookFragment <.. BarcodeScanner: <<uses>>
+LibraryEditBookFragment <.. FailedToScan: <<uses>>
+LibraryEditBookFragment <.. CustomImageBinding: <<uses>>
+LibraryBookDetailsFragment <.. CustomImageBinding: <<uses>>
 @enduml

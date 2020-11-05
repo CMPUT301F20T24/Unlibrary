@@ -26,7 +26,7 @@ EditingState ..* ProfileFragment
 
 '------------------- ViewModel  -------------------------------
 class ProfileViewModel {
--MutableLiveData<User>
+-MutableLiveData<User> mUser
 -MutableLiveData<String> mPassword
 -SingleLiveEvent<Pair<AuthUtil.InputKey, String>> mInvalidInputEvent
 -SingleLiveEvent<Boolean> mProfileUpdateEvent
@@ -50,17 +50,21 @@ ProfileViewModel <.. ProfileFragment: <<uses>>
 package Firestore {
 
 }
+
 class User {
--int id
--string name
--string username
-+void setId(int id)
-+void setName(string name)
-+void setUsername (string username)
-+int getId()
-+string getName()
-+string getUsername ()
+-String mUID
+-String mUsername
+-String mEmail
++User()
++User(String id, String username, String email)
++String getUID()
++void setUID(String id)
++String getUsername()
++void setUsername(String username)
++String getEmail()
++void setEmail(String email)
 }
+
 User ..o ProfileRepository
 Firestore <.. ProfileRepository: <<accesses>>
 
@@ -81,4 +85,14 @@ class ProfileRepository {
 +void updateUserProfile(User user, OnErrorListener onEmailErrorListener, OnErrorListener onUsernameErrorListener, OnFinishedListener onFinished)
 }
 ProfileRepository <.. ProfileViewModel: <<uses>>
+
+'------------------- Utils   -------------------------------
+class AuthUtil{
++enum InputKey
++String validateEmail(String email)
++String validatePassword(String password)
++String validateUsername(String username)
+}
+
+ProfileViewModel <.. AuthUtil: <<uses>>
 @enduml

@@ -1,6 +1,7 @@
 @startuml
 '------------------- Main Activity, Auth Activity, and Authenticated Activty -------------------------------
 class AuthActivity {
++AuthViewModel mViewModel;
 #void onCreate()
 +void showFragment()
 +void showToast()
@@ -23,8 +24,8 @@ class MainActivity {
 }
 
 class AuthenticatedActivity {
+-FirebaseUser mUser
 #void onCreate()
--void goToAuth()
 #FirebaseUser getUser()
 }
 
@@ -43,6 +44,7 @@ class AuthViewModel {
 -SingleLiveEvent<Pair<AuthUtil.InputKey, String>> mInvalidInputEvent
 -SingleLiveEvent<Fragment> mFragmentNavigationEvent
 -SingleLiveEvent<Void> mAuthenticatedEvent
+-AuthRepository mAuthRepository;
 
 +AuthViewModel()
 +MutableLiveData<String> getEmail()
@@ -54,6 +56,8 @@ class AuthViewModel {
 +SingleLiveEvent<Void> getAuthenticatedEvent()
 +void createAccount()
 +void login()
++void cancel()
++void register()
 }
 
 class AuthRepository {
