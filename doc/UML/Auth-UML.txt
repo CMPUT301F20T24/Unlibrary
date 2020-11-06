@@ -71,6 +71,13 @@ class AuthRepository {
 +void register(String email, String password, String username, OnFinishedListener onFinished)
 }
 
+class AuthUtil{
++enum InputKey
++String validateEmail(String email)
++String validatePassword(String password)
++String validateUsername(String username)
+}
+
 package Firestore {}
 
 Firestore <.. AuthRepository: <<accesses>>
