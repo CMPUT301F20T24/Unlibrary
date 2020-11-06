@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -55,9 +56,10 @@ public class CreateAccountCancelTest {
                                 0),
                         isDisplayed()));
         materialButton.perform(click());
-        
+
     // https://developer.android.com/training/testing/espresso/basics
-        onView(allOf(withId(R.id.register_title), withText("Register")));
+        onView(allOf(withId(R.id.register_title))).check(matches(withText("Register")));
+//        onView(allOf(withId(R.id.register_title), withText("Register")));
         onView(withId(R.id.register_username_input));
         onView(withId(R.id.register_email_input));
         onView(withId(R.id.login_password_input));
@@ -72,7 +74,8 @@ public class CreateAccountCancelTest {
                         isDisplayed()));
         materialButton2.perform(click());
 
-        onView(allOf(withId(R.id.login_title), withText("Login")));
+//        onView(allOf(withId(R.id.login_title), withText("Login")));
+        onView(allOf(withId(R.id.login_title))).check(matches(withText("Login")));
 
     }
 
