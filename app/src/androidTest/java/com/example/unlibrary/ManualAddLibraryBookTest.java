@@ -50,7 +50,7 @@ public class ManualAddLibraryBookTest {
                         childAtPosition(
                                 withId(R.id.login_password_input),
                                 0),
-                        0),
+                        1),
                         isDisplayed()));
         textInputEditText2.perform(replaceText("hihihihi"), closeSoftKeyboard());
 
@@ -82,7 +82,7 @@ public class ManualAddLibraryBookTest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText3.perform(replaceText("test1"), closeSoftKeyboard());
+        textInputEditText3.perform(replaceText("test3"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText4 = onView(
                 allOf(childAtPosition(
@@ -91,7 +91,7 @@ public class ManualAddLibraryBookTest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText4.perform(replaceText("some person"), closeSoftKeyboard());
+        textInputEditText4.perform(replaceText("some person3"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText5 = onView(
                 allOf(childAtPosition(
@@ -100,7 +100,7 @@ public class ManualAddLibraryBookTest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText5.perform(replaceText("9780441016079"), closeSoftKeyboard());
+        textInputEditText5.perform(replaceText("9780441016082"), closeSoftKeyboard());
 
         ViewInteraction materialButton2 = onView(
                 allOf(withId(R.id.save_button), withText("Save"),
