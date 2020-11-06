@@ -10,7 +10,6 @@ package com.example.unlibrary.exchange;
 
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
@@ -23,7 +22,6 @@ import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.util.SingleLiveEvent;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -32,13 +30,13 @@ import java.util.List;
  */
 public class ExchangeViewModel extends ViewModel implements BooksSource {
     private static final String TAG = ExchangeViewModel.class.getSimpleName();
-
     private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
+    private String mSearchText;
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
@@ -137,5 +135,23 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     protected void onCleared() {
         super.onCleared();
         mExchangeRepository.detachListener();
+    }
+
+    /**
+     * Returns the current input in search field
+     *
+     * @return current input in search field
+     */
+    public String getSearchText() {
+        return mSearchText;
+    }
+
+    /**
+     * Updates the input to the search field
+     *
+     * @param searchText new input in search field
+     */
+    public void setSearchText(String searchText) {
+        mSearchText = searchText;
     }
 }

@@ -55,6 +55,7 @@ public class ExchangeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentExchangeBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
+        mBinding.setViewModel(mViewModel);
 
         // Child fragments are can only be accessed on view creation, so this is the earliest
         // point where we can specify the data source
