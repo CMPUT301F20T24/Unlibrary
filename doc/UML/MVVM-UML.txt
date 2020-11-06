@@ -79,7 +79,7 @@ Book ..o UnlibraryRepository
 Book ..o ExchangeRepository
 
 Request ..o ExchangeRepository
-
+Request ..o UnlibraryRepository
 
 '------------------- ViewModel and Repositories  -------------------------------
 class ExchangeViewModel{
@@ -254,5 +254,5 @@ BooksSource <|.. UnlibraryViewModel: <<implements>>
 BooksSource ..o BooksFragment
 
 BooksRecyclerViewAdapter *.. BookViewHolder
-BooksFragment o.. BooksRecyclerViewAdapter
+BooksFragment *.. BooksRecyclerViewAdapter
 @enduml
