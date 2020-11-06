@@ -50,7 +50,7 @@ public class CreateAccountOptionTest {
                         childAtPosition(
                                 withId(R.id.register_username_input),
                                 0),
-                        0),
+                        1),
                         isDisplayed()));
         textInputEditText.perform(replaceText("test2"), closeSoftKeyboard());
 
@@ -59,7 +59,7 @@ public class CreateAccountOptionTest {
                         childAtPosition(
                                 withId(R.id.register_email_input),
                                 0),
-                        0),
+                        1),
                         isDisplayed()));
         textInputEditText2.perform(replaceText("test2@gmail.com"), closeSoftKeyboard());
 
@@ -68,7 +68,7 @@ public class CreateAccountOptionTest {
                         childAtPosition(
                                 withId(R.id.register_password_input),
                                 0),
-                        0),
+                        1),
                         isDisplayed()));
         textInputEditText3.perform(replaceText("hi1234"), closeSoftKeyboard());
 
