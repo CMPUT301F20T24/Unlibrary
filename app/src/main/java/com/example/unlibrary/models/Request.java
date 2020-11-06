@@ -129,7 +129,7 @@ public class Request {
         mLocation = location;
     }
 
-    enum State {
+    public enum State {
         REQUESTED,
         ACCEPTED,
         BORROWED,
