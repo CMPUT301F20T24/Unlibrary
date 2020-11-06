@@ -23,9 +23,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Fragment to display the details and requests upon a user owned book.
  */
+@AndroidEntryPoint
 public class LibraryBookDetailsFragment extends Fragment {
 
     private FragmentLibraryBookDetailsBinding mBinding;

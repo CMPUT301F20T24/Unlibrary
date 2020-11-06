@@ -20,9 +20,12 @@ import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentUnlibraryBinding;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Host fragment for Unlibrary feature
  */
+@AndroidEntryPoint
 public class UnlibraryFragment extends Fragment {
     private UnlibraryViewModel mViewModel;
     private FragmentUnlibraryBinding mBinding;

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -47,8 +48,9 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
      * Constructor for the UnLibrary ViewModel. Binds the list of books to return from the
      * repository.
      */
-    public UnlibraryViewModel() {
-        mUnlibraryRepository = new UnlibraryRepository();
+    @ViewModelInject
+    public UnlibraryViewModel(UnlibraryRepository unlibraryRepository) {
+        mUnlibraryRepository = unlibraryRepository;
         mBooks = mUnlibraryRepository.getBooks();
     }
 

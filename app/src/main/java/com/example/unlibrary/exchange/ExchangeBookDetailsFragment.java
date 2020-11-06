@@ -23,9 +23,12 @@ import com.example.unlibrary.models.Book;
 
 import org.jetbrains.annotations.NotNull;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Fragment to display the details and requests upon a user owned book.
  */
+@AndroidEntryPoint
 public class ExchangeBookDetailsFragment extends Fragment {
 
     private FragmentExchangeBookDetailsBinding mBinding;

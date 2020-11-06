@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -42,8 +43,9 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
      */
-    public ExchangeViewModel() {
-        mExchangeRepository = new ExchangeRepository();
+    @ViewModelInject
+    public ExchangeViewModel(ExchangeRepository exchangeRepository) {
+        mExchangeRepository = exchangeRepository;
         mBooks = mExchangeRepository.getBooks();
     }
 

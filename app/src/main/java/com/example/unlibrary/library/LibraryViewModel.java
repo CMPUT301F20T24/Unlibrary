@@ -13,6 +13,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
+import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -64,10 +65,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Constructor for the Library ViewModel. Instantiates listener to Firestore.
      */
-    public LibraryViewModel() {
+    @ViewModelInject
+    public LibraryViewModel(LibraryRepository libraryRepository) {
         // Initialize filter to be false for everything
         this.mFilter = new FilterMap();
-        this.mLibraryRepository = new LibraryRepository();
+        this.mLibraryRepository = libraryRepository;
         this.mBooks = this.mLibraryRepository.getBooks();
     }
 

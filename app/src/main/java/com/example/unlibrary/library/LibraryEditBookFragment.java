@@ -28,9 +28,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Fragment to edit an existing book or create a new one.
  */
+@AndroidEntryPoint
 public class LibraryEditBookFragment extends Fragment {
 
     private LibraryViewModel mViewModel;

@@ -9,6 +9,7 @@ package com.example.unlibrary.profile;
 
 import android.util.Pair;
 
+import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -24,19 +25,20 @@ import static com.example.unlibrary.util.AuthUtil.validateUsername;
  */
 public class ProfileViewModel extends ViewModel {
 
+    private final ProfileRepository mProfileRepository;
     private MutableLiveData<User> mUser = new MutableLiveData<>();
     private MutableLiveData<String> mPassword = new MutableLiveData<>("");
     private SingleLiveEvent<Pair<AuthUtil.InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Boolean> mProfileUpdateEvent = new SingleLiveEvent<>();
-    private ProfileRepository mProfileRepository = new ProfileRepository();
-
     private String mOldUserName;
     private String mOldEmail;
 
     /**
      * Constructs Profile ViewModel
      */
-    public ProfileViewModel() {
+    @ViewModelInject
+    public ProfileViewModel(ProfileRepository profileRepository) {
+        mProfileRepository = profileRepository;
         fetchUser();
     }
 
