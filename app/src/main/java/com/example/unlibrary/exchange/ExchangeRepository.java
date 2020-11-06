@@ -12,10 +12,8 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.unlibrary.auth.AuthRepository;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
-import com.example.unlibrary.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,6 +26,8 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Manages all the database interaction for the ExchangeViewModel.
@@ -49,8 +49,9 @@ public class ExchangeRepository {
     /**
      * Constructor for the Exchange Repository.
      */
-    public ExchangeRepository() {
-        mDb = FirebaseFirestore.getInstance();
+    @Inject
+    public ExchangeRepository(FirebaseFirestore db) {
+        mDb = db;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 

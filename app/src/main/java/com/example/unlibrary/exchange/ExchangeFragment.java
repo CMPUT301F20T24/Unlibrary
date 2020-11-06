@@ -20,9 +20,12 @@ import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentExchangeBinding;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Host fragment for Exchange feature
  */
+@AndroidEntryPoint
 public class ExchangeFragment extends Fragment {
     private ExchangeViewModel mViewModel;
     private FragmentExchangeBinding mBinding;
