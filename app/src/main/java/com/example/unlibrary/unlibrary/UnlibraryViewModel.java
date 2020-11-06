@@ -86,7 +86,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
      * @return LiveData<Book> This returns the mBooks object
      */
     public LiveData<Book> getCurrentBook() {
-        return this.mCurrentBook;
+        return mCurrentBook;
     }
 
     /**
@@ -112,25 +112,18 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
 
         Book book = mBooks.getValue().get(position);
         Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
-
+        Request request = new Request();
         mUnlibraryRepository.getRequest(book,
-                querySnapShot -> {
-                    List<DocumentSnapshot> documents = querySnapShot.getDocuments();
-                    if (documents.size() != 1) {
-                        toast.show();
-                        Log.e(TAG, "Failed to get request.");
-                        return;
-                    }
-
-                    mCurrentRequest.setValue(documents.get(0).toObject(Request.class));
+                r -> {
                     mCurrentBook.setValue(book);
-
+                    mCurrentRequest.setValue(r);
                     NavDirections direction = UnlibraryFragmentDirections.actionUnlibraryFragmentToUnlibraryBookDetailsFragment();
                     Navigation.findNavController(view).navigate(direction);
                 },
-                e -> {
+
+                () -> {
                     toast.show();
-                    Log.e(TAG, "Failed to get request.", e);
+                    Log.e(TAG, "Failed to get request.");
                 });
     }
 

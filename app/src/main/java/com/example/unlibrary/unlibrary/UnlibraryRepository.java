@@ -8,11 +8,13 @@
 package com.example.unlibrary.unlibrary;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,7 +70,6 @@ public class UnlibraryRepository {
             }
         });
 
-        // TODO: make sure user is authenticated
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         mUID = user.getUid();
     }
@@ -76,22 +77,34 @@ public class UnlibraryRepository {
     /**
      * Save new Request into the database. Assumes Request is valid.
      *
-     * @param book              book object to get request from
-     * @param onSuccessListener code to call on success
-     * @param onFailureListener code to call on failure
+     * @param book            book object to get request from
+     * @param onFinished      code to call on success
+     * @param onErrorListener code to call on failure
      */
-    public void getRequest(Book book, OnSuccessListener<QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
+    public void getRequest(Book book, OnFinishedListener onFinished, OnErrorListener onErrorListener) {
 
         mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo(BOOK, book.getId())
                 .whereEqualTo(REQUESTER, mUID)
                 .get()
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(onFailureListener);
+                .addOnCompleteListener(querySnapShot -> {
+                    List<DocumentSnapshot> documents = querySnapShot.getResult().getDocuments();
+
+                    if (querySnapShot.getResult().isEmpty()) {
+                        onErrorListener.error();
+                        return;
+                    }
+                    if (documents.size() != 1) {
+                        onErrorListener.error();
+                        return;
+                    }
+
+                    onFinished.finished(documents.get(0).toObject(Request.class));
+                });
     }
 
     /**
-     * Update sate and status of request and book
+     * Update state and status of request and book
      *
      * @param request           request object to be updated in the database
      * @param book              book object to update
@@ -125,5 +138,20 @@ public class UnlibraryRepository {
      */
     public void detachListeners() {
         mListenerRegistration.remove();
+    }
+
+
+    /**
+     * Simple callback interface for asynchronous events
+     */
+    public interface OnFinishedListener {
+        void finished(Request request);
+    }
+
+    /**
+     * Callback interface for errors with asynchronous events
+     */
+    public interface OnErrorListener {
+        void error();
     }
 }
