@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentUnlibraryBinding;
 
@@ -66,6 +67,8 @@ public class UnlibraryFragment extends Fragment {
             }
         }
 
+
+        mViewModel.getSuccessMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
         return mBinding.getRoot();
     }
 }

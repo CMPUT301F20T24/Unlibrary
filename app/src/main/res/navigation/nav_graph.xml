@@ -28,7 +28,20 @@
         android:id="@+id/unlibraryFragment"
         android:name="com.example.unlibrary.unlibrary.UnlibraryFragment"
         android:label="fragment_unlibrary"
-        tools:layout="@layout/fragment_unlibrary" />
+        tools:layout="@layout/fragment_unlibrary" >
+        <action
+            android:id="@+id/action_unlibraryFragment_to_unlibraryBookDetailsFragment"
+            app:destination="@id/unlibraryBookDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/unlibraryBookDetailsFragment"
+        android:name="com.example.unlibrary.unlibrary.UnlibraryBookDetailsFragment"
+        android:label="fragment_unlibrary"
+        tools:layout="@layout/fragment_unlibrary_book_details" >
+        <action
+            android:id="@+id/action_unlibraryBookDetailsFragment_to_unlibraryFragment"
+            app:destination="@id/unlibraryFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/exchangeFragment"
