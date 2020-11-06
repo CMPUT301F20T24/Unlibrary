@@ -1,0 +1,217 @@
+@startuml
+'------------------- Fragments -------------------------------
+class LibraryFragment {
+-LibraryViewModel mViewModel
+-FragmentLibraryBinding mBinding
+-FilterMap mUpdateFilter
+
++void onCreate(@Nullable Bundle savedInstanceState)
++View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+class UnlibraryFragment {
+-UnlibraryViewModel mViewModel
+-FragmentUnlibraryBinding mBinding
+
++void onCreate(@Nullable Bundle savedInstanceState)
++View onCreateView(LayoutInflater inflater, ViewGroup container,
+                          Bundle savedInstanceState)
+}
+
+class ExchangeFragment {
+-ExchangeViewModel mViewModel
+-FragmentExchangeBinding mBinding
+
+void onCreate(@Nullable Bundle savedInstanceState)
+View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+class ExchangeBookDetailsFragment {
+-FragmentExchangeBookDetailsBinding mBinding
+
++View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+class LibraryBookDetailsFragment {
+-FragmentLibraryBookDetailsBinding mBinding;
++View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+class LibraryEditBookFragment {
+-LibraryViewModel mViewModel;
+-FragmentLibraryEditBookBinding mBinding;
+-Uri mAutofillUri;
+-Uri mTakePhotoUri;
+-ActivityResultLauncher<Uri> mScanBarcodeContract;
+-ActivityResultLauncher<Uri> mTakePhotoContract;
+
++View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+-void showToast(String msg)
+}
+
+LibraryFragment <..> LibraryBookDetailsFragment: <<navigates to>>
+LibraryBookDetailsFragment <..> LibraryEditBookFragment: <<navigates to>>
+
+ExchangeFragment <..> ExchangeBookDetailsFragment: <<navigates to>>
+UnlibraryFragment <..> UnlibraryBookDetailsFragment: <<navigates to>>
+
+'------------------- ViewModel and Repositories  -------------------------------
+class ExchangeViewModel{
+-String TAG
+-LiveData<List<Book>> mBooks;
+-ExchangeRepository mExchangeRepository;
+-MutableLiveData<Book> mCurrentBook
+-SingleLiveEvent<NavDirections> mNavigationEvent
+-SingleLiveEvent<String> mFailureMsgEvent
++ExchangeViewModel()
++SingleLiveEvent<String> getFailureMsgEvent()
++SingleLiveEvent<NavDirections> getNavigationEvent()
++LiveData<List<Book>> getBooks()
++LiveData<Book> getCurrentBook()
++void sendRequest()
++void selectCurrentBook(View view, int position)
+#void onCleared()
+}
+
+class ExchangeRepository{
+-String REQUEST_COLLECTION
+-String BOOK_COLLECTION
+-String OWNER
+-String STATUS
+-String TAG
+-FirebaseFirestore mDb
+-MutableLiveData<List<Book>> mBooks
+-ListenerRegistration mListenerRegistration
+-String mUID
++ExchangeRepository()
++String getUid()
++void attachListener()
++void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
++LiveData<List<Book>> getBooks()
++void detachListener()
+}
+
+
+class LibraryViewModel {
++enum InputKey
+-String TAG
+-int MAX_TITLE_LENGTH
+-int MAX_AUTHOR_LENGTH
+-int ISBN_LENGTH
+-String BOOK_PHOTO_STORE
+-MutableLiveData<Book> mCurrentBook
+-MutableLiveData<Uri> mTakenPhoto
+-MutableLiveData<Boolean> mIsLoading
+-SingleLiveEvent<String> mFailureMsgEvent
+-SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent
+-SingleLiveEvent<NavDirections> mNavigationEvent
+-LiveData<List<Book>> mBooks
+-LibraryRepository mLibraryRepository
++LibraryViewModel()
++MutableLiveData<Book> getCurrentBook()
++LiveData<Uri> getTakenPhoto()
++LiveData<Boolean> getIsLoading()
++SingleLiveEvent<NavDirections> getNavigationEvent()
++SingleLiveEvent<String> getFailureMsgEvent()
++SingleLiveEvent<Pair<InputKey, String>> getInvalidInputEvent()
++LiveData<List<Book>> getBooks()
+#void onCleared()
++void createBook()
++void filter()
++void saveBook()
++void selectCurrentBook(View v, int position)
++void editCurrentBook()
++void deleteCurrentBook()
++void onFinishedScanSuccess(String isbn)
++void takePhoto(Uri uri)
++void onFinishedScanFailure(Throwable e)
+-void validateTitle(String title)
+-void validateAuthor(String author)
+-void validateIsbn(String isbn)
+}
+
+class LibraryRepository {
+-String ISBN_FETCH_TAG
+-String BOOKS_COLLECTION
+-String TAG
+-FirebaseFirestore mDb
+-FirebaseAuth mAuth
+-ListenerRegistration mListenerRegistration
+-MutableLiveData<List<Book>> mBooks
++LibraryRepository()
++void attachListener()
++void createBook(Book book, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
++void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener)
++void detachListener()
++LiveData<List<Book>> getBooks()
+}
+
+class UnlibraryRepository {
+-String TAG
+-String BOOK_COLLECTION
+-FirebaseFirestore mDb
+-MutableLiveData<List<Book>> mBooks
+-ListenerRegistration mListenerRegistration
++UnlibraryRepository()
++MutableLiveData<List<Book>> getBooks()
++void detachListeners()
+}
+
+class UnlibraryViewModel {
+-LiveData<List<Book>> mBooks
+-UnlibraryRepository mUnlibraryRepository
++UnlibraryViewModel()
++LiveData<List<Book>> getBooks()
+#void onCleared()
++void selectCurrentBook(View view, int position)
+}
+
+class FilterMap {
+-Map<Book.Status, Boolean> mFilter
+
++FilterMap()
++void set(String status, Boolean enable)
++Map<Book.Status, Boolean> getMap()
++void setMap(Map<Book.Status, Boolean> map)
++String[] itemStrings()
++boolean[] itemBooleans()
+}
+
+LibraryRepository <.. LibraryViewModel: <<uses>>
+UnlibraryRepository <.. UnlibraryViewModel: <<uses>>
+ExchangeRepository <.. ExchangeViewModel: <<uses>>
+
+LibraryViewModel <.. LibraryFragment: <<uses>>
+UnlibraryViewModel <.. UnlibraryFragment: <<uses>>
+ExchangeViewModel <.. ExchangeFragment: <<uses>>
+
+FilterMap <.. LibraryViewModel: <<uses>>
+FilterMap <.. LibraryRepository: <<uses>>
+
+LibraryViewModel <.. LibraryBookDetailsFragment: <<uses>>
+LibraryViewModel <.. LibraryEditBookFragment: <<uses>>
+ExchangeViewModel <.. ExchangeBookDetailsFragment: <<uses>>
+UnlibraryViewModel <.. UnlibraryBookDetailsFragment: <<uses>>
+
+
+'------------------- Utils -------------------------------
+class BarcodeScanner{
++void scanBarcode(Context context, Uri uri, OnFinishedScanListener onFinished)
+}
+
+class FailedToScan{
++FailedToScan(String msg)
+}
+
+class CustomImageBinding{
++void loadImage(ImageView imageView, String path, Uri uri)
+}
+
+
+LibraryEditBookFragment ..> BarcodeScanner: <<uses>>
+LibraryEditBookFragment ..> FailedToScan: <<uses>>
+LibraryEditBookFragment ..> CustomImageBinding: <<uses>>
+LibraryBookDetailsFragment ..> CustomImageBinding: <<uses>>
+@enduml
