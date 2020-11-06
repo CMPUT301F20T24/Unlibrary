@@ -83,6 +83,18 @@ public class Request {
     }
 
     /**
+     * Set book associated with this request. Should only be called by Firestore.
+     *
+     * @param book unique book ID associated with this request
+     */
+    public void setBook(String book) {
+        if (mBook != null) {
+            throw new IllegalArgumentException("Book associated with request is already initialized");
+        }
+        mBook = book;
+    }
+
+    /**
      * Gets the state of a request.
      * <p>
      * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
