@@ -94,5 +94,5 @@ class AuthUtil{
 +String validateUsername(String username)
 }
 
-ProfileViewModel <.. AuthUtil: <<uses>>
+AuthUtil <.. ProfileViewModel: <<uses>>
 @enduml
