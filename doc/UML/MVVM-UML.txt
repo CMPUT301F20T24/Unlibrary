@@ -1,0 +1,258 @@
+@startuml
+'------------------- Views  -------------------------------
+class LibraryFragment {
+-LibraryViewModel mViewModel
+-FragmentLibraryBinding mBinding
+-FilterMap mUpdateFilter
+
++void onCreate(@Nullable Bundle savedInstanceState)
++View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+class UnlibraryFragment {
+-UnlibraryViewModel mViewModel
+-FragmentUnlibraryBinding mBinding
+
++void onCreate(@Nullable Bundle savedInstanceState) 
++View onCreateView(LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState)
+}
+
+class ExchangeFragment {
+-ExchangeViewModel mViewModel
+-FragmentExchangeBinding mBinding
+
+void onCreate(@Nullable Bundle savedInstanceState)
+View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+
+'------------------- Model Classes + Firestore -------------------------------
+class Book {
++enum Status
+-String mId
+-String mIsbn
+-String mTitle
+-String mAuthor
+-String mOwner
+-String mPhoto
+-Status mStatus
++Book()
++Book(String isbn, String title, String author, String owner, String photo)
++String getId()
++void setId(String id)
++String getAuthor()
++void setAuthor(String author)
++String getPhoto()
++void setPhoto(String photo)
++Status getStatus()
++void setStatus(Status status)
++String getIsbn()
++void setIsbn(String isbn)
++String getOwner()
++void setOwner(String owner)
++String getTitle()
++void setTitle(String title)
+}
+
+class Request {
++enum State
+-String mId
+-String mRequester
+-String mBook
+-State mState
+-Pair<Double, Double> mLocation
++Request()
++Request(String requester, String book)
++String getId()
++void setId(String id)
++String getRequester()
++String getBook()
++State getState()
++void setState(State state)
++Pair<Double, Double> getLocation()
++void setLocation(Pair<Double, Double> location)
+}
+
+Book ..o LibraryRepository
+Book ..o UnlibraryRepository
+Book ..o ExchangeRepository
+
+Request ..o ExchangeRepository
+Request ..o UnlibraryRepository
+
+'------------------- ViewModel and Repositories  -------------------------------
+class ExchangeViewModel{
+-String TAG
+-LiveData<List<Book>> mBooks;
+-ExchangeRepository mExchangeRepository;
+-MutableLiveData<Book> mCurrentBook
+-SingleLiveEvent<NavDirections> mNavigationEvent
+-SingleLiveEvent<String> mFailureMsgEvent
++ExchangeViewModel()
++SingleLiveEvent<String> getFailureMsgEvent()
++SingleLiveEvent<NavDirections> getNavigationEvent()
++LiveData<List<Book>> getBooks()
++LiveData<Book> getCurrentBook()
++void sendRequest()
++void selectCurrentBook(View view, int position)
+#void onCleared()
+}
+
+class ExchangeRepository{
+-String REQUEST_COLLECTION
+-String BOOK_COLLECTION
+-String OWNER
+-String STATUS
+-String TAG
+-FirebaseFirestore mDb
+-MutableLiveData<List<Book>> mBooks
+-ListenerRegistration mListenerRegistration
+-String mUID
++ExchangeRepository()
++String getUid()
++void attachListener()
++void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
++LiveData<List<Book>> getBooks()
++void detachListener()
+}
+
+
+class LibraryViewModel {
++enum InputKey
+-String TAG
+-int MAX_TITLE_LENGTH
+-int MAX_AUTHOR_LENGTH
+-int ISBN_LENGTH
+-String BOOK_PHOTO_STORE
+-MutableLiveData<Book> mCurrentBook
+-MutableLiveData<Uri> mTakenPhoto
+-MutableLiveData<Boolean> mIsLoading
+-SingleLiveEvent<String> mFailureMsgEvent
+-SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent
+-SingleLiveEvent<NavDirections> mNavigationEvent
+-LiveData<List<Book>> mBooks
+-LibraryRepository mLibraryRepository
++LibraryViewModel()
++MutableLiveData<Book> getCurrentBook()
++LiveData<Uri> getTakenPhoto()
++LiveData<Boolean> getIsLoading()
++SingleLiveEvent<NavDirections> getNavigationEvent()
++SingleLiveEvent<String> getFailureMsgEvent()
++SingleLiveEvent<Pair<InputKey, String>> getInvalidInputEvent()
++LiveData<List<Book>> getBooks()
+#void onCleared()
++void createBook()
++void filter()
++void saveBook()
++void selectCurrentBook(View v, int position)
++void editCurrentBook()
++void deleteCurrentBook()
++void onFinishedScanSuccess(String isbn)
++void takePhoto(Uri uri)
++void onFinishedScanFailure(Throwable e)
+-void validateTitle(String title)
+-void validateAuthor(String author)
+-void validateIsbn(String isbn)
+}
+
+class LibraryRepository {
+-String ISBN_FETCH_TAG
+-String BOOKS_COLLECTION
+-String TAG
+-FirebaseFirestore mDb
+-FirebaseAuth mAuth
+-ListenerRegistration mListenerRegistration
+-MutableLiveData<List<Book>> mBooks
++LibraryRepository()
++void attachListener()
++void createBook(Book book, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
++void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener)
++void detachListener()
++LiveData<List<Book>> getBooks()
+}
+
+class UnlibraryRepository {
+-String TAG
+-String BOOK_COLLECTION
+-FirebaseFirestore mDb
+-MutableLiveData<List<Book>> mBooks
+-ListenerRegistration mListenerRegistration
++UnlibraryRepository()
++MutableLiveData<List<Book>> getBooks()
++void detachListeners()
+}
+
+class UnlibraryViewModel {
+-LiveData<List<Book>> mBooks
+-UnlibraryRepository mUnlibraryRepository
++UnlibraryViewModel()
++LiveData<List<Book>> getBooks()
+#void onCleared()
++void selectCurrentBook(View view, int position)
+}
+
+package Firestore {}
+
+LibraryRepository <.. LibraryViewModel: <<uses>>
+UnlibraryRepository <.. UnlibraryViewModel: <<uses>>
+ExchangeRepository <.. ExchangeViewModel: <<uses>>
+
+LibraryViewModel <.. LibraryFragment: <<uses>>
+UnlibraryViewModel <.. UnlibraryFragment: <<uses>>
+ExchangeViewModel <.. ExchangeFragment: <<uses>>
+
+Firestore <.. LibraryRepository: <<uses>>
+Firestore <.. UnlibraryRepository: <<uses>>
+Firestore <.. ExchangeRepository: <<uses>>
+
+
+'------------------- BookFragment, BooksRecyclerViewAdapter -------------------------------
+class BooksFragment {
+-BooksSource mBooksSource
+-BooksRecyclerViewAdapter.OnItemClickListener mOnItemClickListener
+-FragmentBookListBinding mBinding
+
++BooksFragment()
++void setBooksSource(BooksSource booksSource)
++void setOnItemClickListener(BooksRecyclerViewAdapter.OnItemClickListener onItemClickListener)
++View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+class BooksRecyclerViewAdapter {
+#List<Book> mBooks
+-OnItemClickListener mOnItemClickListener
+
++BooksRecyclerViewAdapter(List<Book> books, OnItemClickListener onItemCLickListener)
++void setData(List<Book> books)
++BookViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
++void onBindViewHolder(final BookViewHolder holder, int position)
++int getItemCount()
+}
+
+class BookViewHolder {
+-FragmentBookCardBinding mBinding;
+
++BookViewHolder(FragmentBookCardBinding binding)
++void bind(Book book)
++void onClick(View v)
+}
+
+interface BooksSource {
+LiveData<List<Book>> getBooks()
+}
+
+LibraryFragment *.. BooksFragment
+UnlibraryFragment *.. BooksFragment
+ExchangeFragment *.. BooksFragment
+
+BooksSource <|.. ExchangeViewModel: <<implements>>
+BooksSource <|.. LibraryViewModel: <<implements>>
+BooksSource <|.. UnlibraryViewModel: <<implements>>
+BooksSource ..o BooksFragment
+
+BooksRecyclerViewAdapter *.. BookViewHolder
+BooksFragment *.. BooksRecyclerViewAdapter
+@enduml
