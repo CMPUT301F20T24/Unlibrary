@@ -60,6 +60,8 @@ public class CreateAccountPageUITest {
                         isDisplayed()));
         materialButton.perform(click());
 
+        onView(allOf(withId(R.id.register_title), withText("Register")));
+
         ViewInteraction textInputEditText = onView(
                 allOf(childAtPosition(
                         childAtPosition(

@@ -55,6 +55,12 @@ public class CreateAccountCancelTest {
                                 0),
                         isDisplayed()));
         materialButton.perform(click());
+        
+    // https://developer.android.com/training/testing/espresso/basics
+        onView(allOf(withId(R.id.register_title), withText("Register")));
+        onView(withId(R.id.register_username_input));
+        onView(withId(R.id.register_email_input));
+        onView(withId(R.id.login_password_input));
 
         ViewInteraction materialButton2 = onView(
                 allOf(withId(R.id.cancel_button), withText("Cancel"),
@@ -65,6 +71,9 @@ public class CreateAccountCancelTest {
                                 0),
                         isDisplayed()));
         materialButton2.perform(click());
+
+        onView(allOf(withId(R.id.login_title), withText("Login")));
+
     }
 
     private static Matcher<View> childAtPosition(
