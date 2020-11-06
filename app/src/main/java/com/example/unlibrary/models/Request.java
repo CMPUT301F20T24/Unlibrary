@@ -72,11 +72,14 @@ public class Request {
     }
 
     /**
-     * *Sets the unique borrower user ID who initiated the request
+     * Sets the unique borrower user ID who initiated the request
      *
      * @param requester unique identifier of a user
      */
     public void setRequester(String requester) {
+        if (mRequester != null) {
+            throw new IllegalArgumentException("Requester has already been initialized");
+        }
         mRequester = requester;
     }
 
@@ -95,6 +98,9 @@ public class Request {
      * @param book unique identifier of a book
      */
     public void setBook(String book) {
+        if (mBook != null) {
+            throw new IllegalArgumentException("Book has already been initialized");
+        }
         mBook = book;
     }
 

@@ -50,34 +50,37 @@ public class UnlibraryRepository {
         mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo(REQUESTER_FIELD, FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((snapshot, error) -> {
-            if (error != null) {
-                Log.e(TAG, "Unable to get requests from database", error);
-            }
+                    if (error != null) {
+                        Log.e(TAG, "Unable to get requests from database", error);
+                        return;
+                    }
 
-            List<Request> requests = snapshot.toObjects(Request.class);
+                    List<Request> requests = snapshot.toObjects(Request.class);
 
-            ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
-            ArrayList<Book> books = new ArrayList<>();
+                    ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
+                    ArrayList<Book> books = new ArrayList<>();
 
-            for (Request r : requests) {
-                addBookTasks.add(
-                        mDb.collection(BOOK_COLLECTION).document(r.getBook()).get()
-                                .addOnSuccessListener(documentSnapshot -> {
-                                    Book book = documentSnapshot.toObject(Book.class);
-                                    books.add(book);
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e(TAG, "Unable to get book " + r.getBook() + "from database", e);
-                                })
-                );
-            }
+                    for (Request r : requests) {
+                        addBookTasks.add(
+                                mDb.collection(BOOK_COLLECTION).document(r.getBook()).get()
+                                        .addOnSuccessListener(documentSnapshot -> {
+                                            Book book = documentSnapshot.toObject(Book.class);
+                                            books.add(book);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "Unable to get book " + r.getBook() + "from database", e);
+                                        })
+                        );
+                    }
 
-            Tasks.whenAllComplete(addBookTasks)
-                    .addOnSuccessListener( aVoid -> { mBooks.setValue(books); })
-                    .addOnFailureListener( e -> {
-                        Log.e("TAG", "Failed to update book list", e);
-                    });
-        });
+                    Tasks.whenAllComplete(addBookTasks)
+                            .addOnSuccessListener(aVoid -> {
+                                mBooks.setValue(books);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("TAG", "Failed to update book list", e);
+                            });
+                });
     }
 
     /**
