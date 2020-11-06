@@ -61,7 +61,7 @@ public class UnlibraryRepository {
         mDb = FirebaseFirestore.getInstance();
         // TODO: Get document changes only to minimize payload from Firestore
         mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
-                .whereEqualTo(REQUESTER_FIELD, FirebaseAuth.getInstance().getUid())
+                .whereEqualTo(REQUESTER, FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
                         Log.e(TAG, "Unable to get requests from database", error);
