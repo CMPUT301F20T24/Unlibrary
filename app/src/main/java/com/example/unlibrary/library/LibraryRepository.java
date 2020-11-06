@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 /**
  * Manages all the database interaction for the Library ViewModel.
  */
@@ -48,9 +50,10 @@ public class LibraryRepository {
     /**
      * Constructor for the Library Repository. Sets up the database snapshot listener.
      */
-    public LibraryRepository() {
-        mDb = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
+    @Inject
+    public LibraryRepository(FirebaseFirestore db, FirebaseAuth auth) {
+        mDb = db;
+        mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         this.mFilter = new FilterMap();
         attachListener();
