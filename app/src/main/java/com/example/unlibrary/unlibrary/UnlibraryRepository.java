@@ -12,9 +12,17 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +33,16 @@ import java.util.List;
 public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOK_COLLECTION = "books";
+    private static final String REQUEST_COLLECTION = "requests";
+    private static final String REQUESTER = "requester";
+    private static final String BOOK = "book";
+    private static final String STATE = "state";
+    private static final String STATUS = "status";
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
     private final ListenerRegistration mListenerRegistration;
+    private String mUID;
 
     /**
      * Constructor for UnlibraryRepository. Sets up Firestore
@@ -53,6 +67,48 @@ public class UnlibraryRepository {
                 mBooks.setValue(books);
             }
         });
+
+        // TODO: make sure user is authenticated
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        mUID = user.getUid();
+    }
+
+    /**
+     * Save new Request into the database. Assumes Request is valid.
+     *
+     * @param book              book object to get request from
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void getRequest(Book book, OnSuccessListener<QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
+
+        mDb.collection(REQUEST_COLLECTION)
+                .whereEqualTo(BOOK, book.getId())
+                .whereEqualTo(REQUESTER, mUID)
+                .get()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Update sate and status of request and book
+     *
+     * @param request           request object to be updated in the database
+     * @param book              book object to update
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        WriteBatch batch = mDb.batch();
+        DocumentReference requestCol = mDb.collection(REQUEST_COLLECTION).document(request.getId());
+        DocumentReference bookCol = mDb.collection(BOOK_COLLECTION).document(book.getId());
+
+        requestCol.update(STATE, request.getState());
+        bookCol.update(STATUS, book.getStatus());
+
+        batch.commit()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     /**

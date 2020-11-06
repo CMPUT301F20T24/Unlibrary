@@ -117,7 +117,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public void selectCurrentBook(View view, int position) {
         if (mBooks.getValue() == null) {
-            mFailureMsgEvent.setValue("Failed show details for book");
+            mFailureMsgEvent.setValue("Failed to show details for book");
             return;
         }
 
