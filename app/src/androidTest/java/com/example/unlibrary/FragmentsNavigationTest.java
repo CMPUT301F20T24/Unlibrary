@@ -37,14 +37,6 @@ public class FragmentsNavigationTest {
 
     @Test
     public void fragmentsNavigationTest() {
-        ViewInteraction textInputEditText = onView(
-                allOf(childAtPosition(
-                        childAtPosition(
-                                withId(R.id.login_email_input),
-                                0),
-                        1),
-                        isDisplayed()));
-        textInputEditText.perform(longClick());
 
         ViewInteraction textInputEditText2 = onView(
                 allOf(childAtPosition(
