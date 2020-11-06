@@ -34,4 +34,8 @@
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="add_photo_of_book">Add photo of book</string>
+    <string name="available">Available</string>
+    <string name="requested">Requested</string>
+    <string name="accepted">Accepted</string>
+    <string name="borrowed">Borrowed</string>
 </resources>
