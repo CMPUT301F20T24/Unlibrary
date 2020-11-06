@@ -53,8 +53,6 @@ public class Request {
 
     /**
      * Sets the unique identifier of a request obtained from Firestore.
-     *
-     * @return unique identifier of request
      */
     public void setId(String id) {
         if (mId != null) {
@@ -65,12 +63,21 @@ public class Request {
     }
 
     /**
-     * Gets the unique borrower user ID that initiated the request.
+     * Gets the unique borrower user ID who initiated the request.
      *
      * @return unique ID of borrower that initiated the request
      */
     public String getRequester() {
         return mRequester;
+    }
+
+    /**
+     * *Sets the unique borrower user ID who initiated the request
+     *
+     * @param requester unique identifier of a user
+     */
+    public void setRequester(String requester) {
+        mRequester = requester;
     }
 
     /**
@@ -80,6 +87,15 @@ public class Request {
      */
     public String getBook() {
         return mBook;
+    }
+
+    /**
+     * Sets the unique ID of the book to be borrowed.
+     *
+     * @param book unique identifier of a book
+     */
+    public void setBook(String book) {
+        mBook = book;
     }
 
     /**

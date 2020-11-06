@@ -12,11 +12,17 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,6 +31,9 @@ import java.util.List;
 public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOK_COLLECTION = "books";
+    private final static String REQUEST_COLLECTION = "requests";
+    private final static String REQUESTER_FIELD = "requester";
+
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
@@ -38,20 +47,36 @@ public class UnlibraryRepository {
     public UnlibraryRepository() {
         mDb = FirebaseFirestore.getInstance();
         // TODO: Get document changes only to minimize payload from Firestore
-        mListenerRegistration = mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshot, error) -> {
+        mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
+                .whereEqualTo(REQUESTER_FIELD, FirebaseAuth.getInstance().getUid())
+                .addSnapshotListener((snapshot, error) -> {
             if (error != null) {
-                Log.w(TAG, error);
+                Log.e(TAG, "Unable to get requests from database", error);
             }
 
+            List<Request> requests = snapshot.toObjects(Request.class);
+
+            ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
             ArrayList<Book> books = new ArrayList<>();
-            if (snapshot != null) {
-                for (DocumentSnapshot book : snapshot.getDocuments()) {
-                    Book _book = book.toObject(Book.class);
-                    books.add(_book);
-                }
 
-                mBooks.setValue(books);
+            for (Request r : requests) {
+                addBookTasks.add(
+                        mDb.collection(BOOK_COLLECTION).document(r.getBook()).get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    Book book = documentSnapshot.toObject(Book.class);
+                                    books.add(book);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Unable to get book " + r.getBook() + "from database", e);
+                                })
+                );
             }
+
+            Tasks.whenAllComplete(addBookTasks)
+                    .addOnSuccessListener( aVoid -> { mBooks.setValue(books); })
+                    .addOnFailureListener( e -> {
+                        Log.e("TAG", "Failed to update book list", e);
+                    });
         });
     }
 
