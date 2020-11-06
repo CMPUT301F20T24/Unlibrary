@@ -31,8 +31,8 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
      * repository.
      */
     @ViewModelInject
-    public UnlibraryViewModel() {
-        mUnlibraryRepository = new UnlibraryRepository();
+    public UnlibraryViewModel(UnlibraryRepository unlibraryRepository) {
+        mUnlibraryRepository = unlibraryRepository;
         mBooks = mUnlibraryRepository.getBooks();
     }
 
