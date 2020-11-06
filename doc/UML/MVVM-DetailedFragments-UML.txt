@@ -210,8 +210,8 @@ class CustomImageBinding{
 }
 
 
-LibraryEditBookFragment <.. BarcodeScanner: <<uses>>
-LibraryEditBookFragment <.. FailedToScan: <<uses>>
-LibraryEditBookFragment <.. CustomImageBinding: <<uses>>
-LibraryBookDetailsFragment <.. CustomImageBinding: <<uses>>
+LibraryEditBookFragment ..> BarcodeScanner: <<uses>>
+LibraryEditBookFragment ..> FailedToScan: <<uses>>
+LibraryEditBookFragment ..> CustomImageBinding: <<uses>>
+LibraryBookDetailsFragment ..> CustomImageBinding: <<uses>>
 @enduml
