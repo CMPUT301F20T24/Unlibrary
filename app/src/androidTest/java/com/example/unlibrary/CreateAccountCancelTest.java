@@ -1,3 +1,10 @@
+/*
+ * ExchangeFragment
+ *
+ * Nov 05, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary;
 
 
@@ -25,6 +32,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+
+/**
+ * Check if the Cancel button works on Create Account page
+ */
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)

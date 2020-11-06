@@ -1,3 +1,10 @@
+/*
+ * ExchangeFragment
+ *
+ * Nov 05, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary;
 
 
@@ -22,19 +29,27 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
 
+
+/**
+ * Check if clicking on "CREATE ACCOUNT" button navigates the user to Create Account page and if they are able to type into each textbox
+ * and see the password entered by clicking on "show password"
+ */
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class CreateAccountOptionTest {
+public class CreateAccountPageUITest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void createAccountOptionTest() {
+    public void createAccountPageUITest() {
         ViewInteraction materialButton = onView(
                 allOf(withId(R.id.create_account_button), withText("Create Account"),
                         childAtPosition(
@@ -52,7 +67,7 @@ public class CreateAccountOptionTest {
                                 0),
                         1),
                         isDisplayed()));
-        textInputEditText.perform(replaceText("test2"), closeSoftKeyboard());
+        textInputEditText.perform(replaceText("golnoush"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText2 = onView(
                 allOf(childAtPosition(
@@ -61,7 +76,7 @@ public class CreateAccountOptionTest {
                                 0),
                         1),
                         isDisplayed()));
-        textInputEditText2.perform(replaceText("test2@gmail.com"), closeSoftKeyboard());
+        textInputEditText2.perform(replaceText("golnoush@gmail.com"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText3 = onView(
                 allOf(childAtPosition(
@@ -70,17 +85,17 @@ public class CreateAccountOptionTest {
                                 0),
                         1),
                         isDisplayed()));
-        textInputEditText3.perform(replaceText("hi1234"), closeSoftKeyboard());
+        textInputEditText3.perform(replaceText("12345678"), closeSoftKeyboard());
 
-        ViewInteraction materialButton2 = onView(
-                allOf(withId(R.id.register_button), withText("Register"),
+        ViewInteraction checkableImageButton = onView(
+                allOf(withId(R.id.text_input_end_icon), withContentDescription("Show password"),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.linearLayout),
-                                        4),
-                                1),
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        1),
+                                0),
                         isDisplayed()));
-        materialButton2.perform(click());
+        checkableImageButton.perform(click());
     }
 
     private static Matcher<View> childAtPosition(

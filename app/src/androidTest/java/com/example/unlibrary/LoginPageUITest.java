@@ -1,3 +1,10 @@
+/*
+ * ExchangeFragment
+ *
+ * Nov 05, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary;
 
 
@@ -18,11 +25,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
+
+/**
+ * Checks if the user can enter their email and password into textboxes on the login page
+ */
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -40,7 +55,7 @@ public class LoginPageUITest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText.perform(replaceText("test@gmail.com"), closeSoftKeyboard());
+        textInputEditText.perform(replaceText("golnoush@gmail.com"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText2 = onView(
                 allOf(childAtPosition(
@@ -49,7 +64,17 @@ public class LoginPageUITest {
                                 0),
                         1),
                         isDisplayed()));
-        textInputEditText2.perform(replaceText("12345678"), closeSoftKeyboard());
+        textInputEditText2.perform(replaceText("hihihihi"), closeSoftKeyboard());
+
+        ViewInteraction checkableImageButton = onView(
+                allOf(withId(R.id.text_input_end_icon), withContentDescription("Show password"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.LinearLayout")),
+                                        1),
+                                0),
+                        isDisplayed()));
+        checkableImageButton.perform(click());
     }
 
     private static Matcher<View> childAtPosition(
