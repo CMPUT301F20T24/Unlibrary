@@ -77,5 +77,6 @@ Firestore <.. AuthRepository: <<accesses>>
 AuthRepository <.. AuthViewModel: <<uses>>
 AuthViewModel <.. LoginFragment: <<uses>>
 AuthViewModel <.. RegisterFragment: <<uses>>
+AuthUtil <.. AuthViewModel: <<uses>>
 
 @enduml
