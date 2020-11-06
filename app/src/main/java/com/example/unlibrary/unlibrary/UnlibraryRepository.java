@@ -12,18 +12,10 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
-import com.example.unlibrary.models.Request;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import org.w3c.dom.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +28,8 @@ import javax.inject.Inject;
 public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOK_COLLECTION = "books";
-    private final static String REQUEST_COLLECTION = "requests";
-    private final static String REQUESTER_FIELD = "requester";
 
     private final FirebaseFirestore mDb;
-    private final FirebaseAuth mAuth;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
     private ListenerRegistration mListenerRegistration;
 
@@ -50,9 +39,8 @@ public class UnlibraryRepository {
      * TODO: Add querying logic to return only books that have been requested or borrowed by the user
      */
     @Inject
-    public UnlibraryRepository(FirebaseFirestore db, FirebaseAuth auth) {
+    public UnlibraryRepository(FirebaseFirestore db) {
         mDb = db;
-        mAuth = auth;
         attachListeners();
     }
 
@@ -64,28 +52,21 @@ public class UnlibraryRepository {
      * TODO: Find a way so we can fetch all ids in parallel
      */
     public void attachListeners() {
-        Query query = mDb.collection(REQUEST_COLLECTION).whereEqualTo(REQUESTER_FIELD, mAuth.getUid());
-        mListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
-            List<Request> requests = snapshot.toObjects(Request.class);
-
-            ArrayList<Book> books = new ArrayList<>();
-            ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
-            for (Request request : requests) {
-                addBookTasks.add(
-                        mDb.collection(BOOK_COLLECTION).document(request.getBook()).get()
-                                .addOnSuccessListener(documentSnapshot -> {
-                                    Book book = documentSnapshot.toObject(Book.class);
-                                    books.add(book);
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e(TAG, "UnlibraryRepository: Unable to get book", e);
-                                })
-                );
+        // TODO: Get document changes only to minimize payload from Firestore
+        mListenerRegistration = mDb.collection(BOOK_COLLECTION).addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.w(TAG, error);
             }
 
-            Tasks.whenAll(addBookTasks).addOnSuccessListener(aVoid -> {
+            ArrayList<Book> books = new ArrayList<>();
+            if (snapshot != null) {
+                for (DocumentSnapshot book : snapshot.getDocuments()) {
+                    Book _book = book.toObject(Book.class);
+                    books.add(_book);
+                }
+
                 mBooks.setValue(books);
-            });
+            }
         });
     }
 
