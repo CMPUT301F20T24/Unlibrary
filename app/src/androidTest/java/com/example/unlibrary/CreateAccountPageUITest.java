@@ -28,6 +28,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -60,15 +61,18 @@ public class CreateAccountPageUITest {
                         isDisplayed()));
         materialButton.perform(click());
 
-        onView(allOf(withId(R.id.register_title), withText("Register")));
+        onView(allOf(withId(R.id.register_title))).check(matches(withText("Register")));
+//        onView(allOf(withId(R.id.register_title), withText("Register")));
+        onView(withId(R.id.register_username_input));
+        onView(withId(R.id.register_email_input));
+        onView(withId(R.id.login_password_input));
 
         ViewInteraction textInputEditText = onView(
                 allOf(childAtPosition(
                         childAtPosition(
                                 withId(R.id.register_username_input),
                                 0),
-                        1),
-                        isDisplayed()));
+                        1)));
         textInputEditText.perform(replaceText("golnoush"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText2 = onView(
@@ -76,8 +80,7 @@ public class CreateAccountPageUITest {
                         childAtPosition(
                                 withId(R.id.register_email_input),
                                 0),
-                        1),
-                        isDisplayed()));
+                        1)));
         textInputEditText2.perform(replaceText("golnoush@gmail.com"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText3 = onView(
@@ -85,8 +88,7 @@ public class CreateAccountPageUITest {
                         childAtPosition(
                                 withId(R.id.register_password_input),
                                 0),
-                        1),
-                        isDisplayed()));
+                        1)));
         textInputEditText3.perform(replaceText("12345678"), closeSoftKeyboard());
 
         ViewInteraction checkableImageButton = onView(
