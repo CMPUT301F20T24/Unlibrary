@@ -23,6 +23,7 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
 import com.google.firebase.storage.FirebaseStorage;
@@ -33,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,6 +57,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private FilterMap mFilter;
     private LiveData<List<Book>> mBooks;
     private final LibraryRepository mLibraryRepository;
+    private final MutableLiveData<List<Request>> mCurrentBookRequesters = new MutableLiveData<>();
 
     public enum InputKey {
         TITLE,
@@ -152,6 +155,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     protected void onCleared() {
         super.onCleared();
         mLibraryRepository.detachListener();
+        mLibraryRepository.detachRequestersListener();
     }
 
     /**
@@ -290,6 +294,9 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         }
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
+
+        mCurrentBookRequesters.setValue(new ArrayList<Request>());
+        mLibraryRepository.getRequesters(book.getId());
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
     }
 

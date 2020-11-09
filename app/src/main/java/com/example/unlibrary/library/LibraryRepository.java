@@ -17,6 +17,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,12 +40,16 @@ public class LibraryRepository {
 
     private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
+    private static final String REQUESTS_COLLECTION = "requests";
+    private static final String REQUESTER_FIELD = "requester";
     private static final String TAG = LibraryRepository.class.getSimpleName();
 
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
     private ListenerRegistration mListenerRegistration;
+    private ListenerRegistration mRequestsListernerRegistration;
     private MutableLiveData<List<Book>> mBooks;
+    private MutableLiveData<List<String>> mCurrentBookRequesters;
     private FilterMap mFilter;
 
     /**
@@ -55,6 +60,7 @@ public class LibraryRepository {
         mDb = db;
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
+        mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
         this.mFilter = new FilterMap();
         attachListener();
     }
@@ -178,5 +184,36 @@ public class LibraryRepository {
         mFilter = filter;
         detachListener();
         attachListener();
+    }
+
+    public void getRequesters(String bookID) {
+        mCurrentBookRequesters.setValue(new ArrayList<>());
+        attachRequestsListener(bookID);
+    }
+
+    public void attachRequestsListener(String bookID) {
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo("book", bookID);
+
+        detachRequestersListener(); //Detach request listener on a different bookID if exists
+        mRequestsListernerRegistration = query.addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.w(TAG, "Error fetching requests for book" + bookID, error);
+                return;
+            }
+
+            // TODO only use getDocumentChanges instead of rebuilding the entire list
+            // Rebuild the list
+            ArrayList<String> newRequesters = new ArrayList<>();
+            for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                newRequesters.add((String) doc.get(REQUESTER_FIELD));
+            }
+            mCurrentBookRequesters.setValue(newRequesters);
+        });
+    }
+
+    public void detachRequestersListener() {
+        if (mRequestsListernerRegistration != null) {
+            mRequestsListernerRegistration.remove();
+        }
     }
 }

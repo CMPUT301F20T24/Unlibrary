@@ -8,6 +8,7 @@
 package com.example.unlibrary.library;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +17,11 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.MainActivity;
+import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -64,6 +68,20 @@ public class LibraryBookDetailsFragment extends Fragment {
                     .setPositiveButton("Yes", (dialog, which) -> mViewModel.deleteCurrentBook())
                     .show();
         });
+
+        //Setup the list of requesters
+        //RecyclerView recyclerView = mBinding.requestersList;
+        //Context context = getContext();
+        //recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        //BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue(), mOnItemClickListener);
+
+        // Bind ViewModel books to RecyclerViewAdapter
+        //view.setAdapter(adapter);
+
+        // Watch changes in bookSource and update the view accordingly
+        //mBooksSource.getBooks().observe(getViewLifecycleOwner(), adapter::setData);
+
+
 
         return mBinding.getRoot();
     }
