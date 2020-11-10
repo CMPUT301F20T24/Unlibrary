@@ -57,6 +57,15 @@ public class ExchangeFragment extends Fragment {
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
         mBinding.setViewModel(mViewModel);
 
+        mBinding.searchExchangeBook.setOnEditorActionListener((textView, i, keyEvent) -> {
+            if (keyEvent == null) {
+                return false;
+            }
+
+            mViewModel.newSearch(textView.getText().toString());
+            return true;
+        });
+
         // Child fragments are can only be accessed on view creation, so this is the earliest
         // point where we can specify the data source
         for (Fragment f : getChildFragmentManager().getFragments()) {

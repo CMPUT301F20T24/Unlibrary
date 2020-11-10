@@ -12,6 +12,9 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.algolia.search.saas.Client;
+import com.algolia.search.saas.Index;
+import com.algolia.search.saas.Query;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,10 +40,12 @@ public class ExchangeRepository {
     private static final String BOOK_COLLECTION = "books";
     private static final String OWNER = "owner";
     private static final String STATUS = "status";
+    private static final String ALGOLIA_INDEX_NAME = "books";
 
     private static final String TAG = ExchangeRepository.class.getSimpleName();
 
     private final FirebaseFirestore mDb;
+    private final Client mAlgoliaClient;
 
     private final MutableLiveData<List<Book>> mBooks;
     private ListenerRegistration mListenerRegistration;
@@ -57,6 +62,11 @@ public class ExchangeRepository {
 
         // TODO: make sure user is authenticated
         mUID = user.getUid();
+
+        // TODO: Secure this API key using fetch from server
+        // ref: https://www.algolia.com/doc/guides/security/security-best-practices/#api-keys-in-mobile-applications
+        mAlgoliaClient = new Client("KHVMI882P7", "302b505bf1c13253833d542aef229a8c");
+
         attachListener();
     }
 
@@ -122,6 +132,17 @@ public class ExchangeRepository {
      */
     public void detachListener() {
         mListenerRegistration.remove();
+    }
+
+    public void search(String keywords) {
+        Index index = mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME);
+        index.searchAsync(new Query(keywords), (content, error) -> {
+            if (error != null) {
+                Log.e(TAG, "search: algolia error", error);
+            }
+
+            Log.d(TAG, "search: " + content.toString());
+        });
     }
 }
 

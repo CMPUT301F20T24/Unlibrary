@@ -154,4 +154,8 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     public void setSearchText(String searchText) {
         mSearchText = searchText;
     }
+
+    public void newSearch(String keywords) {
+        mExchangeRepository.search(keywords);
+    }
 }
