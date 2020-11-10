@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.algolia.search.saas.Client;
+import com.algolia.search.saas.Index;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
@@ -26,6 +27,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,11 +47,18 @@ public class LibraryRepository {
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
 
+    // Algolia field names
+    // TODO: Consider using POJOs for algolia
+    private static final String TITLE_FIELD = "title";
+    private static final String AUTHOR_FIELD = "author";
+    private static final String ID_FIELD = "id";
+
+    private final Client mAlgoliaClient;
+    private final Index mAlgoliaIndex;
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
     private ListenerRegistration mListenerRegistration;
     private MutableLiveData<List<Book>> mBooks;
-    private final Client mAlgoliaClient;
     private FilterMap mFilter;
 
     /**
@@ -59,6 +70,7 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
+        mAlgoliaIndex = mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME);
         this.mFilter = new FilterMap();
         attachListener();
     }
@@ -109,7 +121,12 @@ public class LibraryRepository {
         }
         book.setOwner(uid);
         mDb.collection(BOOKS_COLLECTION).add(book)
-                .addOnSuccessListener(onSuccessListener)
+                .addOnSuccessListener(documentReference -> {
+                    book.setId(documentReference.getId());
+                    addAlgoliaIndex(book);
+
+                    onSuccessListener.onSuccess(documentReference);
+                })
                 .addOnFailureListener(onFailureListener);
     }
 
@@ -182,5 +199,24 @@ public class LibraryRepository {
         mFilter = filter;
         detachListener();
         attachListener();
+    }
+
+    public void addAlgoliaIndex(Book book) {
+        try {
+            mAlgoliaIndex.addObjectAsync(new JSONObject()
+                            .put(TITLE_FIELD, book.getTitle())
+                            .put(AUTHOR_FIELD, book.getAuthor())
+                            .put(ID_FIELD, book.getId()),
+                    (jsonObject, e) -> {
+                        if (e != null) {
+                            Log.e(TAG, "createBook: Unable to push to algolia", e);
+                            return;
+                        }
+                        Log.d(TAG, "createBook: Success adding index to algolia!");
+                    });
+        } catch (JSONException e) {
+            Log.e(TAG, "createBook: Unable to push to algolia", e);
+            e.printStackTrace();
+        }
     }
 }
