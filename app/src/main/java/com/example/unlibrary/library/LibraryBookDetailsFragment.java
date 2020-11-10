@@ -36,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class LibraryBookDetailsFragment extends Fragment {
 
     private FragmentLibraryBookDetailsBinding mBinding;
+    //LibraryViewModel mViewModel;
 
     /**
      * Setup the fragment
@@ -47,7 +48,7 @@ public class LibraryBookDetailsFragment extends Fragment {
      */
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Get the activity viewModel
+
         LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
         // Setup data binding
@@ -70,19 +71,24 @@ public class LibraryBookDetailsFragment extends Fragment {
         });
 
         //Setup the list of requesters
-        //RecyclerView recyclerView = mBinding.requestersList;
-        //Context context = getContext();
-        //recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        //BooksRecyclerViewAdapter adapter = new BooksRecyclerViewAdapter(mBooksSource.getBooks().getValue(), mOnItemClickListener);
+        RecyclerView recyclerView = mBinding.requestersList;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mViewModel.fetchRequestersForCurrentBook();
+        RequestersRecyclerViewAdapter adapter = new RequestersRecyclerViewAdapter(mViewModel.getRequesters().getValue());
 
         // Bind ViewModel books to RecyclerViewAdapter
-        //view.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
 
         // Watch changes in bookSource and update the view accordingly
-        //mBooksSource.getBooks().observe(getViewLifecycleOwner(), adapter::setData);
-
-
+        mViewModel.getRequesters().observe(getViewLifecycleOwner(), adapter::setData);
 
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+        mViewModel.detachRequestersListener();
     }
 }
