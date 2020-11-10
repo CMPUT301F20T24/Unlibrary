@@ -212,7 +212,7 @@ public class LibraryRepository {
                             Log.e(TAG, "createBook: Unable to push to algolia", e);
                             return;
                         }
-                        Log.d(TAG, "createBook: Success adding index to algolia!");
+                        Log.d(TAG, "createBook: Success adding index to algolia! " + book.getId());
                     });
         } catch (JSONException e) {
             Log.e(TAG, "createBook: Unable to push to algolia", e);

@@ -14,6 +14,6 @@ public class AlgoliaClientModule {
     public static Client provideAlgoliaClient() {
         // TODO: Secure this API key using fetch from server
         // ref: https://www.algolia.com/doc/guides/security/security-best-practices/#api-keys-in-mobile-applications
-        return new Client("KHVMI882P7", "302b505bf1c13253833d542aef229a8c");
+        return new Client("KHVMI882P7", "9d0307e686c4d1d4f69b8c668a312b4d");
     }
 }
