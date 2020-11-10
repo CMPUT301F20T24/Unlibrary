@@ -13,6 +13,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.algolia.search.saas.Client;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
@@ -40,21 +41,24 @@ public class LibraryRepository {
     private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
     private static final String TAG = LibraryRepository.class.getSimpleName();
+    private static final String ALGOLIA_INDEX_NAME = "books";
 
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
     private ListenerRegistration mListenerRegistration;
     private MutableLiveData<List<Book>> mBooks;
+    private final Client mAlgoliaClient;
     private FilterMap mFilter;
 
     /**
      * Constructor for the Library Repository. Sets up the database snapshot listener.
      */
     @Inject
-    public LibraryRepository(FirebaseFirestore db, FirebaseAuth auth) {
+    public LibraryRepository(FirebaseFirestore db, FirebaseAuth auth, Client algoliaClient) {
         mDb = db;
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
+        mAlgoliaClient = algoliaClient;
         this.mFilter = new FilterMap();
         attachListener();
     }

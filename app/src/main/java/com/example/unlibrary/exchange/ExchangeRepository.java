@@ -55,18 +55,14 @@ public class ExchangeRepository {
      * Constructor for the Exchange Repository.
      */
     @Inject
-    public ExchangeRepository(FirebaseFirestore db) {
+    public ExchangeRepository(FirebaseFirestore db, Client algoliaClient) {
         mDb = db;
+        mAlgoliaClient = algoliaClient;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         // TODO: make sure user is authenticated
         mUID = user.getUid();
-
-        // TODO: Secure this API key using fetch from server
-        // ref: https://www.algolia.com/doc/guides/security/security-best-practices/#api-keys-in-mobile-applications
-        mAlgoliaClient = new Client("KHVMI882P7", "302b505bf1c13253833d542aef229a8c");
-
         attachListener();
     }
 
