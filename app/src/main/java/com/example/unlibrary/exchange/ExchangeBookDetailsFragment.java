@@ -18,8 +18,7 @@ import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.databinding.FragmentExchangeBookDetailsBinding;
-import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
-import com.example.unlibrary.models.Book;
+
 
 import org.jetbrains.annotations.NotNull;
 
@@ -54,6 +53,9 @@ public class ExchangeBookDetailsFragment extends Fragment {
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.addRequest).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
+        mViewModel.fetchOwnerForCurrentBook();
+
         return mBinding.getRoot();
     }
 }
+
