@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.BR;
 import com.example.unlibrary.databinding.FragmentLibraryRequesterItemBinding;
-import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class RequestersRecyclerViewAdapter extends RecyclerView.Adapter<Requeste
     }
 
     /**
-     * Set the new data for the recycler view and notify the Ui of changes
+     * Set the new data for the recycler view and notify the UI of changes
      *
      * @param newRequesters new requesters to be displayed
      */

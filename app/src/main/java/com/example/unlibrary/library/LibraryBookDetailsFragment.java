@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.MainActivity;
-import com.example.unlibrary.book_list.BooksRecyclerViewAdapter;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -36,7 +35,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class LibraryBookDetailsFragment extends Fragment {
 
     private FragmentLibraryBookDetailsBinding mBinding;
-    //LibraryViewModel mViewModel;
 
     /**
      * Setup the fragment
@@ -79,7 +77,7 @@ public class LibraryBookDetailsFragment extends Fragment {
         // Bind ViewModel books to RecyclerViewAdapter
         recyclerView.setAdapter(adapter);
 
-        // Watch changes in bookSource and update the view accordingly
+        // Watch changes in requesters list and update the view accordingly
         mViewModel.getRequesters().observe(getViewLifecycleOwner(), adapter::setData);
 
         return mBinding.getRoot();
