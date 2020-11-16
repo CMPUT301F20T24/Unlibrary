@@ -35,7 +35,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
-    private final LiveData<User>  mCurrentBookOwner;
+    private final LiveData<User> mCurrentBookOwner;
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
@@ -141,16 +141,16 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     }
 
     /**
-     * Fetches requesters for current book
+     * Fetches owner for current book
      */
     public void fetchOwnerForCurrentBook() {
         mExchangeRepository.fetchOwnerForCurrentBook(mCurrentBook.getValue().getOwner());
     }
 
     /**
-     * Getter for the mCurrentBookRequesters object.
+     * Getter for the mCurrentBookOwner object.
      *
-     * @return LiveData<ArrayList < String>> This returns the mCurrentBookRequesters object
+     * @return LiveData<User> This returns the mCurrentBookOwner object
      */
     public LiveData<User> getCurrentBookOwner() {
         return this.mCurrentBookOwner;

@@ -52,10 +52,8 @@ public class ExchangeBookDetailsFragment extends Fragment {
         // Setup observer
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.addRequest).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
-
         mViewModel.fetchOwnerForCurrentBook();
 
         return mBinding.getRoot();
     }
 }
-

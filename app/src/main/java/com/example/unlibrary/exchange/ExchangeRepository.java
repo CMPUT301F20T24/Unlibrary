@@ -129,7 +129,7 @@ public class ExchangeRepository {
     }
 
     /**
-     * Getter for the LiveData List of requesters on a selected book.
+     * Getter for the owner of the book.
      *
      * @return LiveData<ArrayList < String>> This returns the books object.
      */
@@ -138,13 +138,13 @@ public class ExchangeRepository {
     }
 
     /**
-     * Fetches the list of requesters for a newly selected book by clearing the previous book's requesters and
-     * adding a snapshot listener for the new book's requesters
+     * Fetches the owner for a newly selected book by clearing the previous book's owner information and
+     * adding a snapshot listener for the book's owner
      *
      * @param currentBookID
      */
     public void fetchOwnerForCurrentBook(String currentBookOwnerID) {
-        mCurrentBookOwner.setValue(new User()); //Is this required to ensure we clear the previous book's requesters in time before requesters get displayed?
+        mCurrentBookOwner.setValue(new User());
 
         mDb.collection(USER_COLLECTION).document(currentBookOwnerID).get()
                 .addOnSuccessListener(documentSnapshot -> {
