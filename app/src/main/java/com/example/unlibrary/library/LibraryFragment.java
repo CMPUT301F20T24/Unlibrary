@@ -22,9 +22,12 @@ import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Host fragment for Library feature
  */
+@AndroidEntryPoint
 public class LibraryFragment extends Fragment {
     private LibraryViewModel mViewModel;
     private FragmentLibraryBinding mBinding;

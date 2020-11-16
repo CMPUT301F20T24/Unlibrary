@@ -7,13 +7,13 @@
 
         <variable
             name="viewModel"
-            type="com.example.unlibrary.library.LibraryViewModel" />
+            type="com.example.unlibrary.unlibrary.UnlibraryViewModel" />
 
         <import type="android.view.View" />
     </data>
 
     <FrameLayout
-        android:id="@+id/library_book_frame"
+        android:id="@+id/unlibrary_book_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -32,33 +32,20 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:imagePath="@{viewModel.currentBook.photo}" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/edit_book"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:layout_marginBottom="4dp"
-                android:contentDescription="@string/edit_book_fab_description"
-                android:onClick="@{()->viewModel.editCurrentBook()}"
-                app:backgroundTint="@color/colorAccent"
-                app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
-                app:layout_constraintEnd_toStartOf="@+id/delete_book"
-                app:layout_constraintTop_toBottomOf="@+id/bookImageButton"
-                app:srcCompat="@drawable/ic_baseline_edit_24" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/delete_book"
+                android:id="@+id/hand_book"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="4dp"
-                android:contentDescription="@string/delete_book_fab_description"
-                app:backgroundTint="@color/colorAccent"
+                android:contentDescription="@string/handoff_book_description"
+                android:onClick="@{()->viewModel.confirmHandoff()}"
                 app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/bookImageButton"
-                app:srcCompat="@drawable/ic_baseline_delete_24" />
+                app:srcCompat="@drawable/ic_handoff_24" />
 
             <TextView
                 android:id="@+id/textView6"
@@ -138,16 +125,16 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
+                android:id="@+id/chip"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="@dimen/text_margin"
-                android:layout_marginTop="4dp"
-                android:clickable="false"
-                android:text="@{viewModel.currentBook.status.asLower()}"
+                android:layout_marginTop="8dp"
+                android:text="@{viewModel.currentBook.status.toString()}"
                 android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 app:chipIcon="@drawable/status_color"
                 app:chipIconSize="16dp"
                 app:iconStartPadding="3dp"
@@ -163,6 +150,5 @@
             android:visibility="invisible"
             tools:imagePath="@{viewModel.currentBook.photo}" />
     </FrameLayout>
-
 
 </layout>

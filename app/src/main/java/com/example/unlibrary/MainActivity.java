@@ -28,9 +28,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Host Activity for the app
  */
+@AndroidEntryPoint
 public class MainActivity extends AuthenticatedActivity {
 
     private ActivityMainBinding mBinding;
