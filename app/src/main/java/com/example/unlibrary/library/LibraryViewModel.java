@@ -348,7 +348,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         } else if (tag.equals(LibraryBookDetailsFragment.SCAN_TAG)) {
             handoff(isbn);
         } else {
-            Log.i(TAG, "Invalid scan_tag encountered.");
+            Log.w(TAG, "Invalid scan_tag encountered.");
         }
     }
 
@@ -358,11 +358,17 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * @param isbn isbn of book to handoff
      */
     public void handoff(String isbn) {
-        return; // TODO
+        if (mCurrentBook.getValue().getStatus() == Book.Status.ACCEPTED) {
+            // TODO
+        } else if (mCurrentBook.getValue().getStatus() == Book.Status.BORROWED) {
+            // TODO
+        } else {
+            Log.w(TAG, "Handoff called for an invalid book status.");
+        }
     }
 
     /**
-     * Autofill the current book from scan data
+     * Autofill the current book from scan datag
      *
      * @param isbn isbn that was scanned
      */
