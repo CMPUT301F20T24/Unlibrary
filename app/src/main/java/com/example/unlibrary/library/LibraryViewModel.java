@@ -197,7 +197,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mLibraryRepository.setFilter(mFilter);
     }
 
-
     /**
      * Save the book that is currently being created or edited
      */
@@ -339,10 +338,35 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Code to be called when a barcode scan is finished successfully.
      *
+     * @param tag  Identifier for what is using scan barcode.
      * @param isbn isbn from successful scan
      */
     @Override
-    public void onFinishedScanSuccess(String isbn) {
+    public void onFinishedScanSuccess(String tag, String isbn) {
+        if (tag.equals(LibraryEditBookFragment.SCAN_TAG)) {
+            scanAutoFill(isbn);
+        } else if (tag.equals(LibraryBookDetailsFragment.SCAN_TAG)) {
+            handoff(isbn);
+        } else {
+            Log.i(TAG, "Invalid scan_tag encountered.");
+        }
+    }
+
+    /**
+     * Handoff a book to a chose requester.
+     *
+     * @param isbn isbn of book to handoff
+     */
+    public void handoff(String isbn) {
+        return; // TODO
+    }
+
+    /**
+     * Autofill the current book from scan data
+     *
+     * @param isbn isbn that was scanned
+     */
+    private void scanAutoFill(String isbn) {
         if (isbn == null || isbn.isEmpty()) {
             mFailureMsgEvent.setValue("Invalid ISBN found");
             return;
@@ -400,10 +424,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Code to be called when a barcode scan fails.
      *
-     * @param e Throwable
+     * @param tag Identifier for what is using barcode scan.
+     * @param e   Throwable
      */
     @Override
-    public void onFinishedScanFailure(Throwable e) {
+    public void onFinishedScanFailure(String tag, Throwable e) {
         mFailureMsgEvent.setValue("Failed to scan barcode.");
         Log.e(TAG, "Failed to scan barcode.", e);
     }
