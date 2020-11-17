@@ -14,13 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.MainActivity;
+import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -32,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint;
  * Fragment to display the details and requests upon a user owned book.
  */
 @AndroidEntryPoint
-public class LibraryBookDetailsFragment extends Fragment {
+public class LibraryBookDetailsFragment extends BookDetailFragment {
 
     private FragmentLibraryBookDetailsBinding mBinding;
 
@@ -48,7 +48,6 @@ public class LibraryBookDetailsFragment extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
-
         // Setup data binding
         mBinding = FragmentLibraryBookDetailsBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
@@ -79,14 +78,16 @@ public class LibraryBookDetailsFragment extends Fragment {
 
         // Watch changes in requesters list and update the view accordingly
         mViewModel.getRequesters().observe(getViewLifecycleOwner(), adapter::setData);
+        mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.libraryBookFrame, mBinding.bookImageButton, mBinding.bookImage));
 
         return mBinding.getRoot();
     }
-
+  
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         mViewModel.detachRequestersListener();
     }
+  
 }
