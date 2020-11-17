@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class LibraryBookDetailsFragment extends Fragment {
 
     private FragmentLibraryBookDetailsBinding mBinding;
+    LibraryViewModel mViewModel;
 
     /**
      * Setup the fragment
@@ -46,8 +48,8 @@ public class LibraryBookDetailsFragment extends Fragment {
      */
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+        // Get ViewModel
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
         // Setup data binding
         mBinding = FragmentLibraryBookDetailsBinding.inflate(inflater, container, false);
@@ -68,9 +70,10 @@ public class LibraryBookDetailsFragment extends Fragment {
                     .show();
         });
 
-        //Setup the list of requesters
+        // Setup the list of requesters
         RecyclerView recyclerView = mBinding.requestersList;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
         mViewModel.fetchRequestersForCurrentBook();
         RequestersRecyclerViewAdapter adapter = new RequestersRecyclerViewAdapter(mViewModel.getRequesters().getValue());
 
@@ -80,13 +83,17 @@ public class LibraryBookDetailsFragment extends Fragment {
         // Watch changes in requesters list and update the view accordingly
         mViewModel.getRequesters().observe(getViewLifecycleOwner(), adapter::setData);
 
+        // Add dividers between items in the RecyclerView
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
         return mBinding.getRoot();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         mViewModel.detachRequestersListener();
     }
 }

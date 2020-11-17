@@ -205,7 +205,9 @@ public class LibraryRepository {
      * @param currentBookID
      */
     public void fetchRequestersForCurrentBook(String currentBookID) {
-        mCurrentBookRequesters.setValue(new ArrayList<>()); //Is this required to ensure we clear the previous book's requesters in time before requesters get displayed?
+        // Clear the previous book's requesters in time before requesters list gets displayed
+        mCurrentBookRequesters.setValue(new ArrayList<>());
+        // Attach snapshot listener for requesters on current book
         attachRequestsListener(currentBookID);
     }
 
