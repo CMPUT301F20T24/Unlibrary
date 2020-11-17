@@ -57,8 +57,9 @@ public class ExchangeFragment extends Fragment {
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
         mBinding.setViewModel(mViewModel);
 
+        // Add listener to enter key in search bar
         mBinding.searchExchangeBook.setOnEditorActionListener((textView, i, keyEvent) -> {
-            mViewModel.newSearch(textView.getText().toString());
+            mViewModel.search(textView.getText().toString());
             return true;
         });
 

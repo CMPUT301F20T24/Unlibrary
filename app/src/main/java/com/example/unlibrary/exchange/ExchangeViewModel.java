@@ -155,7 +155,13 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         mSearchText = searchText;
     }
 
-    public void newSearch(String keywords) {
+
+    /**
+     * Updates the list of books according to search results for given keywords in title or author.
+     *
+     * @param keywords space separated words to search for
+     */
+    public void search(String keywords) {
         mExchangeRepository.search(keywords);
     }
 }
