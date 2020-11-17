@@ -201,6 +201,12 @@ public class LibraryRepository {
         attachListener();
     }
 
+    /**
+     * Adds book to Algolia search index so it can be searched in {@link com.example.unlibrary.exchange.ExchangeFragment}.
+     * Book's id, title, and author are assumed to be non null.
+     *
+     * @param book new book to add to search index
+     */
     public void addAlgoliaIndex(Book book) {
         try {
             mAlgoliaIndex.addObjectAsync(new JSONObject()
