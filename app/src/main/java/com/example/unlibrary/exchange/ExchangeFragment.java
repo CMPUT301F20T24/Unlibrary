@@ -19,7 +19,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentExchangeBinding;
-import com.example.unlibrary.library.LibraryViewModel;
 
 import dagger.hilt.android.AndroidEntryPoint;
 

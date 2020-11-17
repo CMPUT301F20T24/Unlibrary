@@ -19,7 +19,6 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.databinding.FragmentExchangeBookDetailsBinding;
 
-
 import org.jetbrains.annotations.NotNull;
 
 import dagger.hilt.android.AndroidEntryPoint;
