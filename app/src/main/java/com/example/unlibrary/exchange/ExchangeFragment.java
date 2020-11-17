@@ -58,10 +58,6 @@ public class ExchangeFragment extends Fragment {
         mBinding.setViewModel(mViewModel);
 
         mBinding.searchExchangeBook.setOnEditorActionListener((textView, i, keyEvent) -> {
-            if (keyEvent == null) {
-                return false;
-            }
-
             mViewModel.newSearch(textView.getText().toString());
             return true;
         });

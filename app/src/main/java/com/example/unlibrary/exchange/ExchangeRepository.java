@@ -19,12 +19,16 @@ import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +44,10 @@ public class ExchangeRepository {
     private static final String BOOK_COLLECTION = "books";
     private static final String OWNER = "owner";
     private static final String STATUS = "status";
+
+    // Algolia fields
     private static final String ALGOLIA_INDEX_NAME = "books";
+    private static final String ALGOLIA_ID_FIELD = "id";
 
     private static final String TAG = ExchangeRepository.class.getSimpleName();
 
@@ -130,14 +137,46 @@ public class ExchangeRepository {
         mListenerRegistration.remove();
     }
 
+    /**
+     * Perform full search in title and author using Algolia. Full book details is fetched from
+     * Firestore. Updates list of books at the end.
+     *
+     * TODO: Decide what to do when keywords is empty and what happens when someone adds a new book (go with listener above or do re-search)
+     *
+     * @param keywords space separated words to search for
+     */
     public void search(String keywords) {
         Index index = mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME);
-        index.searchAsync(new Query(keywords), (content, error) -> {
+        Query query = new Query(keywords).setAttributesToRetrieve(ALGOLIA_ID_FIELD);
+
+        index.searchAsync(query, (content, error) -> {
             if (error != null) {
-                Log.e(TAG, "search: algolia error", error);
+                Log.e(TAG, "Algolia error: ", error);
+                return;
             }
 
-            Log.d(TAG, "search: " + content.toString());
+            // Get results array
+            JSONArray hits = content.optJSONArray("hits");
+
+            // Update books list
+            ArrayList<Book> dbBooks = new ArrayList<>();
+            ArrayList<Task<DocumentSnapshot>> tasks = new ArrayList<>();
+
+            for (int i = 0; i < hits.length(); i++) {
+                String bookId = hits.optJSONObject(i).optString(ALGOLIA_ID_FIELD);
+                tasks.add(mDb.collection(BOOK_COLLECTION)
+                        .document(bookId)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            dbBooks.add(documentSnapshot.toObject(Book.class));
+                        }));
+            }
+
+            Tasks.whenAll(tasks).addOnSuccessListener(aVoid -> {
+                mBooks.setValue(dbBooks);
+            }).addOnFailureListener(e -> {
+                Log.e(TAG, "Add searched books error", e);
+            });
         });
     }
 }
