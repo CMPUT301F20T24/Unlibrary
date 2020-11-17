@@ -49,12 +49,10 @@ public class LibraryRepository {
 
     // Algolia field names
     // TODO: Consider using POJOs for algolia
-    private static final String TITLE_FIELD = "title";
-    private static final String AUTHOR_FIELD = "author";
-    private static final String ID_FIELD = "id";
-
+    private static final String ALGOLIA_TITLE_FIELD = "title";
+    private static final String ALGOLIA_AUTHOR_FIELD = "author";
+    private static final String ALGOLIA_ID_FIELD = "id";
     private final Client mAlgoliaClient;
-    private final Index mAlgoliaIndex;
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
     private ListenerRegistration mListenerRegistration;
@@ -70,7 +68,6 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
-        mAlgoliaIndex = mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME);
         this.mFilter = new FilterMap();
         attachListener();
     }
@@ -122,6 +119,7 @@ public class LibraryRepository {
         book.setOwner(uid);
         mDb.collection(BOOKS_COLLECTION).add(book)
                 .addOnSuccessListener(documentReference -> {
+                    // Also add book to algolia with Firestore ID reference
                     book.setId(documentReference.getId());
                     addAlgoliaIndex(book);
 
@@ -208,11 +206,12 @@ public class LibraryRepository {
      * @param book new book to add to search index
      */
     public void addAlgoliaIndex(Book book) {
+        Index index = mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME);
         try {
-            mAlgoliaIndex.addObjectAsync(new JSONObject()
-                            .put(TITLE_FIELD, book.getTitle())
-                            .put(AUTHOR_FIELD, book.getAuthor())
-                            .put(ID_FIELD, book.getId()),
+            index.addObjectAsync(new JSONObject()
+                            .put(ALGOLIA_TITLE_FIELD, book.getTitle())
+                            .put(ALGOLIA_AUTHOR_FIELD, book.getAuthor())
+                            .put(ALGOLIA_ID_FIELD, book.getId()),
                     (jsonObject, e) -> {
                         if (e != null) {
                             Log.e(TAG, "createBook: Unable to push to algolia", e);
@@ -222,7 +221,6 @@ public class LibraryRepository {
                     });
         } catch (JSONException e) {
             Log.e(TAG, "createBook: Unable to push to algolia", e);
-            e.printStackTrace();
         }
     }
 }
