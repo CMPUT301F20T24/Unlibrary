@@ -13,8 +13,6 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
-import androidx.annotation.NonNull;
-import androidx.arch.core.util.Function;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -31,9 +29,6 @@ import com.example.unlibrary.models.User;
 import com.example.unlibrary.unlibrary.UnlibraryBookDetailsFragmentDirections;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -118,16 +113,13 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * @return ShowHandoffButton LiveData
      */
     public LiveData<Boolean> showHandoffButton() {
-        return Transformations.map(mCurrentBook, new Function<Book, Boolean>() {
-            @Override
-            public Boolean apply(Book input) {
-                if (input.getStatus() == Book.Status.ACCEPTED) {
-                    return true;
-                } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
-                    return true;
-                } else {
-                    return false;
-                }
+        return Transformations.map(mCurrentBook, input -> {
+            if (input.getStatus() == Book.Status.ACCEPTED) {
+                return true;
+            } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
+                return true;
+            } else {
+                return false;
             }
         });
     }
@@ -388,12 +380,13 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public void handoff(String isbn) {
         // TODO handle getting back from ready to handoff state
         Book book = mCurrentBook.getValue();
+        if (!book.getIsbn().equals(isbn)) {
+            mFailureMsgEvent.setValue("Isbn does not match current book.");
+            return;
+        }
+
         if (book.getStatus() == Book.Status.ACCEPTED) {
             // Giving book away
-            if (!book.getIsbn().equals(isbn)) {
-                mFailureMsgEvent.setValue("Isbn does not match current book.");
-                return;
-            }
             book.setIsReadyForHandoff(true);
             mLibraryRepository.updateBook(book, aVoid -> mFailureMsgEvent.setValue("Book has been handed off."), e -> mFailureMsgEvent.setValue("Failed to handover book."));
 

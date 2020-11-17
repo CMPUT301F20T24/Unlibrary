@@ -15,26 +15,23 @@ import android.widget.Toast;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksSource;
-import com.example.unlibrary.exchange.ExchangeBookDetailsFragmentDirections;
-import com.example.unlibrary.exchange.ExchangeFragmentDirections;
-import com.example.unlibrary.exchange.ExchangeViewModel;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.List;
 
 /**
  * Manages the Unlibrary flow business logic. Connects the  fragments to the repository.
  */
-public class UnlibraryViewModel extends ViewModel implements BooksSource {
+public class UnlibraryViewModel extends ViewModel implements BooksSource, BarcodeScanner.OnFinishedScanListener {
     private static final String TAG = UnlibraryViewModel.class.getSimpleName();
     private final LiveData<List<Book>> mBooks;
     private final UnlibraryRepository mUnlibraryRepository;
@@ -80,6 +77,24 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
      */
     public SingleLiveEvent<String> getSuccessMsgEvent() {
         return mSuccessMsgEvent;
+    }
+
+    /**
+     * Should handoff button be shown.
+     *
+     * @return ShowHandoffButton LiveData
+     */
+    public LiveData<Boolean> showHandoffButton() {
+        // TODO do I need to worry about state of request at all?
+        return Transformations.map(mCurrentBook, input -> {
+            if (input.getStatus() == Book.Status.ACCEPTED && input.getIsReadyForHandoff()) {
+                return true;
+            } else if (input.getStatus() == Book.Status.BORROWED) {
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 
     /**
@@ -129,27 +144,38 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
                 });
     }
 
-    /**
-     * Update firestore that book has been accepted
-     * TODO: Confirm handoff with barcode scan
-     */
-    public void confirmHandoff() {
+    // TODO
+    public void handoff(String isbn) {
+        // TODO handle getting back from ready to handoff state
+        // TODO do I need to worry about state of request at all?
         Request request = mCurrentRequest.getValue();
         Book book = mCurrentBook.getValue();
+        if (!book.getIsbn().equals(isbn)) {
+            mFailureMsgEvent.setValue("Isbn does not match current book.");
+            return;
+        }
 
+        if (book.getStatus() == Book.Status.ACCEPTED && book.getIsReadyForHandoff()) {
+            // Borrowing book
+            book.setIsReadyForHandoff(false);
+            book.setStatus(Book.Status.BORROWED);
+            request.setState(Request.State.BORROWED);
+            mUnlibraryRepository.completeExchange(request, book,
+                    o -> {
+                        mNavigationEvent.setValue(UnlibraryBookDetailsFragmentDirections.actionUnlibraryBookDetailsFragmentToUnlibraryFragment());
+                        mSuccessMsgEvent.setValue("Successfully Accepted Book");
+                    },
+                    e -> {
+                        mFailureMsgEvent.setValue("Could not change status of book");
+                    });
+        } else if (book.getStatus() == Book.Status.BORROWED) {
+            // Return the book
+            book.setIsReadyForHandoff(true);
+            mUnlibraryRepository.updateBook(book, aVoid -> mSuccessMsgEvent.setValue("Book has been handed off."), e -> mFailureMsgEvent.setValue("Failed to handover book."));
 
-
-        request.setState(Request.State.ACCEPTED);
-        book.setStatus(Book.Status.BORROWED);
-
-        mUnlibraryRepository.completeExchange(request, book,
-                o -> {
-                    mNavigationEvent.setValue(UnlibraryBookDetailsFragmentDirections.actionUnlibraryBookDetailsFragmentToUnlibraryFragment());
-                    mSuccessMsgEvent.setValue("Successfully Accepted Book");
-                },
-                e -> {
-                    mFailureMsgEvent.setValue("Could not change status of book");
-                });
+        } else {
+            Log.w(TAG, "Handoff called for an invalid book status.");
+        }
     }
 
     /**
@@ -158,5 +184,32 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
     @Override
     protected void onCleared() {
         mUnlibraryRepository.detachListeners();
+    }
+
+    /**
+     * Code to be called when a barcode scan is finished successfully.
+     *
+     * @param tag  Identifier for what is using scan barcode.
+     * @param isbn isbn from successful scan
+     */
+    @Override
+    public void onFinishedScanSuccess(String tag, String isbn) {
+        if (tag.equals(UnlibraryBookDetailsFragment.SCAN_TAG)) {
+            handoff(isbn);
+        } else {
+            Log.w(TAG, "Invalid scan_tag encountered.");
+        }
+    }
+
+    /**
+     * Code to be called when a barcode scan fails.
+     *
+     * @param tag Identifier for what is using barcode scan.
+     * @param e   Throwable
+     */
+    @Override
+    public void onFinishedScanFailure(String tag, Throwable e) {
+        mFailureMsgEvent.setValue("Failed to scan barcode.");
+        Log.e(TAG, "Failed to scan barcode.", e);
     }
 }
