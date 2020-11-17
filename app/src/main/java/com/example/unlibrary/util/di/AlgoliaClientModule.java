@@ -1,3 +1,11 @@
+/*
+ * AlgoliaClientModule
+ *
+ * November 10, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.util.di;
 
 import com.algolia.search.saas.Client;
