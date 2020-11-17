@@ -353,15 +353,24 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
-     * Handoff a book to a chose requester.
+     * Handoff a book to a chosen requester.
      *
      * @param isbn isbn of book to handoff
      */
     public void handoff(String isbn) {
         if (mCurrentBook.getValue().getStatus() == Book.Status.ACCEPTED) {
-            // TODO
+            // Giving book away
+            if (!mCurrentBook.getValue().getIsbn().equals(isbn)) {
+                mFailureMsgEvent.setValue("Isbn does not match current book.");
+                return;
+            }
+            Book b = mCurrentBook.getValue();
+            b.setStatus(Book.Status.BORROWED);
+            mLibraryRepository.updateBook(b, aVoid -> mFailureMsgEvent.setValue("Book has been handed off."), e -> mFailureMsgEvent.setValue("Failed to handover book."));
+
         } else if (mCurrentBook.getValue().getStatus() == Book.Status.BORROWED) {
             // TODO
+            // Returning book
         } else {
             Log.w(TAG, "Handoff called for an invalid book status.");
         }
