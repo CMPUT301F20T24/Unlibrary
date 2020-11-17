@@ -265,7 +265,13 @@ public class LibraryRepository {
         mRequestsListenerRegistration.remove();
     }
 
-    // TODO use existing code
+    /**
+     * Get the borrowed request associated with the current book.
+     *
+     * @param book              book request is associated with
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
     public void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
         Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, book.getId()).whereEqualTo(STATE, Request.State.BORROWED.toString());
         query.get().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
