@@ -29,6 +29,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,10 @@ public class LibraryRepository {
     private static final String BOOKS_COLLECTION = "books";
     private static final String REQUESTS_COLLECTION = "requests";
     private static final String USERS_COLLECTION = "users";
+    private static final String BOOK = "book";
+    private static final String STATE = "state";
+    private static final String STATUS = "status";
+    private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
     private static final String TAG = LibraryRepository.class.getSimpleName();
 
     private FirebaseFirestore mDb;
@@ -257,5 +263,33 @@ public class LibraryRepository {
      */
     public void detachRequestersListener() {
         mRequestsListenerRegistration.remove();
+    }
+
+    // TODO use existing code
+    public void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, book.getId()).whereEqualTo(STATE, Request.State.BORROWED.toString());
+        query.get().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Update state and status of request and book
+     *
+     * @param request           request object to be updated in the database
+     * @param book              book object to update
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        WriteBatch batch = mDb.batch();
+        DocumentReference requestCol = mDb.collection(REQUESTS_COLLECTION).document(request.getId());
+        DocumentReference bookCol = mDb.collection(BOOKS_COLLECTION).document(book.getId());
+
+        requestCol.update(STATE, request.getState());
+        bookCol.update(STATUS, book.getStatus());
+        bookCol.update(IS_READY_FOR_HANDOFF, book.getIsReadyForHandoff());
+
+        batch.commit()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 }

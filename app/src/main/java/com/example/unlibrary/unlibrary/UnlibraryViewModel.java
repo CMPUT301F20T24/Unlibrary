@@ -137,6 +137,8 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
         Request request = mCurrentRequest.getValue();
         Book book = mCurrentBook.getValue();
 
+
+
         request.setState(Request.State.ACCEPTED);
         book.setStatus(Book.Status.BORROWED);
 

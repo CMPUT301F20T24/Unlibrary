@@ -13,9 +13,12 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.arch.core.util.Function;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
 
@@ -25,8 +28,12 @@ import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
+import com.example.unlibrary.unlibrary.UnlibraryBookDetailsFragmentDirections;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -103,6 +110,26 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LiveData<Boolean> getIsLoading() {
         return this.mIsLoading;
+    }
+
+    /**
+     * Should handoff button be shown.
+     *
+     * @return ShowHandoffButton LiveData
+     */
+    public LiveData<Boolean> showHandoffButton() {
+        return Transformations.map(mCurrentBook, new Function<Book, Boolean>() {
+            @Override
+            public Boolean apply(Book input) {
+                if (input.getStatus() == Book.Status.ACCEPTED) {
+                    return true;
+                } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
     }
 
     /**
@@ -233,6 +260,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             if (book.getId() == null) {
                 // Book is new
                 book.setStatus(Book.Status.AVAILABLE); // A book is by default available
+                book.setIsReadyForHandoff(false); // A book is by default not ready for handoff
                 mLibraryRepository.createBook(book,
                         o -> {
                             Book bookWithId = mCurrentBook.getValue();
@@ -358,26 +386,46 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * @param isbn isbn of book to handoff
      */
     public void handoff(String isbn) {
-        if (mCurrentBook.getValue().getStatus() == Book.Status.ACCEPTED) {
+        // TODO handle getting back from ready to handoff state
+        Book book = mCurrentBook.getValue();
+        if (book.getStatus() == Book.Status.ACCEPTED) {
             // Giving book away
-            if (!mCurrentBook.getValue().getIsbn().equals(isbn)) {
+            if (!book.getIsbn().equals(isbn)) {
                 mFailureMsgEvent.setValue("Isbn does not match current book.");
                 return;
             }
-            Book b = mCurrentBook.getValue();
-            b.setStatus(Book.Status.BORROWED);
-            mLibraryRepository.updateBook(b, aVoid -> mFailureMsgEvent.setValue("Book has been handed off."), e -> mFailureMsgEvent.setValue("Failed to handover book."));
+            book.setIsReadyForHandoff(true);
+            mLibraryRepository.updateBook(book, aVoid -> mFailureMsgEvent.setValue("Book has been handed off."), e -> mFailureMsgEvent.setValue("Failed to handover book."));
 
-        } else if (mCurrentBook.getValue().getStatus() == Book.Status.BORROWED) {
-            // TODO
+        } else if (book.getStatus() == Book.Status.BORROWED && book.getIsReadyForHandoff()) {
             // Returning book
+            book.setIsReadyForHandoff(false);
+            book.setStatus(Book.Status.AVAILABLE);
+
+            // Get the one active request associated with this book
+            mLibraryRepository.getBorrowedRequest(book, queryDocumentSnapshots -> {
+                if (queryDocumentSnapshots.isEmpty()) {
+                    mFailureMsgEvent.setValue("Failed to find proper request to receive from.");
+                }
+                Request request = queryDocumentSnapshots.getDocuments().get(0).toObject(Request.class);
+                request.setState(Request.State.ARCHIVED);
+
+                mLibraryRepository.completeExchange(request, book,
+                        o -> {
+                            mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
+                            mFailureMsgEvent.setValue("Successfully Returned Book");
+                        },
+                        e -> {
+                            mFailureMsgEvent.setValue("Could not change status of book");
+                        });
+            }, e -> mFailureMsgEvent.setValue("Failed to find proper request to receive from."));
         } else {
             Log.w(TAG, "Handoff called for an invalid book status.");
         }
     }
 
     /**
-     * Autofill the current book from scan datag
+     * Autofill the current book from scan data
      *
      * @param isbn isbn that was scanned
      */
