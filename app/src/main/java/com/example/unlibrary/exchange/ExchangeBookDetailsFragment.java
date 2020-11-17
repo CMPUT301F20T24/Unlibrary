@@ -51,6 +51,7 @@ public class ExchangeBookDetailsFragment extends BookDetailFragment {
         // Setup observer
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.addRequest).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
+        mViewModel.fetchOwnerForCurrentBook();
 
         mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.exchangeBookFrame, mBinding.bookImageButton, mBinding.bookImage));
         return mBinding.getRoot();

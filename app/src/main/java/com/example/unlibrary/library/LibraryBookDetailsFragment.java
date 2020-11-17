@@ -5,8 +5,11 @@
  *
  * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
+
 package com.example.unlibrary.library;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +17,8 @@ import android.view.ViewGroup;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_detail.BookDetailFragment;
@@ -31,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class LibraryBookDetailsFragment extends BookDetailFragment {
 
     private FragmentLibraryBookDetailsBinding mBinding;
+    private LibraryViewModel mViewModel;
 
     /**
      * Setup the fragment
@@ -42,8 +48,8 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
      */
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Get the activity viewModel
-        LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         // Setup data binding
         mBinding = FragmentLibraryBookDetailsBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
@@ -63,9 +69,27 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
                     .show();
         });
 
+        //Setup the list of requesters
+        RecyclerView recyclerView = mBinding.requestersList;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mViewModel.fetchRequestersForCurrentBook();
+        RequestersRecyclerViewAdapter adapter = new RequestersRecyclerViewAdapter(mViewModel.getRequesters().getValue());
+
+        // Bind ViewModel books to RecyclerViewAdapter
+        recyclerView.setAdapter(adapter);
+
+        // Watch changes in requesters list and update the view accordingly
+        mViewModel.getRequesters().observe(getViewLifecycleOwner(), adapter::setData);
         mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.libraryBookFrame, mBinding.bookImageButton, mBinding.bookImage));
 
         return mBinding.getRoot();
     }
-
+  
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+        mViewModel.detachRequestersListener();
+    }
+  
 }

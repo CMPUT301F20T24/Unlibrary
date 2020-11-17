@@ -153,6 +153,26 @@
                 app:iconStartPadding="3dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView2" />
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/text_margin"
+                android:layout_marginTop="@dimen/text_margin"
+                android:text="@string/requesters"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/status" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/requestersList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layoutManager="LinearLayoutManager"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView10"
+                tools:listitem="@layout/fragment_library_requester_item" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -163,6 +183,5 @@
             android:visibility="invisible"
             tools:imagePath="@{viewModel.currentBook.photo}" />
     </FrameLayout>
-
 
 </layout>

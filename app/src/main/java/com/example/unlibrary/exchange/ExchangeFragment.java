@@ -70,4 +70,5 @@ public class ExchangeFragment extends Fragment {
         mViewModel.getSuccessRequestMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
         return mBinding.getRoot();
     }
+
 }

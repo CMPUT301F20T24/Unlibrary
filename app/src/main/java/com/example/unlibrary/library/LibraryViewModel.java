@@ -23,6 +23,8 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
 import com.google.firebase.storage.FirebaseStorage;
@@ -33,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,6 +58,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private FilterMap mFilter;
     private LiveData<List<Book>> mBooks;
     private final LibraryRepository mLibraryRepository;
+    private final LiveData<List<User>> mCurrentBookRequesters;
 
     public enum InputKey {
         TITLE,
@@ -71,6 +75,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         this.mFilter = new FilterMap();
         this.mLibraryRepository = libraryRepository;
         this.mBooks = this.mLibraryRepository.getBooks();
+        this.mCurrentBookRequesters = this.mLibraryRepository.getRequesters();
     }
 
     /**
@@ -143,6 +148,15 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LiveData<List<Book>> getBooks() {
         return this.mBooks;
+    }
+
+    /**
+     * Getter for the mCurrentBookRequesters object.
+     *
+     * @return LiveData<ArrayList < String>> This returns the mCurrentBookRequesters object
+     */
+    public LiveData<List<User>> getRequesters() {
+        return this.mCurrentBookRequesters;
     }
 
     /**
@@ -463,4 +477,19 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             super(errorMessage);
         }
     }
+
+    /**
+     * Fetches requesters for current book
+     */
+    public void fetchRequestersForCurrentBook() {
+        mLibraryRepository.fetchRequestersForCurrentBook(mCurrentBook.getValue().getId());
+    }
+
+    /**
+     * Removes the repository's snapshot listener for current book's requesters.
+     */
+    protected void detachRequestersListener() {
+        mLibraryRepository.detachRequestersListener();
+    }
+
 }
