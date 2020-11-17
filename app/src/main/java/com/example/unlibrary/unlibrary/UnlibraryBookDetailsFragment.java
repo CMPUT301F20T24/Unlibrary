@@ -12,11 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
+import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentUnlibraryBookDetailsBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +27,7 @@ import dagger.hilt.android.AndroidEntryPoint;
  * Fragment to display the details and requests upon a user owned book.
  */
 @AndroidEntryPoint
-public class UnlibraryBookDetailsFragment extends Fragment {
+public class UnlibraryBookDetailsFragment extends BookDetailFragment {
 
     private FragmentUnlibraryBookDetailsBinding mBinding;
 
@@ -52,6 +52,7 @@ public class UnlibraryBookDetailsFragment extends Fragment {
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.handBook).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
+        mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.unlibraryBookFrame, mBinding.bookImageButton, mBinding.bookImage));
         return mBinding.getRoot();
     }
 }

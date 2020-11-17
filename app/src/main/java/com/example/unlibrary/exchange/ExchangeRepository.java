@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,6 +36,7 @@ import javax.inject.Inject;
 public class ExchangeRepository {
     private static final String REQUEST_COLLECTION = "requests";
     private static final String BOOK_COLLECTION = "books";
+    private static final String USER_COLLECTION = "users";
     private static final String OWNER = "owner";
     private static final String STATUS = "status";
 
@@ -43,6 +45,7 @@ public class ExchangeRepository {
     private final FirebaseFirestore mDb;
 
     private final MutableLiveData<List<Book>> mBooks;
+    private final MutableLiveData<User> mCurrentBookOwner;
     private ListenerRegistration mListenerRegistration;
     private String mUID;
 
@@ -53,6 +56,7 @@ public class ExchangeRepository {
     public ExchangeRepository(FirebaseFirestore db) {
         mDb = db;
         mBooks = new MutableLiveData<>(new ArrayList<>());
+        mCurrentBookOwner = new MutableLiveData<>(new User());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         // TODO: make sure user is authenticated
@@ -122,6 +126,33 @@ public class ExchangeRepository {
      */
     public void detachListener() {
         mListenerRegistration.remove();
+    }
+
+    /**
+     * Getter for the owner of the book.
+     *
+     * @return LiveData<ArrayList < String>> This returns the books object.
+     */
+    public LiveData<User> getOwner() {
+        return this.mCurrentBookOwner;
+    }
+
+    /**
+     * Fetches the owner for a newly selected book by clearing the previous book's owner information and
+     * adding a snapshot listener for the book's owner
+     *
+     * @param currentBookID
+     */
+    public void fetchOwnerForCurrentBook(String currentBookOwnerID) {
+        mCurrentBookOwner.setValue(new User());
+
+        mDb.collection(USER_COLLECTION).document(currentBookOwnerID).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    mCurrentBookOwner.setValue(documentSnapshot.toObject(User.class));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Unable to get owner " + currentBookOwnerID + "from database", e);
+                });
     }
 }
 
