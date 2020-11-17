@@ -5,6 +5,7 @@
  *
  * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
+
 package com.example.unlibrary.library;
 
 import android.app.AlertDialog;
@@ -35,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class LibraryBookDetailsFragment extends BookDetailFragment {
 
     private FragmentLibraryBookDetailsBinding mBinding;
+    private LibraryViewModel mViewModel;
 
     /**
      * Setup the fragment
@@ -47,7 +49,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         // Setup data binding
         mBinding = FragmentLibraryBookDetailsBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
@@ -86,7 +88,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         mViewModel.detachRequestersListener();
     }
   
