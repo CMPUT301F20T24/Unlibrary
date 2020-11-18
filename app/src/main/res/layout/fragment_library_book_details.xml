@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
                     android:layout_marginBottom="4dp"
-                    android:contentDescription="Handoff Book"
+                    android:contentDescription="@string/handoff_book"
                     app:backgroundTint="@color/colorAccent"
                     app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
                     app:layout_constraintEnd_toStartOf="@+id/edit_book"

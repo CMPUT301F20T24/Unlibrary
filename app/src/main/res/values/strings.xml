@@ -41,4 +41,5 @@
     <string name="borrowed">Borrowed</string>
     <string name="requesters">Requesters</string>
     <string name="handoff_book_fab_description">Handoff book</string>
+    <string name="handoff_book">Handoff Book</string>
 </resources>
