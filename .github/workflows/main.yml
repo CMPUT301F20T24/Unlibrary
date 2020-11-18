@@ -55,7 +55,7 @@ jobs:
       - name: Set-up firestore emulator and run Android tests
         run: |
           pushd firestore-emulator
-          npm run firebase -- emulators:exec --only firestore --token $FIREBASE_TOKEN ../gradlew test
+          npm run firebase -- emulators:exec --only firestore --token "$FIREBASE_TOKEN" ../gradlew test
           popd
         env: 
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
