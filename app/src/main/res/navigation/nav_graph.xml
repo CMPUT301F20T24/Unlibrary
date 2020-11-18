@@ -28,7 +28,7 @@
         android:id="@+id/unlibraryFragment"
         android:name="com.example.unlibrary.unlibrary.UnlibraryFragment"
         android:label="fragment_unlibrary"
-        tools:layout="@layout/fragment_unlibrary" >
+        tools:layout="@layout/fragment_unlibrary">
         <action
             android:id="@+id/action_unlibraryFragment_to_unlibraryBookDetailsFragment"
             app:destination="@id/unlibraryBookDetailsFragment" />
@@ -37,7 +37,7 @@
         android:id="@+id/unlibraryBookDetailsFragment"
         android:name="com.example.unlibrary.unlibrary.UnlibraryBookDetailsFragment"
         android:label="fragment_unlibrary"
-        tools:layout="@layout/fragment_unlibrary_book_details" >
+        tools:layout="@layout/fragment_unlibrary_book_details">
         <action
             android:id="@+id/action_unlibraryBookDetailsFragment_to_unlibraryFragment"
             app:destination="@id/unlibraryFragment" />
@@ -47,7 +47,7 @@
         android:id="@+id/exchangeFragment"
         android:name="com.example.unlibrary.exchange.ExchangeFragment"
         android:label="fragment_exchange"
-        tools:layout="@layout/fragment_exchange" >
+        tools:layout="@layout/fragment_exchange">
         <action
             android:id="@+id/action_exchangeFragment_to_exchangeBookDetailsFragment"
             app:destination="@id/exchangeBookDetailsFragment" />
@@ -87,7 +87,7 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_libraryBookDetailsFragment_to_libraryRequesterProfileFragment"
-            app:destination="@id/libraryRequesterProfileFragment"/>
+            app:destination="@id/libraryRequesterProfileFragment" />
     </fragment>
     <fragment
         android:id="@+id/libraryRequesterProfileFragment"
@@ -97,7 +97,7 @@
             android:id="@+id/action_libraryRequesterProfileFragment_to_libraryBookDetailsFragment"
             app:destination="@id/libraryBookDetailsFragment"
             app:popUpTo="@id/libraryBookDetailsFragment"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
     </fragment>
 
 </navigation>

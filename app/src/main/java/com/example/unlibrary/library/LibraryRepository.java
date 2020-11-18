@@ -10,6 +10,7 @@ package com.example.unlibrary.library;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -22,6 +23,7 @@ import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.FilterMap;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,6 +39,8 @@ import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -342,5 +346,37 @@ public class LibraryRepository {
         batch.commit()
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Delete book from the database.
+     *
+     * @param requestedUID   book object to be deleted from the database.
+     * @param  bookRequestedID
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
+        mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
+                .whereEqualTo("book", bookRequestedID)
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<Request> matchingRequests = task.getResult().toObjects(Request.class);
+    //                    if(matchingRequests.size() != 1) {   Uncomment when we can ensure user can't request same book twice
+    //                        Log.e(TAG, "The number of requests returned was unexpected");
+    //                        return; Is it safe to return here?
+    //                    }
+                        for (Request request : matchingRequests) {
+                            mDb.collection(REQUESTS_COLLECTION).document(request.getId())
+                                    .delete()
+                                    .addOnSuccessListener(onSuccessListener)
+                                    .addOnFailureListener(onFailureListener);
+                        }
+                    } else {
+                        Log.e(TAG, "Error in fetching requests", task.getException());
+                    }
+
+
+                });
     }
 }
