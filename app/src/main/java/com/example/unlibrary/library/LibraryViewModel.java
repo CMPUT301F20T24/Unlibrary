@@ -418,7 +418,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Autofill the current book from scan data
      *
-     * @param isbn isbn that was scanned
+     * @param isbn scanned isbn
      */
     private void scanAutoFill(String isbn) {
         if (isbn == null || isbn.isEmpty()) {
