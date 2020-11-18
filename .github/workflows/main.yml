@@ -54,14 +54,13 @@ jobs:
 
       # Step 4: Run your unit tests
       - name: Set-up firestore emulator and run unit tests
-        shell: bash
-        env: 
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           pushd firestore-emulator
-          npm run firebase -- emulators:exec --only firestore --token "$FIREBASE_TOKEN" ../gradlew test
+          npm run firebase -- emulators:exec "../gradlew test -p ../" --only firestore --token "$FIREBASE_TOKEN"
           popd
-
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        
       # Step 4: Assemble debug apk to send to firebase test lab
       - name: Assemble Debug APK
         run: ./gradlew assemble
