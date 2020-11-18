@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,7 +49,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
      */
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        // Get ViewModel
         mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         // Setup data binding
         mBinding = FragmentLibraryBookDetailsBinding.inflate(inflater, container, false);
@@ -69,9 +70,10 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
                     .show();
         });
 
-        //Setup the list of requesters
+        // Setup the list of requesters
         RecyclerView recyclerView = mBinding.requestersList;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
         mViewModel.fetchRequestersForCurrentBook();
         RequestersRecyclerViewAdapter adapter = new RequestersRecyclerViewAdapter(mViewModel.getRequesters().getValue());
 
@@ -80,16 +82,20 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
 
         // Watch changes in requesters list and update the view accordingly
         mViewModel.getRequesters().observe(getViewLifecycleOwner(), adapter::setData);
+
+        // Add dividers between items in the RecyclerView
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+      
         mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.libraryBookFrame, mBinding.bookImageButton, mBinding.bookImage));
 
         return mBinding.getRoot();
     }
-  
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         mViewModel.detachRequestersListener();
     }
-  
 }
