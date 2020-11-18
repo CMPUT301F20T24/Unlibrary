@@ -8,13 +8,14 @@
 
 package com.example.unlibrary.library;
 
-import android.app.AlertDialog;
-import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -24,9 +25,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
+import com.example.unlibrary.util.BarcodeScanner;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -36,8 +40,11 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class LibraryBookDetailsFragment extends BookDetailFragment {
 
+    public static final String SCAN_TAG = "com.example.unlibrary.library.LibraryBookDetailsFragment";
     private FragmentLibraryBookDetailsBinding mBinding;
     private LibraryViewModel mViewModel;
+    private Uri mHandoffIsbnUri;
+    private ActivityResultLauncher<Uri> mScanBarcodeContract;
 
     /**
      * Setup the fragment
@@ -59,6 +66,30 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
         // Setup observers
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.editBook).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
+
+        // Setup scanBarcode contract
+        mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
+            if (result) {
+                BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), mHandoffIsbnUri, SCAN_TAG, mViewModel);
+            } else {
+                showToast("Failed to get photo.");
+            }
+        });
+
+        // Setup handoff button. This is done in fragment because camera requires a lot of access to application context
+        mBinding.handoffBook.setOnClickListener(v -> {
+            try {
+                mHandoffIsbnUri = ((MainActivity) requireActivity()).buildFileUri();
+                mScanBarcodeContract.launch(mHandoffIsbnUri);
+            } catch (IOException e) {
+                showToast("Failed to build uri.");
+            }
+        });
+        // Long click as backup for books where you can't scan the isbn
+        mBinding.handoffBook.setOnLongClickListener(v -> {
+            mViewModel.handoff(mViewModel.getCurrentBook().getValue().getIsbn());
+            return true;
+        });
 
         // Setup delete button. This is done in fragment because a confirmation dialog should be displayed first
         mBinding.deleteBook.setOnClickListener(v -> {
@@ -97,5 +128,14 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
     public void onDestroyView() {
         super.onDestroyView();
         mViewModel.detachRequestersListener();
+    }
+
+    /**
+     * Utility to show a toast via the MainActivity.
+     *
+     * @param msg Message to show
+     */
+    private void showToast(String msg) {
+        ((MainActivity) requireActivity()).showToast(msg);
     }
 }
