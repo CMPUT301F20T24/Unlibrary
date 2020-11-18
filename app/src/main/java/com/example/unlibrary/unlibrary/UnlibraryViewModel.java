@@ -85,7 +85,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
      * @return ShowHandoffButton LiveData
      */
     public LiveData<Boolean> showHandoffButton() {
-        // TODO do I need to worry about state of request at all?
         return Transformations.map(mCurrentBook, input -> {
             if (input.getStatus() == Book.Status.ACCEPTED && input.getIsReadyForHandoff()) {
                 return true;
