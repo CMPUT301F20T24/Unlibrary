@@ -50,6 +50,7 @@ public class ExchangeRepository {
     // Algolia fields
     private static final String ALGOLIA_INDEX_NAME = "books";
     private static final String ALGOLIA_ID_FIELD = "id";
+    private String previousSearch;
 
     private static final String TAG = ExchangeRepository.class.getSimpleName();
 
@@ -95,6 +96,11 @@ public class ExchangeRepository {
                 .whereIn(STATUS, Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED))
                 .whereNotEqualTo(OWNER, FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((value, error) -> {
+                    if (previousSearch != null) {
+                        search(previousSearch);
+                        return;
+                    }
+
                     if (error != null) {
                         Log.w(TAG, error);
                         return;
@@ -150,6 +156,10 @@ public class ExchangeRepository {
      * @param keywords space separated words to search for
      */
     public void search(String keywords) {
+        // Store search so that in the event a collection change happens, repository can proactively
+        // update query
+        previousSearch = keywords;
+
         Index index = mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME);
         Query query = new Query(keywords).setAttributesToRetrieve(ALGOLIA_ID_FIELD);
 
@@ -197,7 +207,7 @@ public class ExchangeRepository {
      * Fetches the owner for a newly selected book by clearing the previous book's owner information and
      * adding a snapshot listener for the book's owner
      *
-     * @param currentBookID
+     * @param currentBookOwnerID
      */
     public void fetchOwnerForCurrentBook(String currentBookOwnerID) {
         mCurrentBookOwner.setValue(new User());
