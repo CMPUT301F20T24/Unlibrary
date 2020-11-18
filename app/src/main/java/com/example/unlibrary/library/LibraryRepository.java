@@ -19,8 +19,12 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -44,6 +48,8 @@ public class LibraryRepository {
 
     private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
+    private static final String REQUESTS_COLLECTION = "requests";
+    private static final String USERS_COLLECTION = "users";
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
 
@@ -55,8 +61,10 @@ public class LibraryRepository {
     private final Client mAlgoliaClient;
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
-    private ListenerRegistration mListenerRegistration;
+    private ListenerRegistration mBooksListenerRegistration;
+    private ListenerRegistration mRequestsListenerRegistration;
     private MutableLiveData<List<Book>> mBooks;
+    private MutableLiveData<List<User>> mCurrentBookRequesters;
     private FilterMap mFilter;
 
     /**
@@ -68,6 +76,7 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
+        mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
         this.mFilter = new FilterMap();
         attachListener();
     }
@@ -88,7 +97,7 @@ public class LibraryRepository {
             query = query.whereIn("status", statusValues);
         }
 
-        mListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
+        mBooksListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
             if (error != null) {
                 Log.w(TAG, "Error listening", error);
                 return;
@@ -176,7 +185,7 @@ public class LibraryRepository {
      * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
-        mListenerRegistration.remove();
+        mBooksListenerRegistration.remove();
     }
 
     /**
@@ -222,5 +231,75 @@ public class LibraryRepository {
         } catch (JSONException e) {
             Log.e(TAG, "createBook: Unable to push to algolia", e);
         }
+    }
+
+    /**
+     * Getter for the LiveData List of requesters on a selected book.
+     *
+     * @return LiveData<ArrayList < String>> This returns the books object.
+     */
+    public LiveData<List<User>> getRequesters() {
+        return this.mCurrentBookRequesters;
+    }
+
+    /**
+     * Fetches the list of requesters for a newly selected book by clearing the previous book's requesters and
+     * adding a snapshot listener for the new book's requesters
+     *
+     * @param currentBookID
+     */
+    public void fetchRequestersForCurrentBook(String currentBookID) {
+        // Clear the previous book's requesters in time before requesters list gets displayed
+        mCurrentBookRequesters.setValue(new ArrayList<>());
+        // Attach snapshot listener for requesters on current book
+        attachRequestsListener(currentBookID);
+    }
+
+    /**
+     * Attaches snapshot listener for requests on a given book
+     *
+     * @param bookID requests on this book will be listened to
+     */
+    public void attachRequestsListener(String bookID) {
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo("book", bookID);
+
+        // TODO only use getDocumentChanges instead of rebuilding the entire list
+        mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.w(TAG, "Error fetching requests for book" + bookID, error);
+                return;
+            }
+
+            List<Request> requests = snapshot.toObjects(Request.class);
+
+            ArrayList<Task<DocumentSnapshot>> addRequesterTasks = new ArrayList<>();
+            ArrayList<User> requesters = new ArrayList<>();
+
+            for (Request r : requests) {
+                addRequesterTasks.add(
+                        mDb.collection(USERS_COLLECTION).document(r.getRequester()).get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    User requester = documentSnapshot.toObject(User.class);
+                                    requesters.add(requester);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Unable to get requester " + r.getRequester() + "from database", e);
+                                })
+                );
+            }
+
+
+            Tasks.whenAllComplete(addRequesterTasks)    //This task will never fail
+                    .addOnSuccessListener(aVoid -> {
+                        mCurrentBookRequesters.setValue(requesters);
+                    });
+        });
+    }
+
+    /**
+     * Removes the current snapshot listener for requesters
+     */
+    public void detachRequestersListener() {
+        mRequestsListenerRegistration.remove();
     }
 }

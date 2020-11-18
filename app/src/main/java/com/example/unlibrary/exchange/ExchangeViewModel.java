@@ -21,6 +21,7 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.SingleLiveEvent;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final LiveData<User> mCurrentBookOwner;
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
@@ -45,6 +47,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     public ExchangeViewModel(ExchangeRepository exchangeRepository) {
         mExchangeRepository = exchangeRepository;
         mBooks = mExchangeRepository.getBooks();
+        mCurrentBookOwner = mExchangeRepository.getOwner();
     }
 
     /**
@@ -163,5 +166,21 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public void search(String keywords) {
         mExchangeRepository.search(keywords);
+    }
+        
+    /**
+     * Fetches owner for current book
+     */
+    public void fetchOwnerForCurrentBook() {
+        mExchangeRepository.fetchOwnerForCurrentBook(mCurrentBook.getValue().getOwner());
+    }
+
+    /**
+     * Getter for the mCurrentBookOwner object.
+     *
+     * @return LiveData<User> This returns the mCurrentBookOwner object
+     */
+    public LiveData<User> getCurrentBookOwner() {
+        return this.mCurrentBookOwner;
     }
 }
