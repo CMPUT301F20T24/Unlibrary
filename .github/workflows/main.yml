@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [8.x, 10.x, 12.x]
+        node-version: [12.x]
 
     steps:
       - name: Clone Repo
@@ -33,7 +33,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: |
+      - name: Install firestore-emulator
+        run: |
           pushd firestore-emulator
           npm install
           popd
@@ -51,8 +52,8 @@ jobs:
       - name: Run Android Linter
         run: ./gradlew lint
 
-      # Run android tests after setting up firestore emulator
-      - run: |
+      - name: Set-up firestore emulator and run Android tests
+        run: |
           pushd firestore-emulator
           npm run firebase -- emulators:exec --only firestore --token $FIREBASE_TOKEN ../gradlew test
           popd
