@@ -40,4 +40,6 @@
     <string name="accepted">Accepted</string>
     <string name="borrowed">Borrowed</string>
     <string name="requesters">Requesters</string>
+    <string name="accept_request_fab_description">Accept request</string>
+    <string name="decline_request_fab_description">Decline request</string>
 </resources>

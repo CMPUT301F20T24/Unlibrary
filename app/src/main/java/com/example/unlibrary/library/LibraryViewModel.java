@@ -59,6 +59,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private LiveData<List<Book>> mBooks;
     private final LibraryRepository mLibraryRepository;
     private final LiveData<List<User>> mCurrentBookRequesters;
+    private User mSelectedRequester = new User();
 
     public enum InputKey {
         TITLE,
@@ -490,6 +491,20 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     protected void detachRequestersListener() {
         mLibraryRepository.detachRequestersListener();
+    }
+
+    public void selectRequester(View v, int position) {
+        mSelectedRequester = mCurrentBookRequesters.getValue().get(position);
+       //mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentTo____());
+
+    }
+
+    public void acceptSelectedRequester() {
+
+    }
+
+    public void declineSelectedRequester() {
+
     }
 
 }
