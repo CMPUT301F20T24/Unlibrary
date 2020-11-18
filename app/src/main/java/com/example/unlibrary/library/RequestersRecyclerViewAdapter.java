@@ -21,15 +21,18 @@ import com.example.unlibrary.models.User;
 import java.util.List;
 
 public class RequestersRecyclerViewAdapter extends RecyclerView.Adapter<RequestersRecyclerViewAdapter.RequesterViewHolder> {
+
     protected List<User> mRequesters;
+    private RequestersRecyclerViewAdapter.OnItemClickListener mOnItemClickListener;
 
     /**
      * Constructs the RecyclerAdapter with an initial list of requesters (may be null).
      *
      * @param requesters initial list of requesters
      */
-    public RequestersRecyclerViewAdapter(List<User> requesters) {
+    public RequestersRecyclerViewAdapter(List<User> requesters, RequestersRecyclerViewAdapter.OnItemClickListener onItemClickListener) {
         mRequesters = requesters;
+        mOnItemClickListener = onItemClickListener;
     }
 
     /**
@@ -80,6 +83,20 @@ public class RequestersRecyclerViewAdapter extends RecyclerView.Adapter<Requeste
     }
 
     /**
+     * One parameter to the constructor of this adapter must implement this interface
+     * This ensures that
+     */
+    public interface OnItemClickListener {
+        /**
+         * Called when a requester in the requesters list is clicked.
+         *
+         * @param v        Card view
+         * @param position Position of card in the list
+         */
+        void onItemClicked(View v, int position);
+    }
+
+    /**
      * ViewHolder for the requester list recycler view.
      */
     public class RequesterViewHolder extends RecyclerView.ViewHolder {
@@ -97,7 +114,7 @@ public class RequestersRecyclerViewAdapter extends RecyclerView.Adapter<Requeste
 
                 @Override
                 public void onClick(View v) {
-                    //Navigate to new user profile fragment
+                    mOnItemClickListener.onItemClicked(v, getLayoutPosition());
                 }
             });
         }
