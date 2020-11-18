@@ -85,6 +85,19 @@
             app:destination="@id/libraryFragment"
             app:popUpTo="@+id/libraryFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_libraryBookDetailsFragment_to_libraryRequesterProfileFragment"
+            app:destination="@id/libraryRequesterProfileFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/libraryRequesterProfileFragment"
+        android:name="com.example.unlibrary.library.LibraryRequesterProfileFragment"
+        tools:layout="@layout/fragment_library_requester_profile">
+        <action
+            android:id="@+id/action_libraryRequesterProfileFragment_to_libraryBookDetailsFragment"
+            app:destination="@id/libraryBookDetailsFragment"
+            app:popUpTo="@id/libraryBookDetailsFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
 </navigation>

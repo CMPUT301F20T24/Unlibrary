@@ -179,6 +179,16 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
+     * Getter for the mSelectedRequester object.
+     *
+     * @return User the requester that the user has selected
+     */
+    public User getSelectedRequester() {
+        return mSelectedRequester;
+    }
+
+
+    /**
      * Cleans up resources, removes the snapshot listener from the repository.
      */
     @Override
@@ -572,16 +582,16 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     public void selectRequester(View v, int position) {
         mSelectedRequester = mCurrentBookRequesters.getValue().get(position);
-       //mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentTo____());
+        mNavigationEvent.setValue( LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryRequesterProfileFragment());
 
     }
 
     public void acceptSelectedRequester() {
-
+        //mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
     }
 
     public void declineSelectedRequester() {
-
+        mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
     }
 
 }
