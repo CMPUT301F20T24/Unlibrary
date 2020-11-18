@@ -81,7 +81,6 @@ public class UnlibraryBookDetailsFragment extends BookDetailFragment {
         });
         // Long click as backup for books where you can't scan the isbn
         mBinding.handBook.setOnLongClickListener(v -> {
-            // TODO implement some sort of dialog to force user to reenter isbn and verify they have the book in hand?
             mViewModel.handoff(mViewModel.getCurrentBook().getValue().getIsbn());
             return true;
         });
