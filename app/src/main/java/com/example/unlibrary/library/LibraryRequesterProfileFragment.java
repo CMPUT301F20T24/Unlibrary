@@ -38,6 +38,7 @@ public class LibraryRequesterProfileFragment extends Fragment {
 
         // Setup observers
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.getRoot()).navigate(navDirections));
+        mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
 
         // Setup decline button. This is done in fragment because a confirmation dialog should be displayed first
         mBinding.declineRequest.setOnClickListener(v -> {

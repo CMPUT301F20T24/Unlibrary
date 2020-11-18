@@ -505,7 +505,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     public void selectRequester(View v, int position) {
         mSelectedRequester = mCurrentBookRequesters.getValue().get(position);
-        mNavigationEvent.setValue( LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryRequesterProfileFragment());
+        mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryRequesterProfileFragment());
 
     }
 
@@ -514,7 +514,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     public void declineSelectedRequester() {
-        mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
+        mLibraryRepository.declineRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(),
+                o -> {
+                    mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
+                },
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to decline request");
+                    Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID());
+                });
     }
 
 }
