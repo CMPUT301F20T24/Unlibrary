@@ -56,7 +56,7 @@ jobs:
       - name: Set-up firestore emulator and run unit tests
         run: |
           pushd firestore-emulator
-          npm run firebase -- emulators:exec "../gradlew test -p ../" --only firestore --token "$FIREBASE_TOKEN"
+          npm run firebase -- emulators:exec "../gradlew test -p ../" --token "$FIREBASE_TOKEN"
           popd
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
