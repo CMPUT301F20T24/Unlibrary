@@ -147,7 +147,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         mCurrentBook.setValue(book);
         mExchangeRepository.fetchCurrentRequest(mCurrentBook.getValue());
         mNavigationEvent.setValue(ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment());
-
     }
 
     /**
@@ -203,7 +202,11 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         return this.mCurrentBookOwner;
     }
 
-    // TODO
+    /**
+     * Should the request button be shown i.e. has the book already been requested or not.
+     *
+     * @return Show the book or not
+     */
     public LiveData<Boolean> showRequestButton() {
         return Transformations.map(mCurrentRequest, input -> input == null);
     }

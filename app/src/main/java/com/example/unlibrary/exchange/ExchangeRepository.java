@@ -211,12 +211,20 @@ public class ExchangeRepository {
                 });
     }
 
-    // TODO
+    /**
+     * Get the request associated with the current book.
+     *
+     * @return request
+     */
     public LiveData<Request> getCurrentRequest() {
         return this.mCurrentRequest;
     }
 
-    // TODO
+    /**
+     * Fetch the request associated with the current book.
+     *
+     * @param book current book
+     */
     public void fetchCurrentRequest(Book book) {
         // Set request so that UI thinks that it shouldn't display request button right away
         // This prevents flashing button which could be bad b/c then double requests could be made
@@ -226,6 +234,7 @@ public class ExchangeRepository {
                 .whereEqualTo("book", book.getId())
                 .whereEqualTo("requester", mUID)
                 .whereNotEqualTo("state", Request.State.ARCHIVED.toString());
+
         query.get().addOnSuccessListener(qds -> {
             List<DocumentSnapshot> documents = qds.getDocuments();
             if (documents.size() == 1) {
@@ -238,7 +247,14 @@ public class ExchangeRepository {
         }).addOnFailureListener(e -> Log.e(TAG, "Unable to get current request", e));
     }
 
-    // TODO
+    /**
+     * Request a book.
+     *
+     * @param request request to be created
+     * @param book book to associate request with
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
     public void sendRequest(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         WriteBatch batch = mDb.batch();
 
