@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start-emulator": "firebase emulators:start",
     "test": "firebase emulators:exec \"../gradlew test -p ../\" ",
     "firebase": "firebase"
   },
