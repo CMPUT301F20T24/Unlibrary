@@ -8,9 +8,8 @@
 
 package com.example.unlibrary.models;
 
-import androidx.core.util.Pair;
-
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.GeoPoint;
 
 /**
  * Represents a borrow request in our application domain.
@@ -21,7 +20,7 @@ public class Request {
     private String mRequester;
     private String mBook;
     private State mState;
-    private Pair<Double, Double> mLocation; // TODO: Check whether this can be stored in Firestore
+    private GeoPoint mLocation;
 
     /**
      * Empty constructor. Needed for Firestore.
@@ -137,7 +136,7 @@ public class Request {
      *
      * @return latitude-longitude pair of handoff location.
      */
-    public Pair<Double, Double> getLocation() {
+    public GeoPoint getLocation() {
         return mLocation;
     }
 
@@ -147,7 +146,7 @@ public class Request {
      *
      * @param location described in latitude-longitude
      */
-    public void setLocation(Pair<Double, Double> location) {
+    public void setLocation(GeoPoint location) {
         mLocation = location;
     }
 
