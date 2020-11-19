@@ -27,6 +27,7 @@ import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
+import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.util.SingleLiveEvent;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -72,7 +73,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     @ViewModelInject
     public LibraryViewModel(LibraryRepository libraryRepository) {
         // Initialize filter to be false for everything
-        this.mFilter = new FilterMap();
+        this.mFilter = new FilterMap(true);
         this.mLibraryRepository = libraryRepository;
         this.mBooks = this.mLibraryRepository.getBooks();
         this.mCurrentBookRequesters = this.mLibraryRepository.getRequesters();
@@ -253,9 +254,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 book.setIsReadyForHandoff(false); // A book is by default not ready for handoff
                 mLibraryRepository.createBook(book,
                         o -> {
-                            Book bookWithId = mCurrentBook.getValue();
-                            bookWithId.setId(o.getId());
-                            mCurrentBook.setValue(bookWithId);
                             mIsLoading.setValue(false);
                             mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
                         },

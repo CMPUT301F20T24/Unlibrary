@@ -44,6 +44,7 @@
                     android:layout_margin="16dp"
                     android:layout_marginBottom="4dp"
                     android:contentDescription="@string/handoff_book"
+                    android:visibility="@{viewModel.showHandoffButton() ? View.VISIBLE : View.GONE}"
                     app:backgroundTint="@color/colorAccent"
                     app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
                     app:layout_constraintEnd_toStartOf="@+id/edit_book"

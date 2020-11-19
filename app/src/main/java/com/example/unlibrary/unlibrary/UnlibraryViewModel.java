@@ -22,6 +22,7 @@ import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.exchange.ExchangeFragmentDirections;
+import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
@@ -43,6 +44,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessMsgEvent = new SingleLiveEvent<>();
+    private FilterMap mFilter;
 
     /**
      * Constructor for the UnLibrary ViewModel. Binds the list of books to return from the
@@ -53,6 +55,27 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         mUnlibraryRepository = unlibraryRepository;
         mBooks = mUnlibraryRepository.getBooks();
         mCurrentBookOwner = mUnlibraryRepository.getOwner();
+        mFilter = new FilterMap(false);
+    }
+
+
+    /**
+     * Get the current filter settings.
+     *
+     * @return FilterMap object
+     */
+    public FilterMap getFilter() {
+        return mFilter;
+    }
+
+    /**
+     * Configure the filter settings and trigger a corresponding update to the books data.
+     *
+     * @param filter FilterMap object
+     */
+    public void setFilter(FilterMap filter) {
+        mFilter.setMap(filter.getMap());
+        mUnlibraryRepository.setFilter(mFilter);
     }
 
     /**
