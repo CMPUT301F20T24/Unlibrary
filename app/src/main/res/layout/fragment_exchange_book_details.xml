@@ -131,18 +131,6 @@
                 app:layout_constraintVertical_bias="0.08"
                 tools:layout_editor_absoluteX="0dp">
 
-
-                <ImageView
-                    android:id="@+id/userImage"
-                    android:layout_width="50dp"
-                    android:layout_height="0dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_person_24px"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintDimensionRatio="1:1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
                 <TextView
                     android:id="@+id/ownerUsername"
                     android:layout_width="wrap_content"
@@ -153,7 +141,7 @@
                     android:maxLines="2"
                     android:text="@{viewModel.currentBookOwner.username}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                    app:layout_constraintStart_toEndOf="@+id/userImage"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Username" />
 
@@ -167,7 +155,7 @@
                     android:maxLines="1"
                     android:text="@{viewModel.currentBookOwner.email}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    app:layout_constraintStart_toEndOf="@id/userImage"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ownerUsername"
                     tools:text="email@email.com" />
 
