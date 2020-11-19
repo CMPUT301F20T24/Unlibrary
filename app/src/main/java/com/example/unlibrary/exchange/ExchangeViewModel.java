@@ -11,6 +11,7 @@ package com.example.unlibrary.exchange;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -23,6 +24,8 @@ import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.List;
 
@@ -108,13 +111,26 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         }
 
         // Build request
+        // TODO do this as a write batch
         Request request = new Request(mExchangeRepository.getUid(), mCurrentBook.getValue().getId());
         mExchangeRepository.createRequest(request,
                 o -> {
                     // Update book status
-
-                    mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
-                    mSuccessRequestMsgEvent.setValue("Request successfully sent");
+                    // First assert that book is in AVAILABLE state (only state that it must be updated from
+                    Book book = mCurrentBook.getValue();
+                    if (book.getStatus() == Book.Status.AVAILABLE) {
+                        book.setStatus(Book.Status.REQUESTED);
+                        mExchangeRepository.updateBook(book, aVoid -> {
+                            mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
+                            mSuccessRequestMsgEvent.setValue("Request successfully sent");
+                        }, e -> {
+                            mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
+                            mFailureMsgEvent.setValue("Failed to update status of book");
+                        });
+                    } else if (book.getStatus() != Book.Status.REQUESTED) {
+                        // Requested is the only other valid state here. If it is otherwise we should log it
+                        Log.e(TAG, "Invalid state " + book.getStatus().toString() + " for book " + book.getId());
+                    }
                 },
                 e -> {
                     mFailureMsgEvent.setValue("Failed to send request.");

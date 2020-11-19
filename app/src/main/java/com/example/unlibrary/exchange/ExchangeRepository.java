@@ -73,7 +73,7 @@ public class ExchangeRepository {
         mAlgoliaClient = algoliaClient;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mCurrentBookOwner = new MutableLiveData<>(new User());
-        mCurrentRequest = new MutableLiveData<>(null);
+        mCurrentRequest = new MutableLiveData<>(new Request());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         // TODO: make sure user is authenticated
@@ -231,7 +231,9 @@ public class ExchangeRepository {
 
     // TODO
     public void fetchCurrentRequest(Book book) {
-        mCurrentRequest.setValue(null);
+        // Set request so that UI thinks that it shouldn't display request button right away
+        // This prevents flashing button which could be bad b/c then double requests could be made
+        mCurrentRequest.setValue(new Request());
 
         com.google.firebase.firestore.Query query = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo("book", book.getId())
@@ -241,9 +243,25 @@ public class ExchangeRepository {
             List<DocumentSnapshot> documents = qds.getDocuments();
             if (documents.size() == 1) {
                 mCurrentRequest.setValue(documents.get(0).toObject(Request.class));
-            } else if (documents.size() != 0) {
-                Log.e(TAG, "Only one request should be associated with book.");
+            } else if (documents.size() == 0) {
+                mCurrentRequest.setValue(null);
+            } else {
+                Log.e(TAG, "Only up to one request should be associated with book.");
             }
         }).addOnFailureListener(e -> Log.e(TAG, "Unable to get current request", e));
+    }
+
+    /**
+     * Update a book document.
+     *
+     * @param book              book object to be updated in the database.
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
+        mDb.collection(BOOK_COLLECTION).document(book.getId())
+                .set(book)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 }
