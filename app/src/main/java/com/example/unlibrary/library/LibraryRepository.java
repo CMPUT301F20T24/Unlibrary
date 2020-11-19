@@ -365,6 +365,7 @@ public class LibraryRepository {
                 .addOnFailureListener(onFailureListener);
     }
 
+
     /**
      * Delete book from the database.
      * Make the required changes in FireBase to decline a request
