@@ -29,7 +29,6 @@ import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.util.SingleLiveEvent;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -67,13 +66,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private LatLng mAcceptedRequestLocation = new LatLng(53.5461, -113.4938); // default is Edmonton
     private LiveData<List<User>> mCurrentBookRequesters;
     private User mSelectedRequester = new User();
-    private MutableLiveData<LatLng> mAcceptedRequestLocation = new MutableLiveData<>(); // default is Edmonton
-
-    private LiveData<Boolean> mFetchHandoffLocation = Transformations.switchMap(mCurrentBookStatus, status -> Transformations.map(mCurrentBookRequesters, requesters -> status == Book.Status.ACCEPTED && requesters.size() == 1));
-
-    public LiveData<Boolean> shouldFetchHandoffLocation() {
-        return mFetchHandoffLocation;
-    }
+    private MutableLiveData<LatLng> mAcceptedRequestLocation = new MutableLiveData<>();
+    private LiveData<Boolean> mFetchHandoffLocation =
+            Transformations.switchMap(mCurrentBookStatus, status ->
+                    Transformations.map(mCurrentBookRequesters, requesters ->
+                            status == Book.Status.ACCEPTED && requesters.size() == 1));
 
     public enum InputKey {
         TITLE,
@@ -141,6 +138,10 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     public LiveData<Boolean> showHandoffLocation() {
         return Transformations.map(mCurrentBook, input -> input.getStatus() == Book.Status.ACCEPTED);
+    }
+
+    public LiveData<Boolean> shouldFetchHandoffLocation() {
+        return mFetchHandoffLocation;
     }
 
     /**
@@ -662,7 +663,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 o -> mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment()),
                 e -> {
                     mFailureMsgEvent.setValue("Failed to accept request");
-                    Log.e(TAG, "Failed to accept request of requester " + mSelectedRequester.getUID());
+                    Log.e(TAG, e.toString());
                 });
     }
 
@@ -671,6 +672,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 o -> mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment()),
                 e -> {
                     mFailureMsgEvent.setValue("Failed to update handoff location");
+                    Log.e(TAG, e.toString());
                 });
     }
 
@@ -679,7 +681,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 geoPoint -> mAcceptedRequestLocation.setValue(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())),
                 e -> {
                     mFailureMsgEvent.setValue("Failed to get handoff location");
-                    Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID());
+                    Log.e(TAG, e.toString());
                 });
     }
 

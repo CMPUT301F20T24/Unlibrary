@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
+import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.models.Book;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -131,13 +132,14 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
         // Required to forward onCreate for mapView in lite mode
         mBinding.map.onCreate(savedInstanceState);
 
+        // Fetch handoff location
         mViewModel.shouldFetchHandoffLocation().observe(getViewLifecycleOwner(), s -> {
             if (s) {
                 mViewModel.fetchHandoffLocation();
             }
         });
 
-        // set up map
+        // Set up map
         mViewModel.getAcceptedRequestLocation().observe(getViewLifecycleOwner(), s ->
                 mBinding.map.getMapAsync(this));
 

@@ -69,6 +69,8 @@ public class LibraryRepository {
     private static final String STATUS_FIELD = "status";
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
+    private static final String REQUESTER = "requester";
+    private static final String LOCATION = "location";
 
     // Algolia field names
     // TODO: Consider using POJOs for algolia
@@ -428,38 +430,36 @@ public class LibraryRepository {
     }
     public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo("requester", requestedUID)
-                .whereEqualTo("book", bookRequestedID)
+                .whereEqualTo(REQUESTER, requestedUID)
+                .whereEqualTo(BOOK, bookRequestedID)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         List<Request> matchingRequests = task.getResult().toObjects(Request.class);
-                        //                    if(matchingRequests.size() != 1) {   Uncomment when we can ensure user can't request same book twice
-                        //                        Log.e(TAG, "The number of requests returned was unexpected");
-                        //                        return; Is it safe to return here?
-                        //                    }
+
                         Request request = matchingRequests.get(0);
+                        String id = request.getId();
                         request.setLocation(new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
                         request.setState(Request.State.ACCEPTED);
 
-                        mDb.collection(REQUESTS_COLLECTION).document(request.getId())
+                        mDb.collection(REQUESTS_COLLECTION).document(id)
                                 .set(request)
                                 .addOnSuccessListener(s -> {
                                     // Update the Book Document to accepted
                                     mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
-                                            .update(STATUS, "ACCEPTED")
+                                            .update(STATUS, Status.ACCEPTED.toString())
                                             .addOnSuccessListener(onSuccessListener);
 
                                     // Decline all other requests for the Book
                                     mDb.collection(REQUESTS_COLLECTION)
-                                            .whereEqualTo("book", bookRequestedID)
-                                            .whereNotEqualTo("requester", requestedUID)
+                                            .whereEqualTo(BOOK, bookRequestedID)
+                                            .whereNotEqualTo(REQUESTER, requestedUID)
                                             .get()
                                             .addOnCompleteListener(otherRequestersTask -> {
                                                 List<Request> otherRequests = otherRequestersTask.getResult().toObjects(Request.class);
                                                 for (Request r : otherRequests) {
                                                     mDb.collection(REQUESTS_COLLECTION).document(r.getId())
-                                                            .update(STATE, "DECLINED")
+                                                            .update(STATE, Request.State.DECLINED.toString())
                                                             .addOnSuccessListener(onSuccessListener)
                                                             .addOnFailureListener(onFailureListener);
                                                 }
@@ -476,14 +476,14 @@ public class LibraryRepository {
 
     public void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo("requester", requestedUID)
-                .whereEqualTo("book", bookRequestedID)
+                .whereEqualTo(REQUESTER, requestedUID)
+                .whereEqualTo(BOOK, bookRequestedID)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Request request = task.getResult().toObjects(Request.class).get(0);
                         mDb.collection(REQUESTS_COLLECTION).document(request.getId())
-                                .update("location", new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
+                                .update(LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
                                 .addOnSuccessListener(onSuccessListener)
                                 .addOnFailureListener(onFailureListener);
                     }
@@ -495,8 +495,8 @@ public class LibraryRepository {
         String userID = user.getUID();
 
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo("book", bookID)
-                .whereEqualTo("requester", userID)
+                .whereEqualTo(BOOK, bookID)
+                .whereEqualTo(REQUESTER, userID)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
