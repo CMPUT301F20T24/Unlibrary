@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
@@ -29,7 +28,6 @@ import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
 
 import java.util.List;
-import java.util.Observer;
 
 /**
  * Manages the Unlibrary flow business logic. Connects the  fragments to the repository.
