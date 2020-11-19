@@ -597,7 +597,20 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 },
                 e -> {
                     mFailureMsgEvent.setValue("Failed to decline request");
-                    Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID());
+                    Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID(), e);
+                },
+                o -> {
+                    Book book = mCurrentBook.getValue();
+                    book.setStatus(Book.Status.AVAILABLE);
+                    mCurrentBook.setValue(book);
+                },
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to change book status to AVAILABLE");
+                    Log.e(TAG, "Failed to change status of book with ID " + mCurrentBook.getValue().getId() + " back to AVAILABLE", e);
+                },
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to fetch requests; Book status may be wrong");
+                    Log.e(TAG, "Failed to fetch requests on book with ID " + mCurrentBook.getValue().getId() + " to determine if status should be changed after declining request", e);
                 });
     }
 

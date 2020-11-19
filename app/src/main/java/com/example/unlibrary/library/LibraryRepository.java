@@ -9,6 +9,7 @@
 package com.example.unlibrary.library;
 
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -20,6 +21,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Book.Status;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.FilterMap;
@@ -272,7 +274,9 @@ public class LibraryRepository {
      * @param bookID requests on this book will be listened to
      */
     public void attachRequestsListener(String bookID) {
-        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, bookID).whereNotEqualTo(STATE, Request.State.ARCHIVED);
+        Query query = mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo("book", bookID)
+                .whereEqualTo("state", Status.REQUESTED.name());
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -351,32 +355,60 @@ public class LibraryRepository {
     /**
      * Delete book from the database.
      *
-     * @param requestedUID   book object to be deleted from the database.
-     * @param  bookRequestedID
-     * @param onSuccessListener code to call on success
-     * @param onFailureListener code to call on failure
+     * @param requestedUID           book object to be deleted from the database.
+     * @param bookRequestedID
+     * @param onDeclineSuccess       code to call on successfully declining request
+     * @param onDeclineFailure       code to call on failure to decline request
+     * @param onStatusChangeFailure  code to call on failure to change status of book back to ACCEPTED (if required)
+     * @param onFetchRequestsFailure code to call on failure of fetching requests necessary to potentially change status of book to ACCEPTED
      */
-    public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
+    public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, OnSuccessListener<? super Void> onStatusChangeSuccess, OnFailureListener onStatusChangeFailure, OnFailureListener onFetchRequestsFailure) {
+        // Find the Request document associated with the given book and requester
         mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
                 .whereEqualTo("book", bookRequestedID)
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<Request> matchingRequests = task.getResult().toObjects(Request.class);
-    //                    if(matchingRequests.size() != 1) {   Uncomment when we can ensure user can't request same book twice
-    //                        Log.e(TAG, "The number of requests returned was unexpected");
-    //                        return; Is it safe to return here?
-    //                    }
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        List<Request> matchingRequests = queryDocumentSnapshots.toObjects(Request.class);
+//                        if(matchingRequests.size() != 1) {   Uncomment when we can ensure user can't request same book twice
+//                            Log.e(TAG, "The number of requests returned was unexpected");
+//                            return; Is it safe to return here?
+//                        }
+                        // Change the state of the request to DECLINED
                         for (Request request : matchingRequests) {
                             mDb.collection(REQUESTS_COLLECTION).document(request.getId())
-                                    .delete()
-                                    .addOnSuccessListener(onSuccessListener)
-                                    .addOnFailureListener(onFailureListener);
+                                    .update("state", Status.DECLINED.name())
+                                    .addOnSuccessListener(onDeclineSuccess)
+                                    .addOnFailureListener(onDeclineFailure);
                         }
-                    } else {
-                        Log.e(TAG, "Error in fetching requests", task.getException());
+
+                        // After declining this request, if there are no other non-declined requests, we need to change
+                        // status of the book in the books collection to AVAILABLE
+                        mDb.collection(REQUESTS_COLLECTION).whereEqualTo("book", bookRequestedID)
+                                .get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        List<Request> requestsOnCurrentBook = queryDocumentSnapshots.toObjects(Request.class);
+                                        boolean onlyDeclinedRequestsExist = true;
+                                        for (Request request : requestsOnCurrentBook) {
+                                            if (!request.getState().toString().equals(Status.DECLINED.name())) {
+                                                onlyDeclinedRequestsExist = false;
+                                                break;
+                                            }
+                                        }
+                                        if (onlyDeclinedRequestsExist) {
+                                            mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
+                                                    .update("status", Status.AVAILABLE.name())
+                                                    .addOnSuccessListener(onStatusChangeSuccess)
+                                                    .addOnFailureListener(onStatusChangeFailure);
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(onFetchRequestsFailure);
                     }
-
-
-                });
+                })
+                .addOnFailureListener(onDeclineFailure);
     }
 }
