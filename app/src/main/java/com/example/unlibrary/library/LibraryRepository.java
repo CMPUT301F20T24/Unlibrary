@@ -369,13 +369,16 @@ public class LibraryRepository {
 
 
     /**
-     * Delete book from the database.
      * Make the required changes in FireBase to decline a request
      *
-     * @param requestedUID     User ID of requester who made the request
-     * @param bookRequestedID  Book ID of book that was requested
-     * @param onDeclineSuccess code to call on successfully declining request
-     * @param onDeclineFailure code to call on failure to decline request
+     * @param requestedUID           User ID of requester who made the request
+     * @param bookRequestedID        Book ID of book that was requested
+     * @param onDeclineSuccess       code to call on successfully declining request
+     * @param onDeclineFailure       code to call on failure to decline request
+     * @param onStatusChangeSuccess  code to call when status of book is changed successfully from REQUESTED to ACCEPTED
+     *                               (only if there are no more active requests on the book after declining this one)
+     * @param onStatusChangeFailure  code to call on failure to change status of book back to ACCEPTED (if required)
+     * @param onFetchRequestsFailure code to call on failure of fetching requests necessary to potentially change status of book to ACCEPTED
      */
     public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, Runnable onRequestNotFoundInDB) {
         // Query to find all documents in Requests collection associated with the given book
