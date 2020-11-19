@@ -9,7 +9,6 @@ package com.example.unlibrary.exchange;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -153,7 +152,7 @@ public class ExchangeRepository {
     /**
      * Perform full search in title and author using Algolia. Full book details is fetched from
      * Firestore. Updates list of books at the end.
-     *
+     * <p>
      * TODO: Decide what to do when keywords is empty and what happens when someone adds a new book (go with listener above or do re-search)
      *
      * @param keywords space separated words to search for
@@ -195,8 +194,10 @@ public class ExchangeRepository {
                 Log.e(TAG, "Add searched books error", e);
             });
         });
-    };
-        
+    }
+
+    ;
+
     /**
      * Getter for the owner of the book.
      *
