@@ -1,0 +1,98 @@
+@startuml
+'------------------- View  -------------------------------
+class ProfileFragment {
+-FragmentProfileBinding mBinding
+-ProfileViewModel mViewModel
+-EditingState mEditingState
+
++void onCreate(Bundle savedInstanceState)
++View onCreateView(LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState)
++void logout()
+}
+
+class EditingState {
+-MutableLiveData<Boolean> isEditing
+-MutableLiveData<Boolean> isUpdating
++EditingState()
++LiveData<Boolean> getIsEditing()
++LiveData<Boolean> getIsUpdating()
++void editContent()
++void cancelUpdate()
++void confirmUpdate()
+}
+
+EditingState ..* ProfileFragment
+
+'------------------- ViewModel  -------------------------------
+class ProfileViewModel {
+-MutableLiveData<User> mUser
+-MutableLiveData<String> mPassword
+-SingleLiveEvent<Pair<AuthUtil.InputKey, String>> mInvalidInputEvent
+-SingleLiveEvent<Boolean> mProfileUpdateEvent
+-ProfileRepository mProfileRepository
+-String mOldUserName
+-String mOldEmail
+
++ProfileViewModel()
++void attemptUpdateProfile()
++void fetchUser()
++void resetUserInfo()
++void saveUserInfo()
++SingleLiveEvent<Boolean> getProfileUpdateEvent()
++SingleLiveEvent<Pair<AuthUtil.InputKey, String>> getInvalidInputEvent()
++MutableLiveData<String> getPassword()
++MutableLiveData<User> getUser()
+}
+
+ProfileViewModel <.. ProfileFragment: <<uses>>
+'------------------- Model -------------------------------
+package Firestore {
+
+}
+
+class User {
+-String mUID
+-String mUsername
+-String mEmail
++User()
++User(String id, String username, String email)
++String getUID()
++void setUID(String id)
++String getUsername()
++void setUsername(String username)
++String getEmail()
++void setEmail(String email)
+}
+
+User ..o ProfileRepository
+Firestore <.. ProfileRepository: <<accesses>>
+
+'------------------- Repositories   -------------------------------
+class ProfileRepository {
+-final static String USERS_COLLECTION
+-final static String UID_FIELD
+-final static String USERNAME_FIELD
+-final static String EMAIL_FIELD
+
+-FirebaseFirestore mDB
+-FirebaseAuth mAuth
+-FirebaseUser mUser
+-String mUID
++ProfileRepository()
++void fetchCurrentUser(OnFinishedFetchListener onFinished)
++void reAuthenticateUser(String email, String password, OnFinishedListener onFinishedListener)
++void updateUserProfile(User user, OnErrorListener onEmailErrorListener, OnErrorListener onUsernameErrorListener, OnFinishedListener onFinished)
+}
+ProfileRepository <.. ProfileViewModel: <<uses>>
+
+'------------------- Utils   -------------------------------
+class AuthUtil{
++enum InputKey
++String validateEmail(String email)
++String validatePassword(String password)
++String validateUsername(String username)
+}
+
+AuthUtil <.. ProfileViewModel: <<uses>>
+@enduml

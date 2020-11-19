@@ -28,11 +28,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Fragment to edit an existing book or create a new one.
  */
+@AndroidEntryPoint
 public class LibraryEditBookFragment extends Fragment {
 
+    public static final String SCAN_TAG = "com.example.unlibrary.library.LibraryEditBookFragment";
     private LibraryViewModel mViewModel;
     private FragmentLibraryEditBookBinding mBinding;
     private Uri mAutofillUri;
@@ -78,7 +82,7 @@ public class LibraryEditBookFragment extends Fragment {
         // Setup scanBarcode contract
         mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
             if (result) {
-                BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), mAutofillUri, mViewModel);
+                BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), mAutofillUri, SCAN_TAG, mViewModel);
             } else {
                 showToast("Failed to get photo.");
             }

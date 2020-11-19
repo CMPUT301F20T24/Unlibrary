@@ -12,21 +12,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
+import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentExchangeBookDetailsBinding;
-import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
-import com.example.unlibrary.models.Book;
 
 import org.jetbrains.annotations.NotNull;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * Fragment to display the details and requests upon a user owned book.
  */
-public class ExchangeBookDetailsFragment extends Fragment {
+@AndroidEntryPoint
+public class ExchangeBookDetailsFragment extends BookDetailFragment {
 
     private FragmentExchangeBookDetailsBinding mBinding;
 
@@ -50,7 +51,9 @@ public class ExchangeBookDetailsFragment extends Fragment {
         // Setup observer
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.addRequest).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
+        mViewModel.fetchOwnerForCurrentBook();
 
+        mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.exchangeBookFrame, mBinding.bookImageButton, mBinding.bookImage));
         return mBinding.getRoot();
     }
 }
