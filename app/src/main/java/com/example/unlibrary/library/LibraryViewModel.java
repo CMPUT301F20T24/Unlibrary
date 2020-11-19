@@ -16,6 +16,7 @@ import android.view.View;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
 
@@ -35,7 +36,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -104,6 +104,23 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LiveData<Boolean> getIsLoading() {
         return this.mIsLoading;
+    }
+
+    /**
+     * Should handoff button be shown.
+     *
+     * @return ShowHandoffButton LiveData
+     */
+    public LiveData<Boolean> showHandoffButton() {
+        return Transformations.map(mCurrentBook, input -> {
+            if (input.getStatus() == Book.Status.ACCEPTED) {
+                return true;
+            } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 
     /**
@@ -208,7 +225,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mLibraryRepository.setFilter(mFilter);
     }
 
-
     /**
      * Save the book that is currently being created or edited
      */
@@ -245,6 +261,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             if (book.getId() == null) {
                 // Book is new
                 book.setStatus(Book.Status.AVAILABLE); // A book is by default available
+                book.setIsReadyForHandoff(false); // A book is by default not ready for handoff
                 mLibraryRepository.createBook(book,
                         o -> {
                             Book bookWithId = mCurrentBook.getValue();
@@ -350,10 +367,71 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Code to be called when a barcode scan is finished successfully.
      *
+     * @param tag  Identifier for what is using scan barcode.
      * @param isbn isbn from successful scan
      */
     @Override
-    public void onFinishedScanSuccess(String isbn) {
+    public void onFinishedScanSuccess(String tag, String isbn) {
+        if (tag.equals(LibraryEditBookFragment.SCAN_TAG)) {
+            scanAutoFill(isbn);
+        } else if (tag.equals(LibraryBookDetailsFragment.SCAN_TAG)) {
+            handoff(isbn);
+        } else {
+            Log.w(TAG, "Invalid scan_tag encountered.");
+        }
+    }
+
+    /**
+     * Handoff a book to a chosen requester.
+     *
+     * @param isbn isbn of book to handoff
+     */
+    public void handoff(String isbn) {
+        // TODO handle getting back from ready to handoff state
+        Book book = mCurrentBook.getValue();
+        if (!book.getIsbn().equals(isbn)) {
+            mFailureMsgEvent.setValue("Isbn does not match current book.");
+            return;
+        }
+
+        if (book.getStatus() == Book.Status.ACCEPTED) {
+            // Giving book away
+            book.setIsReadyForHandoff(true);
+            mLibraryRepository.updateBook(book, aVoid -> mFailureMsgEvent.setValue("Book has been handed off."), e -> mFailureMsgEvent.setValue("Failed to handover book."));
+
+        } else if (book.getStatus() == Book.Status.BORROWED && book.getIsReadyForHandoff()) {
+            // Returning book
+            book.setIsReadyForHandoff(false);
+            book.setStatus(Book.Status.AVAILABLE);
+
+            // Get the one active request associated with this book
+            mLibraryRepository.getBorrowedRequest(book, queryDocumentSnapshots -> {
+                if (queryDocumentSnapshots.isEmpty()) {
+                    mFailureMsgEvent.setValue("Failed to find proper request to receive from.");
+                }
+                Request request = queryDocumentSnapshots.getDocuments().get(0).toObject(Request.class);
+                request.setState(Request.State.ARCHIVED);
+
+                mLibraryRepository.completeExchange(request, book,
+                        o -> {
+                            mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
+                            mFailureMsgEvent.setValue("Successfully Returned Book");
+                        },
+                        e -> {
+                            mFailureMsgEvent.setValue("Could not change status of book");
+                        });
+            }, e -> mFailureMsgEvent.setValue("Failed to find proper request to receive from."));
+        } else {
+            Log.w(TAG, "Handoff called for an invalid book status.");
+        }
+    }
+
+    /**
+     * Autofill the current book from scan data
+     *
+     * @param isbn scanned isbn
+     */
+    private void scanAutoFill(String isbn) {
         if (isbn == null || isbn.isEmpty()) {
             mFailureMsgEvent.setValue("Invalid ISBN found");
             return;
@@ -411,10 +489,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Code to be called when a barcode scan fails.
      *
-     * @param e Throwable
+     * @param tag Identifier for what is using barcode scan.
+     * @param e   Throwable
      */
     @Override
-    public void onFinishedScanFailure(Throwable e) {
+    public void onFinishedScanFailure(String tag, Throwable e) {
         mFailureMsgEvent.setValue("Failed to scan barcode.");
         Log.e(TAG, "Failed to scan barcode.", e);
     }

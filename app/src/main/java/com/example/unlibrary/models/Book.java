@@ -26,6 +26,7 @@ public class Book {
     private String mOwner;
     private String mPhoto;
     private Status mStatus;
+    private Boolean mIsReadyForHandoff;
 
     /**
      * Empty constructor. Needed for Firestore.
@@ -49,6 +50,7 @@ public class Book {
         mAuthor = author;
         mOwner = owner;
         mStatus = Status.AVAILABLE;
+        mIsReadyForHandoff = false;
         mPhoto = photo;
     }
 
@@ -193,6 +195,24 @@ public class Book {
      */
     public void setTitle(String title) {
         mTitle = title;
+    }
+
+    /**
+     * Gets the isReadyForHandoff status of a book.
+     *
+     * @return isReadyForHandoff status of current book
+     */
+    public Boolean getIsReadyForHandoff() {
+        return mIsReadyForHandoff;
+    }
+
+    /**
+     * Updates the isReadyForHandoff status of the book.
+     *
+     * @param isReadyForHandoff updated isReadyForHandoff status
+     */
+    public void setIsReadyForHandoff(Boolean isReadyForHandoff) {
+        mIsReadyForHandoff = isReadyForHandoff;
     }
 
     // TODO: Check if there's a better way of holding this information without making another fetch request to the database to retrieve Requests
