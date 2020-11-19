@@ -200,7 +200,8 @@ public class Book {
         AVAILABLE,
         REQUESTED,
         ACCEPTED,
-        BORROWED;
+        BORROWED,
+        DECLINED;
 
         public String asLower() {
             return this.toString().substring(0, 1).toUpperCase(Locale.ENGLISH) + this.toString().substring(1).toLowerCase(Locale.ENGLISH);

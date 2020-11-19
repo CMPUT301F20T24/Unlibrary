@@ -155,6 +155,6 @@ public class Request {
         REQUESTED,
         ACCEPTED,
         BORROWED,
-        ARCHIVED
+        DECLINED
     }
 }
