@@ -38,7 +38,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     private final LiveData<List<Book>> mBooks;
     private final UnlibraryRepository mUnlibraryRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
-    private final LiveData<User> mCurrentBookOwner; // Golnoush
+    private final LiveData<User> mCurrentBookOwner;
     private final MutableLiveData<Request> mCurrentRequest = new MutableLiveData<>();
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
@@ -52,7 +52,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     public UnlibraryViewModel(UnlibraryRepository unlibraryRepository) {
         mUnlibraryRepository = unlibraryRepository;
         mBooks = mUnlibraryRepository.getBooks();
-        mCurrentBookOwner = mUnlibraryRepository.getOwner(); // Golnoush
+        mCurrentBookOwner = mUnlibraryRepository.getOwner();
     }
 
     /**
@@ -181,7 +181,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         }
     }
 
-/// Golnoush
     /**
      * Fetches owner for current book
      */
@@ -197,7 +196,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     public LiveData<User> getCurrentBookOwner() {
         return this.mCurrentBookOwner;
     }
-    // Golnoush
 
     /**
      * Cleans up resources, removes the snapshot listener from the repository.

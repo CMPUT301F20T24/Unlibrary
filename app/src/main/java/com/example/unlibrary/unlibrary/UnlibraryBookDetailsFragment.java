@@ -60,7 +60,7 @@ public class UnlibraryBookDetailsFragment extends BookDetailFragment {
         // Setup observer
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.handBook).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
-        mViewModel.fetchOwnerForCurrentBook(); // Golnoush
+        mViewModel.fetchOwnerForCurrentBook();
         // Setup scanBarcode contract
         mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
             if (result) {

@@ -39,7 +39,7 @@ public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOK_COLLECTION = "books";
     private static final String REQUEST_COLLECTION = "requests";
-    private static final String USER_COLLECTION = "users"; // Golnoush
+    private static final String USER_COLLECTION = "users";
     private static final String REQUESTER = "requester";
     private static final String BOOK = "book";
     private static final String STATE = "state";
@@ -48,7 +48,7 @@ public class UnlibraryRepository {
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
-    private final MutableLiveData<User> mCurrentBookOwner; // Golnoush
+    private final MutableLiveData<User> mCurrentBookOwner;
     private final ListenerRegistration mListenerRegistration;
     private String mUID;
 
@@ -60,7 +60,7 @@ public class UnlibraryRepository {
     @Inject
     public UnlibraryRepository(FirebaseFirestore db) {
         mDb = db;
-        mCurrentBookOwner = new MutableLiveData<>(new User()); // Golnoush
+        mCurrentBookOwner = new MutableLiveData<>(new User());
         // TODO: Get document changes only to minimize payload from Firestore
         mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo(REQUESTER, FirebaseAuth.getInstance().getUid())
@@ -109,7 +109,7 @@ public class UnlibraryRepository {
      */
     public String getUid() {
         return mUID;
-    } // Golnoush
+    }
 
 
     /**
@@ -194,7 +194,6 @@ public class UnlibraryRepository {
         mListenerRegistration.remove();
     }
 
-///// Golnoush
     /**
      * Getter for the owner of the book.
      *
@@ -222,7 +221,6 @@ public class UnlibraryRepository {
                 });
     }
 
-//// Golnoush
     /**
      * Simple callback interface for asynchronous events
      */
