@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "firebase -- emulators:exec \"../gradlew test -p ../\" ",
+    "test": "firebase emulators:exec \"../gradlew test -p ../\" ",
     "firebase": "firebase"
   },
   "keywords": [],
