@@ -28,6 +28,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONArray;
 
@@ -118,19 +119,6 @@ public class ExchangeRepository {
 
                     mBooks.setValue(dbBooks);
                 });
-    }
-
-    /**
-     * Save new Request into the database. Assumes Request is valid.
-     *
-     * @param request           request object to be saved in the database
-     * @param onSuccessListener code to call on success
-     * @param onFailureListener code to call on failure
-     */
-    public void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener) {
-        mDb.collection(REQUEST_COLLECTION).add(request)
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(onFailureListener);
     }
 
     /**
@@ -252,16 +240,17 @@ public class ExchangeRepository {
         }).addOnFailureListener(e -> Log.e(TAG, "Unable to get current request", e));
     }
 
-    /**
-     * Update a book document.
-     *
-     * @param book              book object to be updated in the database.
-     * @param onSuccessListener code to call on success
-     * @param onFailureListener code to call on failure
-     */
-    public void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
-        mDb.collection(BOOK_COLLECTION).document(book.getId())
-                .set(book)
+    // TODO
+    public void sendRequest(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        WriteBatch batch = mDb.batch();
+
+        DocumentReference newRequest = mDb.collection(REQUEST_COLLECTION).document();
+        batch.set(newRequest, request);
+
+        DocumentReference updatedBook = mDb.collection(BOOK_COLLECTION).document(book.getId());
+        batch.update(updatedBook, STATUS, book.getStatus());
+
+        batch.commit()
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
     }

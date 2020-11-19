@@ -107,32 +107,28 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
             return;
         }
 
-        // Build request
-        // TODO do this as a write batch
+        // Log and exit early if book is not available or requested
+        Book book = mCurrentBook.getValue();
+        Book.Status status = book.getStatus();
+        if (!(status == Book.Status.AVAILABLE || status == Book.Status.REQUESTED)) {
+            Log.e(TAG, "Invalid state " + book.getStatus().toString() + " for book " + book.getId());
+            return;
+        }
+
+        // Build new request
         Request request = new Request(mExchangeRepository.getUid(), mCurrentBook.getValue().getId());
-        mExchangeRepository.createRequest(request,
-                o -> {
-                    // Update book status
-                    // First assert that book is in AVAILABLE state (only state that it must be updated from
-                    Book book = mCurrentBook.getValue();
-                    if (book.getStatus() == Book.Status.AVAILABLE) {
-                        book.setStatus(Book.Status.REQUESTED);
-                        mExchangeRepository.updateBook(book, aVoid -> {
-                            mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
-                            mSuccessRequestMsgEvent.setValue("Request successfully sent");
-                        }, e -> {
-                            mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
-                            mFailureMsgEvent.setValue("Failed to update status of book");
-                        });
-                    } else if (book.getStatus() != Book.Status.REQUESTED) {
-                        // Requested is the only other valid state here. If it is otherwise we should log it
-                        Log.e(TAG, "Invalid state " + book.getStatus().toString() + " for book " + book.getId());
-                    }
-                },
-                e -> {
-                    mFailureMsgEvent.setValue("Failed to send request.");
-                    Log.e(TAG, "Failed to send request.", e);
-                });
+
+        // Set book status
+        book.setStatus(Book.Status.REQUESTED);
+
+        // Do batch write
+        mExchangeRepository.sendRequest(request, book, aVoid -> {
+            mSuccessRequestMsgEvent.setValue("Request successfully sent");
+            mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
+        }, e -> {
+            mFailureMsgEvent.setValue("Failed to send request.");
+            Log.e(TAG, "Failed to send request.", e);
+        });
     }
 
     /**
