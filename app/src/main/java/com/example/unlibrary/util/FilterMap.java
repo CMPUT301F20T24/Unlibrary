@@ -6,7 +6,7 @@
  * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
 
-package com.example.unlibrary.library;
+package com.example.unlibrary.util;
 
 import com.example.unlibrary.models.Book;
 
@@ -23,6 +23,7 @@ public class FilterMap {
 
     /**
      * Construct a FilterMap. Defaults to filtering on no statuses.
+     * @param avail checks whether to include request or not
      */
     public FilterMap(boolean avail) {
         mFilter = new EnumMap<>(Book.Status.class);
