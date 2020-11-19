@@ -9,6 +9,7 @@
 package com.example.unlibrary.library;
 
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -19,6 +20,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Book.Status;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.google.android.gms.maps.model.LatLng;
