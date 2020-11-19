@@ -203,8 +203,7 @@ public class UnlibraryRepository {
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
     }
-
-
+    
     /**
      * Gets an observable list of books that are requested or borrowed by the current user.
      *
