@@ -49,7 +49,7 @@ public class ExchangeRepository {
 
     // Algolia fields
     private static final String ALGOLIA_INDEX_NAME = "books";
-    private static final String ALGOLIA_ID_FIELD = "id";
+    private static final String ALGOLIA_ID_FIELD = "objectID";
     private String previousSearch;
 
     private static final String TAG = ExchangeRepository.class.getSimpleName();
