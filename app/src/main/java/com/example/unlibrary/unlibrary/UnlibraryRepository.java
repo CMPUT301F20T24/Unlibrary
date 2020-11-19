@@ -11,6 +11,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -27,6 +28,7 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -45,8 +47,10 @@ public class UnlibraryRepository {
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
-    private final ListenerRegistration mListenerRegistration;
+    private List<Book> mAllBooks;
+    private ListenerRegistration mListenerRegistration;
     private String mUID;
+    private FilterMap mFilter;
 
     /**
      * Constructor for UnlibraryRepository. Sets up Firestore
@@ -56,7 +60,19 @@ public class UnlibraryRepository {
     @Inject
     public UnlibraryRepository(FirebaseFirestore db) {
         mDb = db;
+        mAllBooks = new ArrayList<>();
         // TODO: Get document changes only to minimize payload from Firestore
+        this.mFilter = new FilterMap(true);
+        attachListeners();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        mUID = user.getUid();
+    }
+
+    /**
+     * Attach a listener to a QuerySnapshot from Firestore. Listen to any changes in the database
+     * and update the books object.
+     */
+    public void attachListeners() {
         mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo(REQUESTER, FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((snapshot, error) -> {
@@ -68,14 +84,13 @@ public class UnlibraryRepository {
                     List<Request> requests = snapshot.toObjects(Request.class);
 
                     ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
-                    ArrayList<Book> books = new ArrayList<>();
 
                     for (Request r : requests) {
                         addBookTasks.add(
                                 mDb.collection(BOOK_COLLECTION).document(r.getBook()).get()
                                         .addOnSuccessListener(documentSnapshot -> {
                                             Book book = documentSnapshot.toObject(Book.class);
-                                            books.add(book);
+                                            mAllBooks.add(book);
                                         })
                                         .addOnFailureListener(e -> {
                                             Log.e(TAG, "Unable to get book " + r.getBook() + "from database", e);
@@ -86,15 +101,41 @@ public class UnlibraryRepository {
 
                     Tasks.whenAllComplete(addBookTasks)
                             .addOnSuccessListener(aVoid -> {
-                                mBooks.setValue(books);
+                                filter();
                             })
                             .addOnFailureListener(e -> {
                                 Log.e("TAG", "Failed to update book list", e);
                             });
                 });
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        mUID = user.getUid();
+    }
+
+    /**
+     * Filter the results of the books query.
+     *
+     * @param filter What to filter for
+     */
+    public void setFilter(FilterMap filter) {
+        mFilter = filter;
+        filter();
+    }
+
+    public void filter() {
+        List<Book> filtered = new ArrayList<>();
+        List<String> statusValues = new ArrayList<>();
+        for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
+            if (f.getValue()) {
+                statusValues.add(f.getKey().toString());
+            }
+        }
+
+        for (Book book : mAllBooks) {
+            if (statusValues.isEmpty() || statusValues.contains(book.getStatus().toString())) {
+                filtered.add(book);
+            }
+        }
+
+        mBooks.setValue(filtered);
     }
 
     /**
@@ -162,7 +203,7 @@ public class UnlibraryRepository {
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
     }
-
+    
     /**
      * Gets an observable list of books that are requested or borrowed by the current user.
      *
