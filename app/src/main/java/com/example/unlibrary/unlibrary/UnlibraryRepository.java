@@ -9,10 +9,12 @@ package com.example.unlibrary.unlibrary;
 
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -37,6 +39,7 @@ public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOK_COLLECTION = "books";
     private static final String REQUEST_COLLECTION = "requests";
+    private static final String USER_COLLECTION = "users"; // Golnoush
     private static final String REQUESTER = "requester";
     private static final String BOOK = "book";
     private static final String STATE = "state";
@@ -45,6 +48,7 @@ public class UnlibraryRepository {
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<User> mCurrentBookOwner; // Golnoush
     private final ListenerRegistration mListenerRegistration;
     private String mUID;
 
@@ -56,6 +60,7 @@ public class UnlibraryRepository {
     @Inject
     public UnlibraryRepository(FirebaseFirestore db) {
         mDb = db;
+        mCurrentBookOwner = new MutableLiveData<>(new User()); // Golnoush
         // TODO: Get document changes only to minimize payload from Firestore
         mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo(REQUESTER, FirebaseAuth.getInstance().getUid())
@@ -96,6 +101,16 @@ public class UnlibraryRepository {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         mUID = user.getUid();
     }
+
+    /**
+     * Returns id of currently logged on user.
+     *
+     * @return unique identifier of user
+     */
+    public String getUid() {
+        return mUID;
+    } // Golnoush
+
 
     /**
      * Save new Request into the database. Assumes Request is valid.
@@ -179,7 +194,35 @@ public class UnlibraryRepository {
         mListenerRegistration.remove();
     }
 
+///// Golnoush
+    /**
+     * Getter for the owner of the book.
+     *
+     * @return LiveData<ArrayList < String>> This returns the books object.
+     */
+    public LiveData<User> getOwner() {
+        return this.mCurrentBookOwner;
+    }
 
+    /**
+     * Fetches the owner for a newly selected book by clearing the previous book's owner information and
+     * adding a snapshot listener for the book's owner
+     *
+     * @param currentBookOwnerID
+     */
+    public void fetchOwnerForCurrentBook(String currentBookOwnerID) {
+        mCurrentBookOwner.setValue(new User());
+
+        mDb.collection(USER_COLLECTION).document(currentBookOwnerID).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    mCurrentBookOwner.setValue(documentSnapshot.toObject(User.class));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Unable to get owner " + currentBookOwnerID + "from database", e);
+                });
+    }
+
+//// Golnoush
     /**
      * Simple callback interface for asynchronous events
      */

@@ -21,8 +21,10 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksSource;
+import com.example.unlibrary.exchange.ExchangeFragmentDirections;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
 
@@ -36,6 +38,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     private final LiveData<List<Book>> mBooks;
     private final UnlibraryRepository mUnlibraryRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final LiveData<User> mCurrentBookOwner; // Golnoush
     private final MutableLiveData<Request> mCurrentRequest = new MutableLiveData<>();
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
@@ -49,6 +52,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     public UnlibraryViewModel(UnlibraryRepository unlibraryRepository) {
         mUnlibraryRepository = unlibraryRepository;
         mBooks = mUnlibraryRepository.getBooks();
+        mCurrentBookOwner = mUnlibraryRepository.getOwner(); // Golnoush
     }
 
     /**
@@ -176,6 +180,24 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
             Log.w(TAG, "Handoff called for an invalid book status.");
         }
     }
+
+/// Golnoush
+    /**
+     * Fetches owner for current book
+     */
+    public void fetchOwnerForCurrentBook() {
+        mUnlibraryRepository.fetchOwnerForCurrentBook(mCurrentBook.getValue().getOwner());
+    }
+
+    /**
+     * Getter for the mCurrentBookOwner object.
+     *
+     * @return LiveData<User> This returns the mCurrentBookOwner object
+     */
+    public LiveData<User> getCurrentBookOwner() {
+        return this.mCurrentBookOwner;
+    }
+    // Golnoush
 
     /**
      * Cleans up resources, removes the snapshot listener from the repository.
