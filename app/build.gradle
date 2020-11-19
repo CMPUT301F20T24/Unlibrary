@@ -127,4 +127,7 @@ dependencies {
     // ViewModel extension for Hilt
     implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02'
     annotationProcessor 'androidx.hilt:hilt-compiler:1.0.0-alpha02'
+
+    // Algolia
+    implementation 'com.algolia:algoliasearch-android:3.27.0'
 }
