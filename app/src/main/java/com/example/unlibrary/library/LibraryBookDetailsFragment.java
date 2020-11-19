@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.lifecycle.ViewModelProvider;
@@ -25,6 +26,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
+import com.example.unlibrary.models.Book;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -38,7 +44,7 @@ import dagger.hilt.android.AndroidEntryPoint;
  * Fragment to display the details and requests upon a user owned book.
  */
 @AndroidEntryPoint
-public class LibraryBookDetailsFragment extends BookDetailFragment {
+public class LibraryBookDetailsFragment extends BookDetailFragment implements OnMapReadyCallback {
 
     public static final String SCAN_TAG = "com.example.unlibrary.library.LibraryBookDetailsFragment";
     private FragmentLibraryBookDetailsBinding mBinding;
@@ -121,7 +127,29 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
 
         mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.libraryBookFrame, mBinding.bookImageButton, mBinding.bookImage));
 
+        mViewModel.getCurrentBookStatus().observe(getViewLifecycleOwner(), status -> {
+            if (status == Book.Status.ACCEPTED) {// Required to forward onCreate for mapView in lite mode
+                mBinding.map.onCreate(savedInstanceState);
+
+                // set up map
+                mBinding.map.getMapAsync(this);
+            }
+        });
+
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            LibraryBookDetailsFragmentArgs.fromBundle(getArguments());
+            String locationName = LibraryBookDetailsFragmentArgs.fromBundle(getArguments()).getLocationName();
+            float lat = (float) LibraryBookDetailsFragmentArgs.fromBundle(getArguments()).getLat();
+            float lon = (float) LibraryBookDetailsFragmentArgs.fromBundle(getArguments()).getLon();
+
+            mViewModel.setHandoffLocation(locationName, lat, lon);
+        }
     }
 
     @Override
@@ -137,5 +165,44 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
      */
     private void showToast(String msg) {
         ((MainActivity) requireActivity()).showToast(msg);
+    }
+
+    /**
+     * Callback for setting up mapView
+     *
+     * @param googleMap
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        // Set the bitmap to the handoff location (defaults to Edmonton if no handoff location is set)
+        LatLng edmonton = new LatLng(53.5461, -113.4938);
+        // need to get / set location in request document
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(edmonton, 10));
+
+        // Sets UI and click listener
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+        googleMap.setOnMapClickListener(v -> Navigation.findNavController(mBinding.map).navigate(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToMapsFragment()));
+    }
+
+    /**
+     * Required to forward onResume() for mapView in lite mode
+     * <p>
+     * https://developers.google.com/maps/documentation/android-sdk/lite
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        mBinding.map.onResume();
+    }
+
+    /**
+     * Required to forward onPause() for mapView in lite mode
+     * <p>
+     * https://developers.google.com/maps/documentation/android-sdk/lite
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        mBinding.map.onPause();
     }
 }

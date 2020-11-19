@@ -29,6 +29,7 @@ import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -53,6 +54,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
     private final MutableLiveData<Uri> mTakenPhoto = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mIsLoading = new MutableLiveData<>();
+    private final MutableLiveData<Book.Status> mCurrentBookStatus = new MutableLiveData<>();
     private SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent = new SingleLiveEvent<>();
     private SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
@@ -88,6 +90,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public MutableLiveData<Book> getCurrentBook() {
         return this.mCurrentBook;
     }
+
+    public LiveData<Book.Status> getCurrentBookStatus() { return this.mCurrentBookStatus; }
 
     /**
      * Getter for the mTakenPhoto object.
@@ -330,6 +334,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         }
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
+        mCurrentBookStatus.setValue(book.getStatus());
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
     }
 
@@ -479,6 +484,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 mCurrentBook.setValue(book);
             }
         });
+    }
+
+    public void setHandoffLocation(String name, float lat, float lon) {
+        LatLng latLng = new LatLng(lat,lon);
+        mLibraryRepository.setHandoffLocation(name, latLng);
     }
 
     /**
