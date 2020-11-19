@@ -103,9 +103,17 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      * Generates and saves the request into firestore.
      */
     public void sendRequest() {
+        // Cannot send request if you have already sent one
+        if (mCurrentRequest.getValue() != null) {
+            return;
+        }
+
+        // Build request
         Request request = new Request(mExchangeRepository.getUid(), mCurrentBook.getValue().getId());
         mExchangeRepository.createRequest(request,
                 o -> {
+                    // Update book status
+
                     mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
                     mSuccessRequestMsgEvent.setValue("Request successfully sent");
                 },
