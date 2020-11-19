@@ -223,6 +223,8 @@ public class LibraryRepository {
      * @param bookID requests on this book will be listened to
      */
     public void attachRequestsListener(String bookID) {
+        // Get all requests associated with current book that are in the REQUESTED state (to filter
+        // out declined requests)
         Query query = mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo("book", bookID)
                 .whereEqualTo("state", Status.REQUESTED.name());
@@ -268,17 +270,19 @@ public class LibraryRepository {
     }
 
     /**
-     * Delete book from the database.
+     * Make the required changes in FireBase to decline a request
      *
-     * @param requestedUID           book object to be deleted from the database.
-     * @param bookRequestedID
+     * @param requestedUID           User ID of requester who made the request
+     * @param bookRequestedID        Book ID of book that was requested
      * @param onDeclineSuccess       code to call on successfully declining request
      * @param onDeclineFailure       code to call on failure to decline request
+     * @param onStatusChangeSuccess  code to call when status of book is changed successfully from REQUESTED to ACCEPTED
+     *                               (only if there are no more active requests on the book after declining this one)
      * @param onStatusChangeFailure  code to call on failure to change status of book back to ACCEPTED (if required)
      * @param onFetchRequestsFailure code to call on failure of fetching requests necessary to potentially change status of book to ACCEPTED
      */
     public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, OnSuccessListener<? super Void> onStatusChangeSuccess, OnFailureListener onStatusChangeFailure, OnFailureListener onFetchRequestsFailure) {
-        // Find the Request document associated with the given book and requester
+        // Query to find Request documents associated with the given book and requester
         mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
                 .whereEqualTo("book", bookRequestedID)
                 .get()
@@ -286,9 +290,9 @@ public class LibraryRepository {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         List<Request> matchingRequests = queryDocumentSnapshots.toObjects(Request.class);
-//                        if(matchingRequests.size() != 1) {   Uncomment when we can ensure user can't request same book twice
+//                        if(matchingRequests.size() != 1) {   // Uncomment when we can ensure user can't request same book twice
 //                            Log.e(TAG, "The number of requests returned was unexpected");
-//                            return; Is it safe to return here?
+//                            return;  // Is it safe to return here?
 //                        }
                         // Change the state of the request to DECLINED
                         for (Request request : matchingRequests) {

@@ -163,7 +163,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Getter for the mSelectedRequester object.
      *
-     * @return User the requester that the user has selected
+     * @return the requester that the user has selected
      */
     public User getSelectedRequester() {
         return mSelectedRequester;
@@ -503,35 +503,55 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mLibraryRepository.detachRequestersListener();
     }
 
+    /**
+     * Used in the onClick method for selecting a requester from recycler view of requesters in detailed book view.
+     * Sets mSelectedRequester to the right user and navigates to a fragment with their profile.
+     */
     public void selectRequester(View v, int position) {
         mSelectedRequester = mCurrentBookRequesters.getValue().get(position);
         mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryRequesterProfileFragment());
 
     }
 
+    /**
+     * Used as the onClick method for the accept button in the requester's profile fragment
+     * Naviaates to a google map fragment to allow the selection of a location
+     */
     public void acceptSelectedRequester() {
         //mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
     }
 
+    /**
+     * Used as the onClick method for the decline button in the requester's profile fragment.
+     * Calls a method in the library repository to make required changes in the database by passing
+     * in the required information about the currently selected book and requester, and lambdas to
+     * be used in onSuccess/onFailure listeners.
+     */
     public void declineSelectedRequester() {
         mLibraryRepository.declineRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(),
                 o -> {
+                    // If request is successfully declined, navigate back to detailed book fragment
                     mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
                 },
                 e -> {
+                    // If request was not successfully declined, show error message toast and log error
                     mFailureMsgEvent.setValue("Failed to decline request");
                     Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID(), e);
                 },
                 o -> {
+                    // If we have to change status of book after declining in Firebase, also change locally since mCurrentBook is
+                    // not listening to changes in Firebase
                     Book book = mCurrentBook.getValue();
                     book.setStatus(Book.Status.AVAILABLE);
                     mCurrentBook.setValue(book);
                 },
                 e -> {
+                    // If we are not able to change status but needed to do so, log error and show toast
                     mFailureMsgEvent.setValue("Failed to change book status to AVAILABLE");
                     Log.e(TAG, "Failed to change status of book with ID " + mCurrentBook.getValue().getId() + " back to AVAILABLE", e);
                 },
                 e -> {
+                    // Log error and show toast if unable to fetch requests on the book
                     mFailureMsgEvent.setValue("Failed to fetch requests; Book status may be wrong");
                     Log.e(TAG, "Failed to fetch requests on book with ID " + mCurrentBook.getValue().getId() + " to determine if status should be changed after declining request", e);
                 });
