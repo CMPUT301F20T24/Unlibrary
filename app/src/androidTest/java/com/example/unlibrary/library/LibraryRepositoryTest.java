@@ -1,5 +1,6 @@
 package com.example.unlibrary.library;
 
+import com.algolia.search.saas.Client;
 import com.example.unlibrary.models.Book;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -12,12 +13,14 @@ import java.util.List;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class LibraryRepositoryTest {
     private LibraryRepository repository;
 
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
+    private FirebaseFirestore mDb;
+    private FirebaseAuth mAuth;
+    private Client mAlgoliaClient;
 
     private String newBookId;
 
@@ -25,18 +28,20 @@ public class LibraryRepositoryTest {
     public void setup() {
         // 10.0.2.2 is the special IP address to connect to the 'localhost' of
         // the host computer from an Android emulator.
-        db = FirebaseFirestore.getInstance();
-        db.useEmulator("10.0.2.2", 8080);
+        mDb = FirebaseFirestore.getInstance();
+        mDb.useEmulator("10.0.2.2", 8080);
 
-        auth = FirebaseAuth.getInstance();
-        auth.useEmulator("10.0.2.2", 9099);
+        mAuth = FirebaseAuth.getInstance();
+        mAuth.useEmulator("10.0.2.2", 9099);
 
-        repository = new LibraryRepository(db, auth);
+        mAlgoliaClient = mock(Client.class);
+
+        repository = new LibraryRepository(mDb, mAuth, mAlgoliaClient);
     }
 
     @Test
     public void addBookTest() {
-        Book book = new Book("9780441016075", "Halting State", "Charles Stross", auth.getUid(), null);
+        Book book = new Book("9780441016075", "Halting State", "Charles Stross", mAuth.getUid(), null);
 
         repository.createBook(book, documentReference -> {
             newBookId = documentReference.getId();
