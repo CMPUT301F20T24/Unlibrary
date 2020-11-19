@@ -21,7 +21,7 @@ android {
         if (file("../secure.properties").exists()) {
             file("../secure.properties")?.withInputStream { secureProps.load(it) }
         }
-        resValue "string", "maps_api_key", (secureProps.getProperty("MAPS_API_KEY") ?: "")
+        resValue "string", "api_key", (secureProps.getProperty("API_KEY") ?: "")
     }
 
     buildTypes {

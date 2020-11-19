@@ -21,7 +21,6 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.example.unlibrary.util.FilterMap;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -32,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -65,6 +65,7 @@ public class LibraryRepository {
     private static final String STATE_FIELD = "state";
     private static final String OWNER_FIELD = "owner";
 
+    private static final String STATUS_FIELD = "status";
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
 
@@ -419,5 +420,48 @@ public class LibraryRepository {
                     }).addOnSuccessListener(onDeclineSuccess).addOnFailureListener(onDeclineFailure);
                 })
                 .addOnFailureListener(onDeclineFailure);
+    }
+    public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
+        mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
+                .whereEqualTo("book", bookRequestedID)
+                .get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Request> matchingRequests = task.getResult().toObjects(Request.class);
+                //                    if(matchingRequests.size() != 1) {   Uncomment when we can ensure user can't request same book twice
+                //                        Log.e(TAG, "The number of requests returned was unexpected");
+                //                        return; Is it safe to return here?
+                //                    }
+                Request request = matchingRequests.get(0);
+                request.setLocation(new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
+                request.setState(Request.State.ACCEPTED);
+                mDb.collection(REQUESTS_COLLECTION).document(request.getId())
+                        .set(request)
+                        .addOnSuccessListener(s1 -> {
+                            mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
+                                    .update(STATUS_FIELD, "ACCEPTED")
+                                    .addOnSuccessListener(s2 -> {
+                                        mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
+                                                .get()
+                                                .addOnCompleteListener(task2 -> {
+                                                    if (task2.isSuccessful()) {
+                                                        List<Request> requests = task2.getResult().toObjects(Request.class);
+                                                        for (Request r : requests) {
+                                                            mDb.collection(REQUESTS_COLLECTION).document(r.getId())
+                                                                    .delete()
+                                                                    .addOnSuccessListener(onSuccessListener)
+                                                                    .addOnFailureListener(onFailureListener);
+                                                        }
+                                                    }
+                                                })
+                                                .addOnFailureListener(onFailureListener);
+                                    })
+                                    .addOnFailureListener(onFailureListener);
+                        })
+                        .addOnFailureListener(onFailureListener);
+
+            } else {
+                Log.e(TAG, "Error in fetching requests", task.getException());
+            }
+        });
     }
 }

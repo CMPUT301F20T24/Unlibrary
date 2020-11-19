@@ -127,29 +127,17 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
 
         mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.libraryBookFrame, mBinding.bookImageButton, mBinding.bookImage));
 
-        mViewModel.getCurrentBookStatus().observe(getViewLifecycleOwner(), status -> {
-            if (status == Book.Status.ACCEPTED) {// Required to forward onCreate for mapView in lite mode
-                mBinding.map.onCreate(savedInstanceState);
+        // Required to forward onCreate for mapView in lite mode
+        mBinding.map.onCreate(savedInstanceState);
 
+        mViewModel.getCurrentBookStatus().observe(getViewLifecycleOwner(), status -> {
+            if (status == Book.Status.ACCEPTED) {
                 // set up map
                 mBinding.map.getMapAsync(this);
             }
         });
 
         return mBinding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            LibraryBookDetailsFragmentArgs.fromBundle(getArguments());
-            String locationName = LibraryBookDetailsFragmentArgs.fromBundle(getArguments()).getLocationName();
-            float lat = (float) LibraryBookDetailsFragmentArgs.fromBundle(getArguments()).getLat();
-            float lon = (float) LibraryBookDetailsFragmentArgs.fromBundle(getArguments()).getLon();
-
-            mViewModel.setHandoffLocation(locationName, lat, lon);
-        }
     }
 
     @Override
@@ -175,12 +163,11 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Set the bitmap to the handoff location (defaults to Edmonton if no handoff location is set)
-        LatLng edmonton = new LatLng(53.5461, -113.4938);
-        // need to get / set location in request document
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(edmonton, 10));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getAcceptedRequestLocation(), 10));
 
         // Sets UI and click listener
         googleMap.getUiSettings().setMapToolbarEnabled(false);
+
         googleMap.setOnMapClickListener(v -> Navigation.findNavController(mBinding.map).navigate(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToMapsFragment()));
     }
 

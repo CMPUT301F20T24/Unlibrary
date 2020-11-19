@@ -24,11 +24,11 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
-import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -63,6 +63,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final LibraryRepository mLibraryRepository;
     private final LiveData<List<User>> mCurrentBookRequesters;
     private User mSelectedRequester;
+    private LatLng mAcceptedRequestLocation = new LatLng(53.5461, -113.4938); // default is Edmonton
 
     public enum InputKey {
         TITLE,
@@ -189,6 +190,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public User getSelectedRequester() {
         return mSelectedRequester;
+    }
+
+    public LatLng getAcceptedRequestLocation() {
+        return mAcceptedRequestLocation;
+    }
+
+    public void setAcceptedRequestLocation(LatLng latLng) {
+        mAcceptedRequestLocation = latLng;
     }
 
 
@@ -487,8 +496,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     public void setHandoffLocation(String name, float lat, float lon) {
-        LatLng latLng = new LatLng(lat,lon);
-        mLibraryRepository.setHandoffLocation(name, latLng);
+        LatLng latLng = new LatLng(lat, lon);
+//        mLibraryRepository.setHandoffLocation(name, latLng);
     }
 
     /**
@@ -605,12 +614,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryRequesterProfileFragment());
     }
 
-    /**
-     * Used as the onClick method for the accept button in the requester's profile fragment
-     * Navigates to a google map fragment to allow the selection of a location
-     */
-    public void acceptSelectedRequester() {
-        //mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
+    public void initMapsFragment() {
+        mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
     }
 
     /**
@@ -635,6 +640,15 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     Log.e(TAG, "The request was not found for book ID " +  mCurrentBook.getValue().getId() + " and requesterID " + mSelectedRequester.getUID());
                     mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
 
+                });
+    }
+
+    public void acceptSelectedRequester() {
+        mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), mAcceptedRequestLocation,
+                o -> mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment()),
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to accept request");
+                    Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID());
                 });
     }
 

@@ -8,6 +8,9 @@
 
 package com.example.unlibrary.models;
 
+import androidx.core.util.Pair;
+
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.DocumentId;
 import com.google.firebase.firestore.GeoPoint;
 

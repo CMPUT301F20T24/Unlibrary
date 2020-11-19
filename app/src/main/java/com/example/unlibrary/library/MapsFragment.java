@@ -1,6 +1,7 @@
 package com.example.unlibrary.library;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.unlibrary.R;
@@ -30,9 +32,10 @@ import java.util.Arrays;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
+    private static final String TAG = MapsFragment.class.getSimpleName();
     GoogleMap mMap;
-    Place mPlace;
     FragmentMapsBinding mBinding;
+    LibraryViewModel mViewModel;
 
     /**
      * Manipulates the map once available.
@@ -45,38 +48,31 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        LatLng edmonton = new LatLng(53.5461, -113.4938);
         mMap = googleMap;
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(edmonton));
-        googleMap.setMinZoomPreference(10);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getAcceptedRequestLocation(), 10.0f));
+        mMap.addMarker(new MarkerOptions().position(mViewModel.getAcceptedRequestLocation()));
     }
-
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+        mBinding = FragmentMapsBinding.inflate(inflater, container, false);
+
         // Initialize the SDK
         if (!Places.isInitialized()) {
-            Places.initialize(getActivity().getApplicationContext(), getString(R.string.maps_api_key));
+            Places.initialize(getActivity().getApplicationContext(), getString(R.string.api_key));
         }
-        mBinding = FragmentMapsBinding.inflate(inflater, container, false);
-        mBinding.confirmButton.setOnClickListener(v -> {
-            MapsFragmentDirections.ActionMapsFragmentToLibraryBookDetailsFragment action =
-                            MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment();
-            action.setLocationName(mPlace.getName());
-            action.setLat((float) mPlace.getLatLng().latitude);
-            action.setLon((float) mPlace.getLatLng().longitude);
-            Navigation.findNavController(mBinding.confirmButton).navigate(action);
-        });
+        mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.confirmButton).navigate(navDirections));
+
         return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
 
         // Setup Map Fragment
         SupportMapFragment mapFragment =
@@ -98,14 +94,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             public void onPlaceSelected(@NotNull Place place) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15.0f));
                 mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
-                mPlace = place;
+                mViewModel.setAcceptedRequestLocation(place.getLatLng());
                 mBinding.confirmButton.setVisibility(View.VISIBLE);
+                mBinding.confirmButton.setOnClickListener(v -> mViewModel.acceptSelectedRequester());
             }
-
 
             @Override
             public void onError(@NotNull Status status) {
-                // TODO: Handle the error.
+                Log.e(TAG, "Failed to get place: " + status.toString());
             }
         });
     }
