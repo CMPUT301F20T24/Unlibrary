@@ -13,22 +13,35 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.algolia.search.saas.Client;
+import com.algolia.search.saas.Index;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 /**
  * Manages all the database interaction for the Library ViewModel.
@@ -37,21 +50,39 @@ public class LibraryRepository {
 
     private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
+    private static final String REQUESTS_COLLECTION = "requests";
+    private static final String USERS_COLLECTION = "users";
+    private static final String BOOK = "book";
+    private static final String STATE = "state";
+    private static final String STATUS = "status";
+    private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
     private static final String TAG = LibraryRepository.class.getSimpleName();
+    private static final String ALGOLIA_INDEX_NAME = "books";
 
+    // Algolia field names
+    // TODO: Consider using POJOs for algolia
+    private static final String ALGOLIA_TITLE_FIELD = "title";
+    private static final String ALGOLIA_AUTHOR_FIELD = "author";
+    private static final String ALGOLIA_ID_FIELD = "id";
+    private final Client mAlgoliaClient;
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
-    private ListenerRegistration mListenerRegistration;
+    private ListenerRegistration mBooksListenerRegistration;
+    private ListenerRegistration mRequestsListenerRegistration;
     private MutableLiveData<List<Book>> mBooks;
+    private MutableLiveData<List<User>> mCurrentBookRequesters;
     private FilterMap mFilter;
 
     /**
      * Constructor for the Library Repository. Sets up the database snapshot listener.
      */
-    public LibraryRepository() {
-        mDb = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
+    @Inject
+    public LibraryRepository(FirebaseFirestore db, FirebaseAuth auth, Client algoliaClient) {
+        mDb = db;
+        mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
+        mAlgoliaClient = algoliaClient;
+        mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
         this.mFilter = new FilterMap();
         attachListener();
     }
@@ -72,7 +103,7 @@ public class LibraryRepository {
             query = query.whereIn("status", statusValues);
         }
 
-        mListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
+        mBooksListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
             if (error != null) {
                 Log.w(TAG, "Error listening", error);
                 return;
@@ -102,7 +133,13 @@ public class LibraryRepository {
         }
         book.setOwner(uid);
         mDb.collection(BOOKS_COLLECTION).add(book)
-                .addOnSuccessListener(onSuccessListener)
+                .addOnSuccessListener(documentReference -> {
+                    // Also add book to algolia with Firestore ID reference
+                    book.setId(documentReference.getId());
+                    addAlgoliaIndex(book);
+
+                    onSuccessListener.onSuccess(documentReference);
+                })
                 .addOnFailureListener(onFailureListener);
     }
 
@@ -154,7 +191,7 @@ public class LibraryRepository {
      * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
-        mListenerRegistration.remove();
+        mBooksListenerRegistration.remove();
     }
 
     /**
@@ -175,5 +212,134 @@ public class LibraryRepository {
         mFilter = filter;
         detachListener();
         attachListener();
+    }
+
+    /**
+     * Adds book to Algolia search index so it can be searched in {@link com.example.unlibrary.exchange.ExchangeFragment}.
+     * Book's id, title, and author are assumed to be non null.
+     *
+     * @param book new book to add to search index
+     */
+    public void addAlgoliaIndex(Book book) {
+        Index index = mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME);
+        try {
+            index.addObjectAsync(new JSONObject()
+                            .put(ALGOLIA_TITLE_FIELD, book.getTitle())
+                            .put(ALGOLIA_AUTHOR_FIELD, book.getAuthor())
+                            .put(ALGOLIA_ID_FIELD, book.getId()),
+                    (jsonObject, e) -> {
+                        if (e != null) {
+                            Log.e(TAG, "createBook: Unable to push to algolia", e);
+                            return;
+                        }
+                        Log.d(TAG, "createBook: Success adding index to algolia! " + book.getId());
+                    });
+        } catch (JSONException e) {
+            Log.e(TAG, "createBook: Unable to push to algolia", e);
+        }
+    }
+
+    /**
+     * Getter for the LiveData List of requesters on a selected book.
+     *
+     * @return LiveData<ArrayList < String>> This returns the books object.
+     */
+    public LiveData<List<User>> getRequesters() {
+        return this.mCurrentBookRequesters;
+    }
+
+    /**
+     * Fetches the list of requesters for a newly selected book by clearing the previous book's requesters and
+     * adding a snapshot listener for the new book's requesters
+     *
+     * @param currentBookID
+     */
+    public void fetchRequestersForCurrentBook(String currentBookID) {
+        // Clear the previous book's requesters in time before requesters list gets displayed
+        mCurrentBookRequesters.setValue(new ArrayList<>());
+        // Attach snapshot listener for requesters on current book
+        attachRequestsListener(currentBookID);
+    }
+
+    /**
+     * Attaches snapshot listener for requests on a given book
+     *
+     * @param bookID requests on this book will be listened to
+     */
+    public void attachRequestsListener(String bookID) {
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, bookID).whereNotEqualTo(STATE, Request.State.ARCHIVED);
+
+        // TODO only use getDocumentChanges instead of rebuilding the entire list
+        mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
+            if (error != null) {
+                Log.w(TAG, "Error fetching requests for book" + bookID, error);
+                return;
+            }
+
+            List<Request> requests = snapshot.toObjects(Request.class);
+
+            ArrayList<Task<DocumentSnapshot>> addRequesterTasks = new ArrayList<>();
+            ArrayList<User> requesters = new ArrayList<>();
+
+            for (Request r : requests) {
+                addRequesterTasks.add(
+                        mDb.collection(USERS_COLLECTION).document(r.getRequester()).get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    User requester = documentSnapshot.toObject(User.class);
+                                    requesters.add(requester);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Unable to get requester " + r.getRequester() + "from database", e);
+                                })
+                );
+            }
+
+
+            Tasks.whenAllComplete(addRequesterTasks)    //This task will never fail
+                    .addOnSuccessListener(aVoid -> {
+                        mCurrentBookRequesters.setValue(requesters);
+                    });
+        });
+    }
+
+    /**
+     * Removes the current snapshot listener for requesters
+     */
+    public void detachRequestersListener() {
+        mRequestsListenerRegistration.remove();
+    }
+
+    /**
+     * Get the borrowed request associated with the current book.
+     *
+     * @param book              book request is associated with
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, book.getId()).whereEqualTo(STATE, Request.State.BORROWED.toString());
+        query.get().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Update state and status of request and book
+     *
+     * @param request           request object to be updated in the database
+     * @param book              book object to update
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        WriteBatch batch = mDb.batch();
+        DocumentReference requestCol = mDb.collection(REQUESTS_COLLECTION).document(request.getId());
+        DocumentReference bookCol = mDb.collection(BOOKS_COLLECTION).document(book.getId());
+
+        requestCol.update(STATE, request.getState());
+        bookCol.update(STATUS, book.getStatus());
+        bookCol.update(IS_READY_FOR_HANDOFF, book.getIsReadyForHandoff());
+
+        batch.commit()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 }

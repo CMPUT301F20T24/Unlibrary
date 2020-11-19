@@ -15,13 +15,17 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.databinding.FragmentProfileBinding;
 import com.google.firebase.auth.FirebaseAuth;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Host fragment for Profile feature
  */
+@AndroidEntryPoint
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding mBinding;
@@ -37,7 +41,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ProfileViewModel();
+        mViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
     }
 
     /**

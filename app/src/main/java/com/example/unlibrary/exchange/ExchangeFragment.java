@@ -20,9 +20,12 @@ import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentExchangeBinding;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Host fragment for Exchange feature
  */
+@AndroidEntryPoint
 public class ExchangeFragment extends Fragment {
     private ExchangeViewModel mViewModel;
     private FragmentExchangeBinding mBinding;
@@ -52,6 +55,13 @@ public class ExchangeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentExchangeBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
+        mBinding.setViewModel(mViewModel);
+
+        // Add listener to enter key in search bar
+        mBinding.searchExchangeBook.setOnEditorActionListener((textView, i, keyEvent) -> {
+            mViewModel.search(textView.getText().toString());
+            return true;
+        });
 
         // Child fragments are can only be accessed on view creation, so this is the earliest
         // point where we can specify the data source
@@ -67,4 +77,5 @@ public class ExchangeFragment extends Fragment {
         mViewModel.getSuccessRequestMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
         return mBinding.getRoot();
     }
+
 }

@@ -10,8 +10,8 @@ package com.example.unlibrary.exchange;
 
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
+import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -21,8 +21,8 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.SingleLiveEvent;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -31,20 +31,23 @@ import java.util.List;
  */
 public class ExchangeViewModel extends ViewModel implements BooksSource {
     private static final String TAG = ExchangeViewModel.class.getSimpleName();
-
     private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final LiveData<User> mCurrentBookOwner;
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
+    private String mSearchText;
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
      */
-    public ExchangeViewModel() {
-        mExchangeRepository = new ExchangeRepository();
+    @ViewModelInject
+    public ExchangeViewModel(ExchangeRepository exchangeRepository) {
+        mExchangeRepository = exchangeRepository;
         mBooks = mExchangeRepository.getBooks();
+        mCurrentBookOwner = mExchangeRepository.getOwner();
     }
 
     /**
@@ -117,7 +120,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public void selectCurrentBook(View view, int position) {
         if (mBooks.getValue() == null) {
-            mFailureMsgEvent.setValue("Failed show details for book");
+            mFailureMsgEvent.setValue("Failed to show details for book");
             return;
         }
 
@@ -135,5 +138,49 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     protected void onCleared() {
         super.onCleared();
         mExchangeRepository.detachListener();
+    }
+
+    /**
+     * Returns the current input in search field
+     *
+     * @return current input in search field
+     */
+    public String getSearchText() {
+        return mSearchText;
+    }
+
+    /**
+     * Updates the input to the search field
+     *
+     * @param searchText new input in search field
+     */
+    public void setSearchText(String searchText) {
+        mSearchText = searchText;
+    }
+
+
+    /**
+     * Updates the list of books according to search results for given keywords in title or author.
+     *
+     * @param keywords space separated words to search for
+     */
+    public void search(String keywords) {
+        mExchangeRepository.search(keywords);
+    }
+        
+    /**
+     * Fetches owner for current book
+     */
+    public void fetchOwnerForCurrentBook() {
+        mExchangeRepository.fetchOwnerForCurrentBook(mCurrentBook.getValue().getOwner());
+    }
+
+    /**
+     * Getter for the mCurrentBookOwner object.
+     *
+     * @return LiveData<User> This returns the mCurrentBookOwner object
+     */
+    public LiveData<User> getCurrentBookOwner() {
+        return this.mCurrentBookOwner;
     }
 }

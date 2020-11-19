@@ -28,6 +28,7 @@
     <string name="save_button">Save</string>
     <string name="edit_book_fab_description">Edit book</string>
     <string name="delete_book_fab_description">Delete book</string>
+    <string name="handoff_book_description">Handoff book</string>
     <string name="isbn">ISBN</string>
     <string name="request_status">Request Status</string>
     <string name="book_description">Book Description</string>
@@ -38,4 +39,7 @@
     <string name="requested">Requested</string>
     <string name="accepted">Accepted</string>
     <string name="borrowed">Borrowed</string>
+    <string name="requesters">Requesters</string>
+    <string name="handoff_book_fab_description">Handoff book</string>
+    <string name="handoff_book">Handoff Book</string>
 </resources>

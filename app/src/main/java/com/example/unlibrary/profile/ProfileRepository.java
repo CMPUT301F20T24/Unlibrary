@@ -17,6 +17,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
+import javax.inject.Inject;
+
 /**
  * Manages all the database interaction for the Profile ViewModel
  */
@@ -35,9 +37,10 @@ public class ProfileRepository {
     /**
      * Get instances of firestore database and firebase auth
      */
-    public ProfileRepository() {
-        mDB = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
+    @Inject
+    public ProfileRepository(FirebaseFirestore db, FirebaseAuth auth) {
+        mDB = db;
+        mAuth = auth;
     }
 
     /**

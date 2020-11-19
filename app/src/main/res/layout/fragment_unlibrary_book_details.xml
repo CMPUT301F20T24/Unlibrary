@@ -7,11 +7,13 @@
 
         <variable
             name="viewModel"
-            type="com.example.unlibrary.exchange.ExchangeViewModel" />
+            type="com.example.unlibrary.unlibrary.UnlibraryViewModel" />
+
+        <import type="android.view.View" />
     </data>
 
     <FrameLayout
-        android:id="@+id/exchange_book_frame"
+        android:id="@+id/unlibrary_book_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -30,19 +32,20 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:imagePath="@{viewModel.currentBook.photo}" />
 
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/add_request"
+                android:id="@+id/hand_book"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:layout_marginBottom="24dp"
-                android:backgroundTint="@color/colorAccent"
-                android:contentDescription="@string/edit_book_fab_description"
-                android:onClick="@{()->viewModel.sendRequest()}"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="4dp"
+                android:contentDescription="@string/handoff_book_description"
+                android:visibility="@{viewModel.showHandoffButton ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/bookImageButton"
-                app:srcCompat="@drawable/ic_add" />
+                app:srcCompat="@drawable/ic_handoff_24" />
 
             <TextView
                 android:id="@+id/textView6"
@@ -109,69 +112,34 @@
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />
-            
+
             <TextView
-                android:id="@+id/textView10"
+                android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/text_margin"
-                android:layout_marginTop="16dp"
-                android:text="OWNER"
+                android:layout_marginTop="@dimen/text_margin"
+                android:text="@string/request_status"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
                 android:layout_marginStart="@dimen/text_margin"
                 android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView10"
-                app:layout_constraintVertical_bias="0.08"
-                tools:layout_editor_absoluteX="0dp">
-
-
-                <ImageView
-                    android:id="@+id/userImage"
-                    android:layout_width="50dp"
-                    android:layout_height="0dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_person_24px"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintDimensionRatio="1:1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/ownerUsername"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/text_margin"
-                    android:layout_marginTop="4dp"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:text="@{viewModel.currentBookOwner.username}"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                    app:layout_constraintStart_toEndOf="@+id/userImage"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Username" />
-
-                <TextView
-                    android:id="@+id/ownerEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/text_margin"
-                    android:layout_marginEnd="8dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="@{viewModel.currentBookOwner.email}"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    app:layout_constraintStart_toEndOf="@id/userImage"
-                    app:layout_constraintTop_toBottomOf="@+id/ownerUsername"
-                    tools:text="email@email.com" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:text="@{viewModel.currentBook.status.toString()}"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                app:chipIcon="@drawable/status_color"
+                app:chipIconSize="16dp"
+                app:iconStartPadding="3dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -181,7 +149,6 @@
             android:layout_height="match_parent"
             android:visibility="invisible"
             tools:imagePath="@{viewModel.currentBook.photo}" />
-        
     </FrameLayout>
-    
+
 </layout>

@@ -5,30 +5,46 @@
  *
  * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
+
 package com.example.unlibrary.library;
 
-import android.app.AlertDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.unlibrary.MainActivity;
+import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBookDetailsBinding;
+import com.example.unlibrary.util.BarcodeScanner;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
  * Fragment to display the details and requests upon a user owned book.
  */
-public class LibraryBookDetailsFragment extends Fragment {
+@AndroidEntryPoint
+public class LibraryBookDetailsFragment extends BookDetailFragment {
 
+    public static final String SCAN_TAG = "com.example.unlibrary.library.LibraryBookDetailsFragment";
     private FragmentLibraryBookDetailsBinding mBinding;
+    private LibraryViewModel mViewModel;
+    private Uri mHandoffIsbnUri;
+    private ActivityResultLauncher<Uri> mScanBarcodeContract;
 
     /**
      * Setup the fragment
@@ -40,9 +56,8 @@ public class LibraryBookDetailsFragment extends Fragment {
      */
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Get the activity viewModel
-        LibraryViewModel mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
-
+        // Get ViewModel
+        mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         // Setup data binding
         mBinding = FragmentLibraryBookDetailsBinding.inflate(inflater, container, false);
         mBinding.setViewModel(mViewModel);
@@ -51,6 +66,30 @@ public class LibraryBookDetailsFragment extends Fragment {
         // Setup observers
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.editBook).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
+
+        // Setup scanBarcode contract
+        mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
+            if (result) {
+                BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), mHandoffIsbnUri, SCAN_TAG, mViewModel);
+            } else {
+                showToast("Failed to get photo.");
+            }
+        });
+
+        // Setup handoff button. This is done in fragment because camera requires a lot of access to application context
+        mBinding.handoffBook.setOnClickListener(v -> {
+            try {
+                mHandoffIsbnUri = ((MainActivity) requireActivity()).buildFileUri();
+                mScanBarcodeContract.launch(mHandoffIsbnUri);
+            } catch (IOException e) {
+                showToast("Failed to build uri.");
+            }
+        });
+        // Long click as backup for books where you can't scan the isbn
+        mBinding.handoffBook.setOnLongClickListener(v -> {
+            mViewModel.handoff(mViewModel.getCurrentBook().getValue().getIsbn());
+            return true;
+        });
 
         // Setup delete button. This is done in fragment because a confirmation dialog should be displayed first
         mBinding.deleteBook.setOnClickListener(v -> {
@@ -62,6 +101,41 @@ public class LibraryBookDetailsFragment extends Fragment {
                     .show();
         });
 
+        // Setup the list of requesters
+        RecyclerView recyclerView = mBinding.requestersList;
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        mViewModel.fetchRequestersForCurrentBook();
+        RequestersRecyclerViewAdapter adapter = new RequestersRecyclerViewAdapter(mViewModel.getRequesters().getValue());
+
+        // Bind ViewModel books to RecyclerViewAdapter
+        recyclerView.setAdapter(adapter);
+
+        // Watch changes in requesters list and update the view accordingly
+        mViewModel.getRequesters().observe(getViewLifecycleOwner(), adapter::setData);
+
+        // Add dividers between items in the RecyclerView
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
+      
+        mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.libraryBookFrame, mBinding.bookImageButton, mBinding.bookImage));
+
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mViewModel.detachRequestersListener();
+    }
+
+    /**
+     * Utility to show a toast via the MainActivity.
+     *
+     * @param msg Message to show
+     */
+    private void showToast(String msg) {
+        ((MainActivity) requireActivity()).showToast(msg);
     }
 }
