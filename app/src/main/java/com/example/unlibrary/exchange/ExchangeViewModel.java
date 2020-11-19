@@ -14,6 +14,7 @@ import android.view.View;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -34,6 +35,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final LiveData<Request> mCurrentRequest;
     private final LiveData<User> mCurrentBookOwner;
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
@@ -48,6 +50,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         mExchangeRepository = exchangeRepository;
         mBooks = mExchangeRepository.getBooks();
         mCurrentBookOwner = mExchangeRepository.getOwner();
+        mCurrentRequest = mExchangeRepository.getCurrentRequest();
     }
 
     /**
@@ -126,6 +129,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
 
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
+        mExchangeRepository.fetchCurrentRequest(mCurrentBook.getValue());
         mNavigationEvent.setValue(ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment());
 
     }
@@ -181,5 +185,10 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public LiveData<User> getCurrentBookOwner() {
         return this.mCurrentBookOwner;
+    }
+
+    // TODO
+    public LiveData<Boolean> showRequestButton() {
+        return Transformations.map(mCurrentRequest, input -> input == null);
     }
 }

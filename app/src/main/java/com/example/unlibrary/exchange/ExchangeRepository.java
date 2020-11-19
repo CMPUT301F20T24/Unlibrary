@@ -9,6 +9,7 @@ package com.example.unlibrary.exchange;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -59,6 +60,7 @@ public class ExchangeRepository {
 
     private final MutableLiveData<List<Book>> mBooks;
     private final MutableLiveData<User> mCurrentBookOwner;
+    private final MutableLiveData<Request> mCurrentRequest;
     private ListenerRegistration mListenerRegistration;
     private String mUID;
 
@@ -71,6 +73,7 @@ public class ExchangeRepository {
         mAlgoliaClient = algoliaClient;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mCurrentBookOwner = new MutableLiveData<>(new User());
+        mCurrentRequest = new MutableLiveData<>(null);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         // TODO: make sure user is authenticated
@@ -220,5 +223,27 @@ public class ExchangeRepository {
                     Log.e(TAG, "Unable to get owner " + currentBookOwnerID + "from database", e);
                 });
     }
-}
 
+    // TODO
+    public LiveData<Request> getCurrentRequest() {
+        return this.mCurrentRequest;
+    }
+
+    // TODO
+    public void fetchCurrentRequest(Book book) {
+        mCurrentRequest.setValue(null);
+
+        com.google.firebase.firestore.Query query = mDb.collection(REQUEST_COLLECTION)
+                .whereEqualTo("book", book.getId())
+                .whereEqualTo("requester", mUID)
+                .whereNotEqualTo("state", Request.State.ARCHIVED.toString());
+        query.get().addOnSuccessListener(qds -> {
+            List<DocumentSnapshot> documents = qds.getDocuments();
+            if (documents.size() == 1) {
+                mCurrentRequest.setValue(documents.get(0).toObject(Request.class));
+            } else if (documents.size() != 0) {
+                Log.e(TAG, "Only one request should be associated with book.");
+            }
+        }).addOnFailureListener(e -> Log.e(TAG, "Unable to get current request", e));
+    }
+}
