@@ -433,19 +433,29 @@ public class LibraryRepository {
                 })
                 .addOnFailureListener(onDeclineFailure);
     }
+
+    /**
+     * Accepts the selected requester, sets the handoff location, and clears the other requesters
+     *
+     * @param requestedUID      accepted requester user ID
+     * @param bookRequestedID   book ID request is associated with
+     * @param handoffLocation   LatLng of handoff location
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
     public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(BOOK, bookRequestedID)
                 .get()
                 .addOnCompleteListener(requestTask -> {
                     if (requestTask.isSuccessful()) {
-                        // Get selected request and set its state and location
                         List<Request> requests = requestTask.getResult().toObjects(Request.class);
                         mDb.runTransaction((Transaction.Function<Void>) transaction -> {
                             for (Request r : requests) {
                                 String id = r.getId();
                                 DocumentReference requestDocument = mDb.collection(REQUESTS_COLLECTION).document(id);
                                 DocumentSnapshot snapshot = transaction.get(requestDocument);
+
                                 if (snapshot.get(REQUESTER).equals(requestedUID)) {
                                     transaction.update(requestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
                                     transaction.update(requestDocument, STATE, Request.State.ACCEPTED.toString());
@@ -461,41 +471,21 @@ public class LibraryRepository {
                             // Success
                             return null;
                         }).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
-
-//                        final DocumentReference requestDocument = mDb.collection(REQUESTS_COLLECTION).document(id);
-//                        final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
-//
-//                        WriteBatch acceptingBatch = mDb.batch();
-//                        acceptingBatch.set(requestDocument, request);
-//                        acceptingBatch.update(bookDocument, STATUS, Status.ACCEPTED.toString());
-//
-//                        acceptingBatch.commit()
-//                                .addOnSuccessListener(s -> mDb.collection(REQUESTS_COLLECTION)
-//                                        .whereEqualTo(BOOK, bookRequestedID)
-//                                        .whereNotEqualTo(REQUESTER, requestedUID)
-//                                        .get()
-//                                        .addOnCompleteListener(otherRequestTask -> {
-//                                            List<Request> otherRequests = otherRequestTask.getResult().toObjects(Request.class);
-//                                            if (otherRequests.size() == 0) {
-//                                                return;
-//                                            }
-//                                            WriteBatch decliningBatch = mDb.batch();
-//
-//                                            for (Request r : otherRequests) {
-//                                                DocumentReference doc = mDb.collection(REQUESTS_COLLECTION).document(r.getId());
-//                                                // TODO: switch to ARCHIVE
-//                                                decliningBatch.update(doc, STATE, Request.State.DECLINED.toString());
-//                                            }
-//
-//                                            decliningBatch.commit().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
-//
-//                                        }));
                     } else {
                         Log.e(TAG, "Error in fetching requests", requestTask.getException());
                     }
                 });
     }
 
+    /**
+     * Updates the handoff location for the book
+     *
+     * @param requestedUID      accepted requester user ID
+     * @param bookRequestedID   book ID request is associated with
+     * @param handoffLocation   LatLng of handoff location
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
     public void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(REQUESTER, requestedUID)
@@ -512,13 +502,18 @@ public class LibraryRepository {
                 });
     }
 
-    public void fetchHandoffLocation(Book book, User user, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
-        String bookID = book.getId();
-        String userID = user.getUID();
-
+    /**
+     * Fetches the handoff location for the selected book
+     *
+     * @param requestedUID      accepted requester user ID
+     * @param bookRequestedID   book ID request is associated with
+     * @param onFinished        code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK, bookID)
-                .whereEqualTo(REQUESTER, userID)
+                .whereEqualTo(BOOK, bookRequestedID)
+                .whereEqualTo(REQUESTER, requestedUID)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

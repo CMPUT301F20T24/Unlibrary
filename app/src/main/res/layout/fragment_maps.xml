@@ -51,7 +51,6 @@
             android:layout_marginBottom="16dp"
             android:src="@drawable/ic_done_24px"
             android:visibility="gone"
-            android:onClick="@{()->viewModel.acceptSelectedRequester()}"
             app:backgroundTint="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

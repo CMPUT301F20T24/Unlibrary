@@ -133,7 +133,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
         mBinding.map.onCreate(savedInstanceState);
 
         // Fetch handoff location
-        mViewModel.shouldFetchHandoffLocation().observe(getViewLifecycleOwner(), s -> {
+        mViewModel.showHandoffLocation().observe(getViewLifecycleOwner(), s -> {
             if (s) {
                 mViewModel.fetchHandoffLocation();
             }

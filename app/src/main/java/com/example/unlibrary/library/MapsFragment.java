@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -37,6 +36,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     GoogleMap mMap;
     FragmentMapsBinding mBinding;
     LibraryViewModel mViewModel;
+    LatLng mLatLng;
 
     /**
      * Manipulates the map once available.
@@ -50,7 +50,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng latLng =  mViewModel.getAcceptedRequestLocation().getValue();
+        LatLng latLng = mViewModel.getAcceptedRequestLocation().getValue();
 
         if (latLng == null) {
             latLng = new LatLng(53.5461, -113.4938);
@@ -60,6 +60,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
     }
 
+    /**
+     * Sets up Places SDK, ViewModel, and Binding
+     *
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -74,9 +82,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.confirmButton).navigate(navDirections));
 
+        mBinding.confirmButton.setOnClickListener(v -> {
+            if (mViewModel.getAcceptedRequestLocation().getValue() != null) {
+                mViewModel.updateHandoffLocation(mLatLng);
+            } else {
+                mViewModel.acceptSelectedRequester(mLatLng);
+            }
+        });
+
         return mBinding.getRoot();
     }
 
+    /**
+     * Sets up autocomplete fragment and the map fragment
+     *
+     * @param view
+     * @param savedInstanceState
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -101,17 +123,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             public void onPlaceSelected(@NotNull Place place) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), 15.0f));
                 mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
-                mViewModel.setAcceptedRequestLocation(place.getLatLng());
                 mBinding.confirmButton.setVisibility(View.VISIBLE);
-                mBinding.confirmButton.setOnClickListener(v -> {
-                    mViewModel.acceptSelectedRequester();
-                    // TODO: fix this shit
-//                    if (mViewModel.getAcceptedRequestLocation().getValue() != null) {
-//                        mViewModel.updateHandoffLocation();
-//                    } else {
-//                        mViewModel.acceptSelectedRequester();
-//                    }
-                });
+                mLatLng = place.getLatLng();
             }
 
             @Override
