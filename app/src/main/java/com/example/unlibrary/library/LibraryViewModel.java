@@ -254,9 +254,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 book.setIsReadyForHandoff(false); // A book is by default not ready for handoff
                 mLibraryRepository.createBook(book,
                         o -> {
-                            Book bookWithId = mCurrentBook.getValue();
-                            bookWithId.setId(o.getId());
-                            mCurrentBook.setValue(bookWithId);
                             mIsLoading.setValue(false);
                             mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
                         },
