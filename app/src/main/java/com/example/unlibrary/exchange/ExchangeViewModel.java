@@ -126,8 +126,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
 
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
-        NavDirections direction = ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment();
-        Navigation.findNavController(view).navigate(direction);
+        mNavigationEvent.setValue(ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment());
 
     }
 
