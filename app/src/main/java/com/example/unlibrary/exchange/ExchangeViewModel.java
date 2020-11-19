@@ -17,7 +17,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
@@ -178,7 +177,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     public void search(String keywords) {
         mExchangeRepository.search(keywords);
     }
-        
+
     /**
      * Fetches owner for current book
      */
