@@ -1,5 +1,5 @@
 /*
- * UI Test
+ *  CreateAccountPageUITest
  *
  * Nov 05, 2020
  *

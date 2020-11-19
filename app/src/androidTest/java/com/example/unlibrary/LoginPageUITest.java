@@ -1,5 +1,5 @@
 /*
- * UI Test
+ * LoginPageUITest
  *
  * Nov 05, 2020
  *

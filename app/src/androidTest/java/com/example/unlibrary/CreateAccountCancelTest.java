@@ -1,5 +1,5 @@
 /*
- * UI Test
+ * CreateAccountCancelTest
  *
  * Nov 05, 2020
  *
