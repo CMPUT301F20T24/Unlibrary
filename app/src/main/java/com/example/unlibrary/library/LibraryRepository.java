@@ -375,8 +375,9 @@ public class LibraryRepository {
                     }
                 })
                 .addOnFailureListener(onDeclineFailure);
+    }
 
-     * Get the borrowed request associated with the current book.
+     /** Get the borrowed request associated with the current book.
      *
      * @param book              book request is associated with
      * @param onSuccessListener code to call on success
