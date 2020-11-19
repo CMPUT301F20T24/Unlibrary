@@ -410,7 +410,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     mFailureMsgEvent.setValue("Failed to find proper request to receive from.");
                 }
                 Request request = queryDocumentSnapshots.getDocuments().get(0).toObject(Request.class);
-                request.setState(Request.State.ARCHIVED);
+                request.setState(Request.State.DECLINED);
 
                 mLibraryRepository.completeExchange(request, book,
                         o -> {
