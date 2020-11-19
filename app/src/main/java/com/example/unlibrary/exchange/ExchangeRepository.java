@@ -57,6 +57,7 @@ public class ExchangeRepository {
     private final FirebaseFirestore mDb;
     private final Client mAlgoliaClient;
 
+    private final List<Book.Status> mAllowedStatus;
     private final MutableLiveData<List<Book>> mBooks;
     private final MutableLiveData<User> mCurrentBookOwner;
     private ListenerRegistration mListenerRegistration;
@@ -72,6 +73,8 @@ public class ExchangeRepository {
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mCurrentBookOwner = new MutableLiveData<>(new User());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        mAllowedStatus = Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED);
 
         // TODO: make sure user is authenticated
         mUID = user.getUid();
@@ -93,7 +96,7 @@ public class ExchangeRepository {
      */
     public void attachListener() {
         mListenerRegistration = mDb.collection(BOOK_COLLECTION)
-                .whereIn(STATUS, Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED))
+                .whereIn(STATUS, mAllowedStatus)
                 .whereNotEqualTo(OWNER, FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((value, error) -> {
                     if (previousSearch != null) {
@@ -111,6 +114,8 @@ public class ExchangeRepository {
                     ArrayList<Book> dbBooks = new ArrayList<>();
                     for (DocumentSnapshot doc : value.getDocuments()) {
                         // Only show the book with AVAILABLE or REQUESTED status for exchange
+                        Book book = doc.toObject(Book.class);
+                        book.setStatus(Book.Status.AVAILABLE);
                         dbBooks.add(doc.toObject(Book.class));
                     }
 
@@ -132,9 +137,11 @@ public class ExchangeRepository {
     }
 
     /**
-     * Getter for the books object.
+     * Gets the observable list of books that are available to be requested for. This includes all
+     * books that are not currently being borrowed or has been accepted. Status is always set to
+     * AVAILABLE.
      *
-     * @return LiveData<ArrayList < Book>> This returns the books object.
+     * @return observable list of requestable books
      */
     public LiveData<List<Book>> getBooks() {
         return this.mBooks;
@@ -150,7 +157,7 @@ public class ExchangeRepository {
     /**
      * Perform full search in title and author using Algolia. Full book details is fetched from
      * Firestore. Updates list of books at the end.
-     *
+     * <p>
      * TODO: Decide what to do when keywords is empty and what happens when someone adds a new book (go with listener above or do re-search)
      *
      * @param keywords space separated words to search for
@@ -182,7 +189,12 @@ public class ExchangeRepository {
                         .document(bookId)
                         .get()
                         .addOnSuccessListener(documentSnapshot -> {
-                            dbBooks.add(documentSnapshot.toObject(Book.class));
+                            Book book = documentSnapshot.toObject(Book.class);
+                            if (!book.getOwner().equals(FirebaseAuth.getInstance().getUid()) &&
+                                    mAllowedStatus.contains(book.getStatus())) {
+                                book.setStatus(Book.Status.AVAILABLE);
+                                dbBooks.add(book);
+                            }
                         }));
             }
 
@@ -192,8 +204,8 @@ public class ExchangeRepository {
                 Log.e(TAG, "Add searched books error", e);
             });
         });
-    };
-        
+    }
+
     /**
      * Getter for the owner of the book.
      *
