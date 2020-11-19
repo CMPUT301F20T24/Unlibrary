@@ -184,8 +184,6 @@ public class ExchangeRepository {
         });
     }
 
-    ;
-
     /**
      * Getter for the owner of the book.
      *
