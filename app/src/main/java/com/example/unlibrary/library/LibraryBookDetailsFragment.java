@@ -32,6 +32,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.example.unlibrary.util.BarcodeScanner;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
@@ -130,12 +131,15 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
         // Required to forward onCreate for mapView in lite mode
         mBinding.map.onCreate(savedInstanceState);
 
-        mViewModel.getCurrentBookStatus().observe(getViewLifecycleOwner(), status -> {
-            if (status == Book.Status.ACCEPTED) {
-                // set up map
-                mBinding.map.getMapAsync(this);
+        mViewModel.shouldFetchHandoffLocation().observe(getViewLifecycleOwner(), s -> {
+            if (s) {
+                mViewModel.fetchHandoffLocation();
             }
         });
+
+        // set up map
+        mViewModel.getAcceptedRequestLocation().observe(getViewLifecycleOwner(), s ->
+                mBinding.map.getMapAsync(this));
 
         return mBinding.getRoot();
     }
@@ -163,7 +167,8 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Set the bitmap to the handoff location (defaults to Edmonton if no handoff location is set)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getAcceptedRequestLocation(), 10));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getAcceptedRequestLocation().getValue(), 12));
+        googleMap.addMarker(new MarkerOptions().position(mViewModel.getAcceptedRequestLocation().getValue()));
 
         // Sets UI and click listener
         googleMap.getUiSettings().setMapToolbarEnabled(false);

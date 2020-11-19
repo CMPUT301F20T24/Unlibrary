@@ -65,6 +65,15 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final LiveData<List<User>> mCurrentBookRequesters;
     private User mSelectedRequester;
     private LatLng mAcceptedRequestLocation = new LatLng(53.5461, -113.4938); // default is Edmonton
+    private LiveData<List<User>> mCurrentBookRequesters;
+    private User mSelectedRequester = new User();
+    private MutableLiveData<LatLng> mAcceptedRequestLocation = new MutableLiveData<>(); // default is Edmonton
+
+    private LiveData<Boolean> mFetchHandoffLocation = Transformations.switchMap(mCurrentBookStatus, status -> Transformations.map(mCurrentBookRequesters, requesters -> status == Book.Status.ACCEPTED && requesters.size() == 1));
+
+    public LiveData<Boolean> shouldFetchHandoffLocation() {
+        return mFetchHandoffLocation;
+    }
 
     public enum InputKey {
         TITLE,
@@ -130,6 +139,10 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         });
     }
 
+    public LiveData<Boolean> showHandoffLocation() {
+        return Transformations.map(mCurrentBook, input -> input.getStatus() == Book.Status.ACCEPTED);
+    }
+
     /**
      * NavigationEvent getter for activity observers.
      *
@@ -193,12 +206,12 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         return mSelectedRequester;
     }
 
-    public LatLng getAcceptedRequestLocation() {
+    public LiveData<LatLng> getAcceptedRequestLocation() {
         return mAcceptedRequestLocation;
     }
 
     public void setAcceptedRequestLocation(LatLng latLng) {
-        mAcceptedRequestLocation = latLng;
+        mAcceptedRequestLocation.setValue(latLng);
     }
 
 
@@ -645,10 +658,27 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     public void acceptSelectedRequester() {
-        mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), mAcceptedRequestLocation,
+        mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), mAcceptedRequestLocation.getValue(),
                 o -> mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment()),
                 e -> {
                     mFailureMsgEvent.setValue("Failed to accept request");
+                    Log.e(TAG, "Failed to accept request of requester " + mSelectedRequester.getUID());
+                });
+    }
+
+    public void updateHandoffLocation() {
+        mLibraryRepository.updateHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(), mAcceptedRequestLocation.getValue(),
+                o -> mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment()),
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to update handoff location");
+                });
+    }
+
+    public void fetchHandoffLocation() {
+        mLibraryRepository.fetchHandoffLocation(mCurrentBook.getValue(), mCurrentBookRequesters.getValue().get(0),
+                geoPoint -> mAcceptedRequestLocation.setValue(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())),
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to get handoff location");
                     Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID());
                 });
     }

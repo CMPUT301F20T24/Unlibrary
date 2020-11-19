@@ -49,8 +49,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getAcceptedRequestLocation(), 10.0f));
-        mMap.addMarker(new MarkerOptions().position(mViewModel.getAcceptedRequestLocation()));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getAcceptedRequestLocation().getValue(), 10.0f));
+        mMap.addMarker(new MarkerOptions().position(mViewModel.getAcceptedRequestLocation().getValue()));
     }
 
     @Nullable
@@ -96,7 +96,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 mMap.addMarker(new MarkerOptions().position(place.getLatLng()));
                 mViewModel.setAcceptedRequestLocation(place.getLatLng());
                 mBinding.confirmButton.setVisibility(View.VISIBLE);
-                mBinding.confirmButton.setOnClickListener(v -> mViewModel.acceptSelectedRequester());
+                mBinding.confirmButton.setOnClickListener(v -> {
+                    if (mViewModel.getAcceptedRequestLocation().getValue() != null) {
+                        mViewModel.updateHandoffLocation();
+                    } else {
+                        mViewModel.acceptSelectedRequester();
+                    }
+                });
             }
 
             @Override

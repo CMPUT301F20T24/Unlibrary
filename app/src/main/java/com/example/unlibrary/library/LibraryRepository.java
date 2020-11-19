@@ -9,7 +9,6 @@
 package com.example.unlibrary.library;
 
 import android.util.Log;
-import android.widget.TextView;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -428,46 +427,120 @@ public class LibraryRepository {
                 .addOnFailureListener(onDeclineFailure);
     }
     public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
-        mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
+        mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo("requester", requestedUID)
                 .whereEqualTo("book", bookRequestedID)
-                .get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                List<Request> matchingRequests = task.getResult().toObjects(Request.class);
-                //                    if(matchingRequests.size() != 1) {   Uncomment when we can ensure user can't request same book twice
-                //                        Log.e(TAG, "The number of requests returned was unexpected");
-                //                        return; Is it safe to return here?
-                //                    }
-                Request request = matchingRequests.get(0);
-                request.setLocation(new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
-                request.setState(Request.State.ACCEPTED);
-                mDb.collection(REQUESTS_COLLECTION).document(request.getId())
-                        .set(request)
-                        .addOnSuccessListener(s1 -> {
-                            mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
-                                    .update(STATUS_FIELD, "ACCEPTED")
-                                    .addOnSuccessListener(s2 -> {
-                                        mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
-                                                .get()
-                                                .addOnCompleteListener(task2 -> {
-                                                    if (task2.isSuccessful()) {
-                                                        List<Request> requests = task2.getResult().toObjects(Request.class);
-                                                        for (Request r : requests) {
-                                                            mDb.collection(REQUESTS_COLLECTION).document(r.getId())
-                                                                    .delete()
-                                                                    .addOnSuccessListener(onSuccessListener)
-                                                                    .addOnFailureListener(onFailureListener);
-                                                        }
-                                                    }
-                                                })
-                                                .addOnFailureListener(onFailureListener);
-                                    })
-                                    .addOnFailureListener(onFailureListener);
-                        })
-                        .addOnFailureListener(onFailureListener);
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<Request> matchingRequests = task.getResult().toObjects(Request.class);
+                        //                    if(matchingRequests.size() != 1) {   Uncomment when we can ensure user can't request same book twice
+                        //                        Log.e(TAG, "The number of requests returned was unexpected");
+                        //                        return; Is it safe to return here?
+                        //                    }
+                        Request request = matchingRequests.get(0);
+                        request.setLocation(new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
+                        request.setState(Request.State.ACCEPTED);
 
-            } else {
-                Log.e(TAG, "Error in fetching requests", task.getException());
-            }
-        });
+                        mDb.collection(REQUESTS_COLLECTION).document(request.getId())
+                                .set(request)
+                                .addOnSuccessListener(s -> {
+                                    // Update the Book Document to accepted
+                                    mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
+                                            .update(STATUS, "ACCEPTED")
+                                            .addOnSuccessListener(onSuccessListener);
+
+                                    // Decline all other requests for the Book
+                                    mDb.collection(REQUESTS_COLLECTION)
+                                            .whereEqualTo("book", bookRequestedID)
+                                            .whereNotEqualTo("requester", requestedUID)
+                                            .get()
+                                            .addOnCompleteListener(otherRequestersTask -> {
+                                                List<Request> otherRequests = otherRequestersTask.getResult().toObjects(Request.class);
+                                                for (Request r : otherRequests) {
+                                                    mDb.collection(REQUESTS_COLLECTION).document(r.getId())
+                                                            .update(STATE, "DECLINED")
+                                                            .addOnSuccessListener(onSuccessListener)
+                                                            .addOnFailureListener(onFailureListener);
+                                                }
+                                            });
+
+                                })
+                                .addOnFailureListener(onFailureListener);
+
+                    } else {
+                        Log.e(TAG, "Error in fetching requests", task.getException());
+                    }
+                });
+    }
+
+    public void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
+        mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo("requester", requestedUID)
+                .whereEqualTo("book", bookRequestedID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Request request = task.getResult().toObjects(Request.class).get(0);
+                        mDb.collection(REQUESTS_COLLECTION).document(request.getId())
+                                .update("location", new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
+                                .addOnSuccessListener(onSuccessListener)
+                                .addOnFailureListener(onFailureListener);
+                    }
+                });
+    }
+
+    public void fetchHandoffLocation(Book book, User user, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
+        String bookID = book.getId();
+        String userID = user.getUID();
+
+        mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo("book", bookID)
+                .whereEqualTo("requester", userID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<Request> requests = task.getResult().toObjects(Request.class);
+                        onFinished.onFinished(requests.get(0).getLocation());
+                    }
+                })
+                .addOnFailureListener(onFailureListener);
+    }
+
+    public interface OnFinishedHandoffLocationListener {
+        void onFinished(GeoPoint geoPoint);
+    }
+
+     /** Get the borrowed request associated with the current book.
+     *
+     * @param book              book request is associated with
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, book.getId()).whereEqualTo(STATE, Request.State.BORROWED.toString());
+        query.get().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Update state and status of request and book
+     *
+     * @param request           request object to be updated in the database
+     * @param book              book object to update
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        WriteBatch batch = mDb.batch();
+        DocumentReference requestCol = mDb.collection(REQUESTS_COLLECTION).document(request.getId());
+        DocumentReference bookCol = mDb.collection(BOOKS_COLLECTION).document(book.getId());
+
+        requestCol.update(STATE, request.getState());
+        bookCol.update(STATUS, book.getStatus());
+        bookCol.update(IS_READY_FOR_HANDOFF, book.getIsReadyForHandoff());
+
+        batch.commit()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 }
