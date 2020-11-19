@@ -630,6 +630,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     public void initMapsFragment() {
+        mAcceptedRequestLocation.setValue(null);
         mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
     }
 
@@ -658,15 +659,26 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 });
     }
 
+    /**
+     * Accepts the selected requester and sets the handoff location
+     */
     public void acceptSelectedRequester() {
         mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), mAcceptedRequestLocation.getValue(),
-                o -> mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment()),
+                o -> {
+                    Book book = mCurrentBook.getValue();
+                    book.setStatus(Book.Status.ACCEPTED);
+                    mCurrentBook.setValue(book);
+                    mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
+                },
                 e -> {
                     mFailureMsgEvent.setValue("Failed to accept request");
                     Log.e(TAG, e.toString());
                 });
     }
 
+    /**
+     * Updates the handoff location for the current book
+     */
     public void updateHandoffLocation() {
         mLibraryRepository.updateHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(), mAcceptedRequestLocation.getValue(),
                 o -> mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment()),
@@ -676,6 +688,9 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 });
     }
 
+    /**
+     * Fetches the handoff location for the current book
+     */
     public void fetchHandoffLocation() {
         mLibraryRepository.fetchHandoffLocation(mCurrentBook.getValue(), mCurrentBookRequesters.getValue().get(0),
                 geoPoint -> mAcceptedRequestLocation.setValue(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())),

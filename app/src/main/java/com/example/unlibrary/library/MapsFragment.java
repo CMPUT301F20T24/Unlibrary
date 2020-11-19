@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -49,8 +50,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getAcceptedRequestLocation().getValue(), 10.0f));
-        mMap.addMarker(new MarkerOptions().position(mViewModel.getAcceptedRequestLocation().getValue()));
+        LatLng latLng =  mViewModel.getAcceptedRequestLocation().getValue();
+
+        if (latLng == null) {
+            latLng = new LatLng(53.5461, -113.4938);
+        } else {
+            mMap.addMarker(new MarkerOptions().position(latLng));
+        }
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
     }
 
     @Nullable
@@ -97,11 +104,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 mViewModel.setAcceptedRequestLocation(place.getLatLng());
                 mBinding.confirmButton.setVisibility(View.VISIBLE);
                 mBinding.confirmButton.setOnClickListener(v -> {
-                    if (mViewModel.getAcceptedRequestLocation().getValue() != null) {
-                        mViewModel.updateHandoffLocation();
-                    } else {
-                        mViewModel.acceptSelectedRequester();
-                    }
+                    mViewModel.acceptSelectedRequester();
+                    // TODO: fix this shit
+//                    if (mViewModel.getAcceptedRequestLocation().getValue() != null) {
+//                        mViewModel.updateHandoffLocation();
+//                    } else {
+//                        mViewModel.acceptSelectedRequester();
+//                    }
                 });
             }
 

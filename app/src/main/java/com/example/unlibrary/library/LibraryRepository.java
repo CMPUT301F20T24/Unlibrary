@@ -36,6 +36,7 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONException;
@@ -293,6 +294,10 @@ public class LibraryRepository {
                 .whereEqualTo(BOOK, bookID)
                 .whereNotEqualTo(STATE, Request.State.ARCHIVED);
 
+        // Get all requests associated with current book filtering out the ones that are declined
+        // TODO: figur this out, i think will be resolved with Taran's PR
+        // Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, bookID).whereNotEqualTo(STATE, Request.State.DECLINED)
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo("book", bookID);
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -430,46 +435,63 @@ public class LibraryRepository {
     }
     public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(REQUESTER, requestedUID)
                 .whereEqualTo(BOOK, bookRequestedID)
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<Request> matchingRequests = task.getResult().toObjects(Request.class);
+                .addOnCompleteListener(requestTask -> {
+                    if (requestTask.isSuccessful()) {
+                        // Get selected request and set its state and location
+                        List<Request> requests = requestTask.getResult().toObjects(Request.class);
+                        mDb.runTransaction((Transaction.Function<Void>) transaction -> {
+                            for (Request r : requests) {
+                                String id = r.getId();
+                                DocumentReference requestDocument = mDb.collection(REQUESTS_COLLECTION).document(id);
+                                DocumentSnapshot snapshot = transaction.get(requestDocument);
+                                if (snapshot.get(REQUESTER).equals(requestedUID)) {
+                                    transaction.update(requestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
+                                    transaction.update(requestDocument, STATE, Request.State.ACCEPTED.toString());
+                                } else {
+                                    // TODO: Switch to ARCHIVE
+                                    transaction.update(requestDocument, STATE, Request.State.DECLINED.toString());
+                                }
+                            }
 
-                        Request request = matchingRequests.get(0);
-                        String id = request.getId();
-                        request.setLocation(new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
-                        request.setState(Request.State.ACCEPTED);
+                            final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
+                            transaction.update(bookDocument, STATUS, Status.ACCEPTED.toString());
 
-                        mDb.collection(REQUESTS_COLLECTION).document(id)
-                                .set(request)
-                                .addOnSuccessListener(s -> {
-                                    // Update the Book Document to accepted
-                                    mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
-                                            .update(STATUS, Status.ACCEPTED.toString())
-                                            .addOnSuccessListener(onSuccessListener);
+                            // Success
+                            return null;
+                        }).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
 
-                                    // Decline all other requests for the Book
-                                    mDb.collection(REQUESTS_COLLECTION)
-                                            .whereEqualTo(BOOK, bookRequestedID)
-                                            .whereNotEqualTo(REQUESTER, requestedUID)
-                                            .get()
-                                            .addOnCompleteListener(otherRequestersTask -> {
-                                                List<Request> otherRequests = otherRequestersTask.getResult().toObjects(Request.class);
-                                                for (Request r : otherRequests) {
-                                                    mDb.collection(REQUESTS_COLLECTION).document(r.getId())
-                                                            .update(STATE, Request.State.DECLINED.toString())
-                                                            .addOnSuccessListener(onSuccessListener)
-                                                            .addOnFailureListener(onFailureListener);
-                                                }
-                                            });
-
-                                })
-                                .addOnFailureListener(onFailureListener);
-
+//                        final DocumentReference requestDocument = mDb.collection(REQUESTS_COLLECTION).document(id);
+//                        final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
+//
+//                        WriteBatch acceptingBatch = mDb.batch();
+//                        acceptingBatch.set(requestDocument, request);
+//                        acceptingBatch.update(bookDocument, STATUS, Status.ACCEPTED.toString());
+//
+//                        acceptingBatch.commit()
+//                                .addOnSuccessListener(s -> mDb.collection(REQUESTS_COLLECTION)
+//                                        .whereEqualTo(BOOK, bookRequestedID)
+//                                        .whereNotEqualTo(REQUESTER, requestedUID)
+//                                        .get()
+//                                        .addOnCompleteListener(otherRequestTask -> {
+//                                            List<Request> otherRequests = otherRequestTask.getResult().toObjects(Request.class);
+//                                            if (otherRequests.size() == 0) {
+//                                                return;
+//                                            }
+//                                            WriteBatch decliningBatch = mDb.batch();
+//
+//                                            for (Request r : otherRequests) {
+//                                                DocumentReference doc = mDb.collection(REQUESTS_COLLECTION).document(r.getId());
+//                                                // TODO: switch to ARCHIVE
+//                                                decliningBatch.update(doc, STATE, Request.State.DECLINED.toString());
+//                                            }
+//
+//                                            decliningBatch.commit().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+//
+//                                        }));
                     } else {
-                        Log.e(TAG, "Error in fetching requests", task.getException());
+                        Log.e(TAG, "Error in fetching requests", requestTask.getException());
                     }
                 });
     }
