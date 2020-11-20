@@ -537,23 +537,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     // If request was not successfully declined, show error message toast and log error
                     mFailureMsgEvent.setValue("Failed to decline request");
                     Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID(), e);
-                },
-                o -> {
-                    // If we have to change status of book after declining in Firebase, also change locally since mCurrentBook is
-                    // not listening to changes in Firebase
-                    Book book = mCurrentBook.getValue();
-                    book.setStatus(Book.Status.AVAILABLE);
-                    mCurrentBook.setValue(book);
-                },
-                e -> {
-                    // If we are not able to change status but needed to do so, log error and show toast
-                    mFailureMsgEvent.setValue("Failed to change book status to AVAILABLE");
-                    Log.e(TAG, "Failed to change status of book with ID " + mCurrentBook.getValue().getId() + " back to AVAILABLE", e);
-                },
-                e -> {
-                    // Log error and show toast if unable to fetch requests on the book
-                    mFailureMsgEvent.setValue("Failed to fetch requests; Book status may be wrong");
-                    Log.e(TAG, "Failed to fetch requests on book with ID " + mCurrentBook.getValue().getId() + " to determine if status should be changed after declining request", e);
                 });
     }
 

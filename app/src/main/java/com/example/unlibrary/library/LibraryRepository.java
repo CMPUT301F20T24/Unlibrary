@@ -9,10 +9,7 @@
 package com.example.unlibrary.library;
 
 import android.util.Log;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -22,7 +19,6 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -30,13 +26,10 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -280,55 +273,52 @@ public class LibraryRepository {
     /**
      * Make the required changes in FireBase to decline a request
      *
-     * @param requestedUID           User ID of requester who made the request
-     * @param bookRequestedID        Book ID of book that was requested
-     * @param onDeclineSuccess       code to call on successfully declining request
-     * @param onDeclineFailure       code to call on failure to decline request
-     * @param onStatusChangeSuccess  code to call when status of book is changed successfully from REQUESTED to ACCEPTED
-     *                               (only if there are no more active requests on the book after declining this one)
-     * @param onStatusChangeFailure  code to call on failure to change status of book back to ACCEPTED (if required)
-     * @param onFetchRequestsFailure code to call on failure of fetching requests necessary to potentially change status of book to ACCEPTED
+     * @param requestedUID     User ID of requester who made the request
+     * @param bookRequestedID  Book ID of book that was requested
+     * @param onDeclineSuccess code to call on successfully declining request
+     * @param onDeclineFailure code to call on failure to decline request
      */
-    public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, OnSuccessListener<? super Void> onStatusChangeSuccess, OnFailureListener onStatusChangeFailure, OnFailureListener onFetchRequestsFailure) {
-        // Query to find Request documents associated with the given book and requester
-        mDb.collection(REQUESTS_COLLECTION).whereEqualTo(REQUESTER_FIELD, requestedUID)
-                .whereEqualTo(BOOK_FIELD, bookRequestedID)
-                .get()
+    public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure) {
+        // Query to find all Request documents associated with the given book
+        mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, bookRequestedID).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Request> matchingRequests = queryDocumentSnapshots.toObjects(Request.class);
-//                        if(matchingRequests.size() != 1) {   // Uncomment when we can ensure user can't request same book twice
-//                            Log.e(TAG, "The number of requests returned was unexpected");
-//                            return;  // Is it safe to return here?
-//                        }
-                    // Change the state of the request to ARCHIVED
-                    for (Request request : matchingRequests) {
-                        mDb.collection(REQUESTS_COLLECTION).document(request.getId())
-                                .update(STATE_FIELD, Request.State.ARCHIVED.name())
-                                .addOnSuccessListener(onDeclineSuccess)
-                                .addOnFailureListener(onDeclineFailure);
+                    List<Request> requestsOnBook = queryDocumentSnapshots.toObjects(Request.class);
+                    // Find the Request on this book associated with this specific requester/user and store for later
+                    Request requestToUpdate = null;
+                    for (Request request : requestsOnBook) {
+                        if (request.getRequester().equals(requestedUID)) {
+                            requestToUpdate = request;
+                            break;
+                        }
                     }
-
-                    // After declining this request, if there are no other non-archived requests, we need to change
-                    // status of the book in the books collection to AVAILABLE
-                    mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, bookRequestedID)
-                            .get()
-                            .addOnSuccessListener(queryDocumentSnapshots1 -> {
-                                List<Request> requestsOnCurrentBook = queryDocumentSnapshots1.toObjects(Request.class);
-                                boolean onlyArchivedRequestsExist = true;
-                                for (Request request : requestsOnCurrentBook) {
-                                    if (!request.getState().toString().equals(Request.State.ARCHIVED.name())) {
-                                        onlyArchivedRequestsExist = false;
-                                        break;
-                                    }
-                                }
-                                if (onlyArchivedRequestsExist) {
-                                    mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
-                                            .update(STATUS_FIELD, Book.Status.AVAILABLE.name())
-                                            .addOnSuccessListener(onStatusChangeSuccess)
-                                            .addOnFailureListener(onStatusChangeFailure);
-                                }
-                            })
-                            .addOnFailureListener(onFetchRequestsFailure);
+                    // Check to make sure we found the request
+                    if (requestToUpdate == null) {
+                        Log.e(TAG, "The request was not found");
+                        return;  // We don't show toast here to user. Is that okay?
+                    }
+                    // Find if there are any other non-archived requests on this book
+                    boolean allOtherRequestsAreArchived = true;
+                    for (Request request : requestsOnBook) {
+                        if (!request.getState().toString().equals(Request.State.ARCHIVED.name())) {
+                            allOtherRequestsAreArchived = false;
+                            break;
+                        }
+                    }
+                    // Get DocumentReferences required for transaction
+                    DocumentReference requestToUpdateDocRef = mDb.collection(REQUESTS_COLLECTION).document(requestToUpdate.getId());
+                    DocumentReference currentBookDocRef = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
+                    // Convert to a final variable so it can be referenced in transaction
+                    final boolean updateBookStatus = allOtherRequestsAreArchived;
+                    // Transaction to do both updates at once
+                    mDb.runTransaction((Transaction.Function<Void>) transaction -> {
+                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.ARCHIVED.name());
+                        if (updateBookStatus) {
+                            transaction.update(currentBookDocRef, STATUS_FIELD, Book.Status.AVAILABLE.name());
+                        }
+                        // Success
+                        return null;
+                    }).addOnSuccessListener(onDeclineSuccess).addOnFailureListener(onDeclineFailure);
+                    // TODO: Need to change mCurrentBook locally in viewmodel
                 })
                 .addOnFailureListener(onDeclineFailure);
     }
