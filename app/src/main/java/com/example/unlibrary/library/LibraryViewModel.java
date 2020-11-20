@@ -688,7 +688,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * Fetches the handoff location for the current book
      */
     public void fetchHandoffLocation() {
-        mLibraryRepository.fetchHandoffLocation(mCurrentBook.getValue(), mCurrentBookRequesters.getValue().get(0),
+        mLibraryRepository.fetchHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(),
                 geoPoint -> mAcceptedRequestLocation.setValue(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())),
                 e -> {
                     mFailureMsgEvent.setValue("Failed to get handoff location");
