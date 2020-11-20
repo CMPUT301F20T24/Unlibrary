@@ -9,11 +9,13 @@ package com.example.unlibrary.unlibrary;
 
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -39,6 +41,7 @@ public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOK_COLLECTION = "books";
     private static final String REQUEST_COLLECTION = "requests";
+    private static final String USER_COLLECTION = "users";
     private static final String REQUESTER = "requester";
     private static final String BOOK = "book";
     private static final String STATE = "state";
@@ -49,6 +52,7 @@ public class UnlibraryRepository {
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
     private List<Book> mAllBooks;
     private ListenerRegistration mListenerRegistration;
+
     private String mUID;
     private FilterMap mFilter;
 
@@ -60,6 +64,7 @@ public class UnlibraryRepository {
     @Inject
     public UnlibraryRepository(FirebaseFirestore db) {
         mDb = db;
+
         mAllBooks = new ArrayList<>();
         // TODO: Get document changes only to minimize payload from Firestore
         this.mFilter = new FilterMap(true);
@@ -220,6 +225,23 @@ public class UnlibraryRepository {
         mListenerRegistration.remove();
     }
 
+    /**
+     * Fetches the owner for a newly selected book by clearing the previous book's owner information and
+     * adding a snapshot listener for the book's owner
+     *
+     * @param book
+     */
+    public void fetchOwner(Book book, OnSuccessListener<User> onSuccessListener) {
+
+        mDb.collection(USER_COLLECTION).document(book.getOwner()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    User user = documentSnapshot.toObject(User.class);
+                    onSuccessListener.onSuccess(user);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Unable to get owner " + book + "from database", e);
+                });
+    }
 
     /**
      * Simple callback interface for asynchronous events

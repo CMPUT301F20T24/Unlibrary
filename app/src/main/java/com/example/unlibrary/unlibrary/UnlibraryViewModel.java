@@ -24,6 +24,7 @@ import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
 
@@ -37,6 +38,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     private final LiveData<List<Book>> mBooks;
     private final UnlibraryRepository mUnlibraryRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final MutableLiveData<User> mCurrentBookOwner = new MutableLiveData<>();
     private final MutableLiveData<Request> mCurrentRequest = new MutableLiveData<>();
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
@@ -150,6 +152,9 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         }
 
         Book book = mBooks.getValue().get(position);
+        mUnlibraryRepository.fetchOwner(book, (user -> {
+            mCurrentBookOwner.setValue(user); // Gets user to display in detailed fragment
+        }));
         Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
         Request request = new Request();
         mUnlibraryRepository.getRequest(book,
@@ -198,6 +203,15 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         } else {
             Log.w(TAG, "Handoff called for an invalid book status.");
         }
+    }
+
+    /**
+     * Getter for the mCurrentBookOwner object.
+     *
+     * @return LiveData<User> This returns the mCurrentBookOwner object
+     */
+    public MutableLiveData<User> getCurrentBookOwner() {
+        return this.mCurrentBookOwner;
     }
 
     /**
