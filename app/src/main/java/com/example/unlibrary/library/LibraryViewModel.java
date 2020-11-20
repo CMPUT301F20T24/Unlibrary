@@ -515,7 +515,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     /**
      * Used as the onClick method for the accept button in the requester's profile fragment
-     * Naviaates to a google map fragment to allow the selection of a location
+     * Navigates to a google map fragment to allow the selection of a location
      */
     public void acceptSelectedRequester() {
         //mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
