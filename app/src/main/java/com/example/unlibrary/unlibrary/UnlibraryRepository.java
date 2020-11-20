@@ -50,7 +50,6 @@ public class UnlibraryRepository {
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
-    private final MutableLiveData<User> mCurrentBookOwner;
     private List<Book> mAllBooks;
     private ListenerRegistration mListenerRegistration;
 
@@ -66,7 +65,6 @@ public class UnlibraryRepository {
     public UnlibraryRepository(FirebaseFirestore db) {
         mDb = db;
 
-        mCurrentBookOwner = new MutableLiveData<>(new User());
         mAllBooks = new ArrayList<>();
         // TODO: Get document changes only to minimize payload from Firestore
         this.mFilter = new FilterMap(true);
@@ -238,27 +236,20 @@ public class UnlibraryRepository {
     }
 
     /**
-     * Getter for the owner of the book.
-     *
-     * @return LiveData<ArrayList < String>> This returns the books object.
-     */
-    public LiveData<User> getOwner() {
-        return this.mCurrentBookOwner;
-    }
-
-    /**
      * Fetches the owner for a newly selected book by clearing the previous book's owner information and
      * adding a snapshot listener for the book's owner
      *
-     * @param currentBookOwnerID
+     * @param book
      */
-    public void fetchOwnerForCurrentBook(String currentBookOwnerID) {
-        mDb.collection(USER_COLLECTION).document(currentBookOwnerID).get()
+    public void fetchOwner(Book book, OnSuccessListener<User> onSuccessListener) {
+
+        mDb.collection(USER_COLLECTION).document(book.getOwner()).get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    mCurrentBookOwner.setValue(documentSnapshot.toObject(User.class));
+                    User user = documentSnapshot.toObject(User.class);
+                    onSuccessListener.onSuccess(user);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Unable to get owner " + currentBookOwnerID + "from database", e);
+                    Log.e(TAG, "Unable to get owner " + book + "from database", e);
                 });
     }
 
