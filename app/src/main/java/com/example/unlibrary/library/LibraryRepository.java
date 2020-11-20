@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -32,7 +33,9 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -103,6 +106,7 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
+        mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
         Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo("owner", FirebaseAuth.getInstance().getUid());
         List<String> statusValues = new ArrayList<>();
         for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
@@ -278,11 +282,11 @@ public class LibraryRepository {
      * @param bookID requests on this book will be listened to
      */
     public void attachRequestsListener(String bookID) {
-        // Get all requests associated with current book that are in the REQUESTED state (to filter
-        // out declined requests)
+        // Get all requests associated with current book that are in REQUESTED state
         Query query = mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(BOOK_FIELD, bookID)
                 .whereEqualTo(STATE_FIELD, Request.State.REQUESTED.name());
+
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -373,50 +377,44 @@ public class LibraryRepository {
      */
     public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, OnSuccessListener<? super Void> onStatusChangeSuccess, OnFailureListener onStatusChangeFailure, OnFailureListener onFetchRequestsFailure) {
         // Query to find Request documents associated with the given book and requester
-        mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
+        mDb.collection(REQUESTS_COLLECTION).whereEqualTo(REQUESTER_FIELD, requestedUID)
                 .whereEqualTo(BOOK_FIELD, bookRequestedID)
                 .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        List<Request> matchingRequests = queryDocumentSnapshots.toObjects(Request.class);
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> matchingRequests = queryDocumentSnapshots.toObjects(Request.class);
 //                        if(matchingRequests.size() != 1) {   // Uncomment when we can ensure user can't request same book twice
 //                            Log.e(TAG, "The number of requests returned was unexpected");
 //                            return;  // Is it safe to return here?
 //                        }
-                        // Change the state of the request to ARCHIVED
-                        for (Request request : matchingRequests) {
-                            mDb.collection(REQUESTS_COLLECTION).document(request.getId())
-                                    .update(STATE_FIELD, Request.State.ARCHIVED.name())
-                                    .addOnSuccessListener(onDeclineSuccess)
-                                    .addOnFailureListener(onDeclineFailure);
-                        }
-
-                        // After declining this request, if there are no other non-archived requests, we need to change
-                        // status of the book in the books collection to AVAILABLE
-                        mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, bookRequestedID)
-                                .get()
-                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                        List<Request> requestsOnCurrentBook = queryDocumentSnapshots.toObjects(Request.class);
-                                        boolean onlyArchivedRequestsExist = true;
-                                        for (Request request : requestsOnCurrentBook) {
-                                            if (!request.getState().toString().equals(Request.State.ARCHIVED.name())) {
-                                                onlyArchivedRequestsExist = false;
-                                                break;
-                                            }
-                                        }
-                                        if (onlyArchivedRequestsExist) {
-                                            mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
-                                                    .update(STATUS_FIELD, Book.Status.AVAILABLE.name())
-                                                    .addOnSuccessListener(onStatusChangeSuccess)
-                                                    .addOnFailureListener(onStatusChangeFailure);
-                                        }
-                                    }
-                                })
-                                .addOnFailureListener(onFetchRequestsFailure);
+                    // Change the state of the request to ARCHIVED
+                    for (Request request : matchingRequests) {
+                        mDb.collection(REQUESTS_COLLECTION).document(request.getId())
+                                .update(STATE_FIELD, Request.State.ARCHIVED.name())
+                                .addOnSuccessListener(onDeclineSuccess)
+                                .addOnFailureListener(onDeclineFailure);
                     }
+
+                    // After declining this request, if there are no other non-archived requests, we need to change
+                    // status of the book in the books collection to AVAILABLE
+                    mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, bookRequestedID)
+                            .get()
+                            .addOnSuccessListener(queryDocumentSnapshots1 -> {
+                                List<Request> requestsOnCurrentBook = queryDocumentSnapshots1.toObjects(Request.class);
+                                boolean onlyArchivedRequestsExist = true;
+                                for (Request request : requestsOnCurrentBook) {
+                                    if (!request.getState().toString().equals(Request.State.ARCHIVED.name())) {
+                                        onlyArchivedRequestsExist = false;
+                                        break;
+                                    }
+                                }
+                                if (onlyArchivedRequestsExist) {
+                                    mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
+                                            .update(STATUS_FIELD, Book.Status.AVAILABLE.name())
+                                            .addOnSuccessListener(onStatusChangeSuccess)
+                                            .addOnFailureListener(onStatusChangeFailure);
+                                }
+                            })
+                            .addOnFailureListener(onFetchRequestsFailure);
                 })
                 .addOnFailureListener(onDeclineFailure);
     }
