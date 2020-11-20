@@ -22,7 +22,6 @@ import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.FilterMap;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -38,8 +37,6 @@ import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
@@ -372,32 +369,45 @@ public class LibraryRepository {
         mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, bookRequestedID).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Request> requestsOnBook = queryDocumentSnapshots.toObjects(Request.class);
-                    // Find the Request on this book associated with this specific requester/user and store for later
-                    Request requestToUpdate = null;
+
+                    // From these queried requests, find the request made by given requester that is non-archived; this is the one we should decline
+                    // Note there should only be one such requests; we use an ArrayList to find all such requests and log error if the number of such requests is not 1
+                    ArrayList<Request> matchingRequests = new ArrayList<>();
                     for (Request request : requestsOnBook) {
-                        if (request.getRequester().equals(requestedUID)) {
-                            requestToUpdate = request;
-                            break;
+                        if (request.getRequester().equals(requestedUID) && !request.getState().equals(Request.State.ARCHIVED)) {
+                            matchingRequests.add(request);
+                            //Sanity Check
+                            if (request.getState().equals(Request.State.BORROWED) || request.getState().equals(Request.State.ACCEPTED )) {
+                                Log.e(TAG, "Unexpected requests were found for book ID " + bookRequestedID + " and requesterID " + requestedUID);
+                                return;
+                            }
                         }
                     }
-                    // Check to make sure we found the request
-                    if (requestToUpdate == null) {
-                        Log.e(TAG, "The request was not found");
-                        return;  // We don't show toast here to user. Is that okay?
+                    // Check to make sure we actually found the request and there was only one such request
+                    if (matchingRequests.size() == 0) {
+                        Log.e(TAG, "The request was not found for book ID " + bookRequestedID + " and requesterID " + requestedUID);
+                        return;  // We don't show toast here to user. Can we do that (we don't have access to mFailureMsgEvent of ViewModel)?
+                    } else if (matchingRequests.size() != 1) {
+                        Log.e(TAG, "More than one request was returned for book ID " + bookRequestedID + " and requesterID " + requestedUID);
+                        return;  // We don't show toast here to user. Can we do that (we don't have access to mFailureMsgEvent of ViewModel)?
                     }
-                    // Find if there are any other non-archived requests on this book
+                    Request requestToUpdate = matchingRequests.get(0);
+
+                    // Figure out if there are any other non-archived requests on this book (made by other users)
                     boolean allOtherRequestsAreArchived = true;
                     for (Request request : requestsOnBook) {
-                        if (!request.getState().toString().equals(Request.State.ARCHIVED.name())) {
+                        if (!request.getState().toString().equals(Request.State.ARCHIVED.name()) && !request.getId().equals(requestToUpdate.getId())) {
                             allOtherRequestsAreArchived = false;
                             break;
                         }
                     }
+
                     // Get DocumentReferences required for transaction
                     DocumentReference requestToUpdateDocRef = mDb.collection(REQUESTS_COLLECTION).document(requestToUpdate.getId());
                     DocumentReference currentBookDocRef = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
-                    // Convert to a final variable so it can be referenced in transaction
+                    // Convert to a final variable so it can be referenced later in transaction
                     final boolean updateBookStatus = allOtherRequestsAreArchived;
+
                     // Transaction to do both updates at once
                     mDb.runTransaction((Transaction.Function<Void>) transaction -> {
                         transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.ARCHIVED.name());
