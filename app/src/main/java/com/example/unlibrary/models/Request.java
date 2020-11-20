@@ -110,7 +110,7 @@ public class Request {
      * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
      * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
      * BORROWED - Owner has handed off the book to the borrower
-     * DECLINED - Request has completed either by returning the book to the owner or request was declined
+     * ARCHIVED - Request has completed either by returning the book to the owner or request was declined
      *
      * @return one of the above state
      */
@@ -124,7 +124,7 @@ public class Request {
      * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
      * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
      * BORROWED - Owner has handed off the book to the borrower
-     * DECLINED - Request has completed either by returning the book to the owner or request was declined
+     * ARCHIVED - Request has completed either by returning the book to the owner or request was declined
      *
      * @param state one of the states above
      */
