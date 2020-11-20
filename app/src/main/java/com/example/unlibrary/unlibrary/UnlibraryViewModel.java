@@ -153,7 +153,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
 
         Book book = mBooks.getValue().get(position);
         mUnlibraryRepository.fetchOwner(book, (user -> {
-            mCurrentBookOwner.setValue(user);
+            mCurrentBookOwner.setValue(user); // Gets user to display in detailed fragment
         }));
         Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
         Request request = new Request();
@@ -210,7 +210,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
      *
      * @return LiveData<User> This returns the mCurrentBookOwner object
      */
-    public LiveData<User> getCurrentBookOwner() {
+    public MutableLiveData<User> getCurrentBookOwner() {
         return this.mCurrentBookOwner;
     }
 

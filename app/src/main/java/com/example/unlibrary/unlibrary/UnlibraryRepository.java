@@ -144,16 +144,6 @@ public class UnlibraryRepository {
     }
 
     /**
-     * Returns id of currently logged on user.
-     *
-     * @return unique identifier of user
-     */
-    public String getUid() {
-        return mUID;
-    }
-
-
-    /**
      * Save new Request into the database. Assumes Request is valid.
      *
      * @param book            book object to get request from
