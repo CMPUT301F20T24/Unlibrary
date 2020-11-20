@@ -21,7 +21,6 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
-import com.example.unlibrary.models.Book.Status;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.FilterMap;
@@ -63,6 +62,11 @@ public class LibraryRepository {
     private static final String STATE = "state";
     private static final String STATUS = "status";
     private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
+    private static final String REQUESTER_FIELD = "requester";
+    private static final String BOOK_FIELD = "book";
+    private static final String STATUS_FIELD = "status";
+    private static final String STATE_FIELD = "state";
+
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
 
@@ -277,8 +281,8 @@ public class LibraryRepository {
         // Get all requests associated with current book that are in the REQUESTED state (to filter
         // out declined requests)
         Query query = mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo("book", bookID)
-                .whereEqualTo("state", Status.REQUESTED.name());
+                .whereEqualTo(BOOK_FIELD, bookID)
+                .whereEqualTo(STATE_FIELD, Request.State.REQUESTED.name());
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -370,7 +374,7 @@ public class LibraryRepository {
     public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, OnSuccessListener<? super Void> onStatusChangeSuccess, OnFailureListener onStatusChangeFailure, OnFailureListener onFetchRequestsFailure) {
         // Query to find Request documents associated with the given book and requester
         mDb.collection(REQUESTS_COLLECTION).whereEqualTo("requester", requestedUID)
-                .whereEqualTo("book", bookRequestedID)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -380,32 +384,32 @@ public class LibraryRepository {
 //                            Log.e(TAG, "The number of requests returned was unexpected");
 //                            return;  // Is it safe to return here?
 //                        }
-                        // Change the state of the request to DECLINED
+                        // Change the state of the request to ARCHIVED
                         for (Request request : matchingRequests) {
                             mDb.collection(REQUESTS_COLLECTION).document(request.getId())
-                                    .update("state", Status.DECLINED.name())
+                                    .update(STATE_FIELD, Request.State.ARCHIVED.name())
                                     .addOnSuccessListener(onDeclineSuccess)
                                     .addOnFailureListener(onDeclineFailure);
                         }
 
-                        // After declining this request, if there are no other non-declined requests, we need to change
+                        // After declining this request, if there are no other non-archived requests, we need to change
                         // status of the book in the books collection to AVAILABLE
-                        mDb.collection(REQUESTS_COLLECTION).whereEqualTo("book", bookRequestedID)
+                        mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, bookRequestedID)
                                 .get()
                                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                     @Override
                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                         List<Request> requestsOnCurrentBook = queryDocumentSnapshots.toObjects(Request.class);
-                                        boolean onlyDeclinedRequestsExist = true;
+                                        boolean onlyArchivedRequestsExist = true;
                                         for (Request request : requestsOnCurrentBook) {
-                                            if (!request.getState().toString().equals(Status.DECLINED.name())) {
-                                                onlyDeclinedRequestsExist = false;
+                                            if (!request.getState().toString().equals(Request.State.ARCHIVED.name())) {
+                                                onlyArchivedRequestsExist = false;
                                                 break;
                                             }
                                         }
-                                        if (onlyDeclinedRequestsExist) {
+                                        if (onlyArchivedRequestsExist) {
                                             mDb.collection(BOOKS_COLLECTION).document(bookRequestedID)
-                                                    .update("status", Status.AVAILABLE.name())
+                                                    .update(STATUS_FIELD, Book.Status.AVAILABLE.name())
                                                     .addOnSuccessListener(onStatusChangeSuccess)
                                                     .addOnFailureListener(onStatusChangeFailure);
                                         }
