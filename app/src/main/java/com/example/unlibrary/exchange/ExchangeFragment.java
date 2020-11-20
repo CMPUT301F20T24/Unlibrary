@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
@@ -67,6 +68,8 @@ public class ExchangeFragment extends Fragment {
             }
         }
 
+        // Setup observer
+        mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.getRoot()).navigate(navDirections));
         mViewModel.getSuccessRequestMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
         return mBinding.getRoot();
     }
