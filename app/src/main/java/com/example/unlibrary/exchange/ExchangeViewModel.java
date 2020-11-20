@@ -14,9 +14,9 @@ import android.view.View;
 import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
@@ -34,6 +34,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final LiveData<Request> mCurrentRequest;
     private final LiveData<User> mCurrentBookOwner;
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
@@ -48,6 +49,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         mExchangeRepository = exchangeRepository;
         mBooks = mExchangeRepository.getBooks();
         mCurrentBookOwner = mExchangeRepository.getOwner();
+        mCurrentRequest = mExchangeRepository.getCurrentRequest();
     }
 
     /**
@@ -100,16 +102,33 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      * Generates and saves the request into firestore.
      */
     public void sendRequest() {
+        // Cannot send request if you have already sent one
+        if (mCurrentRequest.getValue() != null) {
+            return;
+        }
+
+        // Log and exit early if book is not available or requested
+        Book book = mCurrentBook.getValue();
+        Book.Status status = book.getStatus();
+        if (!(status == Book.Status.AVAILABLE || status == Book.Status.REQUESTED)) {
+            Log.e(TAG, "Invalid state " + book.getStatus().toString() + " for book " + book.getId());
+            return;
+        }
+
+        // Build new request
         Request request = new Request(mExchangeRepository.getUid(), mCurrentBook.getValue().getId());
-        mExchangeRepository.createRequest(request,
-                o -> {
-                    mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
-                    mSuccessRequestMsgEvent.setValue("Request successfully sent");
-                },
-                e -> {
-                    mFailureMsgEvent.setValue("Failed to send request.");
-                    Log.e(TAG, "Failed to send request.", e);
-                });
+
+        // Set book status
+        book.setStatus(Book.Status.REQUESTED);
+
+        // Do batch write
+        mExchangeRepository.sendRequest(request, book, aVoid -> {
+            mSuccessRequestMsgEvent.setValue("Request successfully sent");
+            mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
+        }, e -> {
+            mFailureMsgEvent.setValue("Failed to send request.");
+            Log.e(TAG, "Failed to send request.", e);
+        });
     }
 
     /**
@@ -126,9 +145,8 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
 
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
-        NavDirections direction = ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment();
-        Navigation.findNavController(view).navigate(direction);
-
+        mExchangeRepository.fetchCurrentRequest(mCurrentBook.getValue());
+        mNavigationEvent.setValue(ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment());
     }
 
     /**
@@ -167,7 +185,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     public void search(String keywords) {
         mExchangeRepository.search(keywords);
     }
-        
+
     /**
      * Fetches owner for current book
      */
@@ -182,5 +200,14 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public LiveData<User> getCurrentBookOwner() {
         return this.mCurrentBookOwner;
+    }
+
+    /**
+     * Should the request button be shown i.e. has the book already been requested or not.
+     *
+     * @return Show the book or not
+     */
+    public LiveData<Boolean> showRequestButton() {
+        return Transformations.map(mCurrentRequest, input -> input == null);
     }
 }

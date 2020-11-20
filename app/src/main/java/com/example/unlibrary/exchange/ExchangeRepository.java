@@ -28,6 +28,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONArray;
 
@@ -60,6 +61,7 @@ public class ExchangeRepository {
     private final List<Book.Status> mAllowedStatus;
     private final MutableLiveData<List<Book>> mBooks;
     private final MutableLiveData<User> mCurrentBookOwner;
+    private final MutableLiveData<Request> mCurrentRequest;
     private ListenerRegistration mListenerRegistration;
     private String mUID;
 
@@ -72,6 +74,7 @@ public class ExchangeRepository {
         mAlgoliaClient = algoliaClient;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mCurrentBookOwner = new MutableLiveData<>(new User());
+        mCurrentRequest = new MutableLiveData<>(new Request());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         mAllowedStatus = Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED);
@@ -232,5 +235,62 @@ public class ExchangeRepository {
                     Log.e(TAG, "Unable to get owner " + currentBookOwnerID + "from database", e);
                 });
     }
-}
 
+    /**
+     * Get the request associated with the current book.
+     *
+     * @return request
+     */
+    public LiveData<Request> getCurrentRequest() {
+        return this.mCurrentRequest;
+    }
+
+    /**
+     * Fetch the request associated with the current book.
+     *
+     * @param book current book
+     */
+    public void fetchCurrentRequest(Book book) {
+        // Set request so that UI thinks that it shouldn't display request button right away
+        // This prevents flashing button which could be bad b/c then double requests could be made
+        mCurrentRequest.setValue(new Request());
+
+        com.google.firebase.firestore.Query query = mDb.collection(REQUEST_COLLECTION)
+                .whereEqualTo("book", book.getId())
+                .whereEqualTo("requester", mUID)
+                .whereNotEqualTo("state", Request.State.ARCHIVED.toString());
+
+        query.get().addOnSuccessListener(qds -> {
+            List<DocumentSnapshot> documents = qds.getDocuments();
+            if (documents.size() == 1) {
+                mCurrentRequest.setValue(documents.get(0).toObject(Request.class));
+            } else if (documents.size() == 0) {
+                mCurrentRequest.setValue(null);
+            } else {
+                Log.e(TAG, "Only up to one request should be associated with book.");
+            }
+        }).addOnFailureListener(e -> Log.e(TAG, "Unable to get current request", e));
+    }
+
+    /**
+     * Request a book.
+     *
+     * @param request request to be created
+     * @param book book to associate request with
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void sendRequest(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
+        WriteBatch batch = mDb.batch();
+
+        DocumentReference newRequest = mDb.collection(REQUEST_COLLECTION).document();
+        batch.set(newRequest, request);
+
+        DocumentReference updatedBook = mDb.collection(BOOK_COLLECTION).document(book.getId());
+        batch.update(updatedBook, STATUS, book.getStatus());
+
+        batch.commit()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+    }
+}

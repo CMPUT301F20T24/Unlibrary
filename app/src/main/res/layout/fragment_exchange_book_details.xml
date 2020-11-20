@@ -8,6 +8,9 @@
         <variable
             name="viewModel"
             type="com.example.unlibrary.exchange.ExchangeViewModel" />
+
+        <import type="android.view.View" />
+
     </data>
 
     <FrameLayout
@@ -39,6 +42,7 @@
                 android:backgroundTint="@color/colorAccent"
                 android:contentDescription="@string/edit_book_fab_description"
                 android:onClick="@{()->viewModel.sendRequest()}"
+                android:visibility="@{viewModel.showRequestButton() ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/bookImageButton"
@@ -109,7 +113,7 @@
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />
-            
+
             <TextView
                 android:id="@+id/textView10"
                 android:layout_width="wrap_content"
@@ -181,7 +185,7 @@
             android:layout_height="match_parent"
             android:visibility="invisible"
             tools:imagePath="@{viewModel.currentBook.photo}" />
-        
+
     </FrameLayout>
-    
+
 </layout>
