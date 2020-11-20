@@ -253,8 +253,6 @@ public class UnlibraryRepository {
      * @param currentBookOwnerID
      */
     public void fetchOwnerForCurrentBook(String currentBookOwnerID) {
-        mCurrentBookOwner.setValue(new User());
-
         mDb.collection(USER_COLLECTION).document(currentBookOwnerID).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     mCurrentBookOwner.setValue(documentSnapshot.toObject(User.class));
