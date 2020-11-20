@@ -6,14 +6,12 @@
  * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
  */
 
-package com.example.unlibrary.util;
+package com.example.unlibrary.library;
 
 import com.example.unlibrary.models.Book;
 
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 /**
  * Wrapper class to manage the filter settings for the library book list.
@@ -23,12 +21,11 @@ public class FilterMap {
 
     /**
      * Construct a FilterMap. Defaults to filtering on no statuses.
-     * @param avail checks whether to include request or not
      */
-    public FilterMap(boolean avail) {
+    public FilterMap() {
         mFilter = new EnumMap<>(Book.Status.class);
         mFilter.put(Book.Status.AVAILABLE, false);
-        if (avail) mFilter.put(Book.Status.REQUESTED, false);
+        mFilter.put(Book.Status.REQUESTED, false);
         mFilter.put(Book.Status.ACCEPTED, false);
         mFilter.put(Book.Status.BORROWED, false);
     }
@@ -69,8 +66,12 @@ public class FilterMap {
      * @return List of names
      */
     public String[] itemStrings() {
-        // https://stackoverflow.com/questions/32616271/getting-return-list-from-foreach-java-8
-        return Arrays.stream(mFilter.keySet().toArray()).map(status -> status.toString()).toArray(String[]::new);
+        return new String[]{
+                Book.Status.AVAILABLE.toString(),
+                Book.Status.REQUESTED.toString(),
+                Book.Status.ACCEPTED.toString(),
+                Book.Status.BORROWED.toString()
+        };
     }
 
     /**
@@ -79,9 +80,11 @@ public class FilterMap {
      * @return List of booleans
      */
     public boolean[] itemBooleans() {
-        Boolean[] filter = Arrays.stream(mFilter.keySet().toArray()).map(status -> mFilter.get(status)).toArray(Boolean[]::new);
-        boolean[] bfilter = new boolean[filter.length];
-        IntStream.range(0, bfilter.length).forEach(index -> bfilter[index] = filter[index].booleanValue());
-        return bfilter;
+        return new boolean[]{
+                mFilter.get(Book.Status.AVAILABLE),
+                mFilter.get(Book.Status.REQUESTED),
+                mFilter.get(Book.Status.ACCEPTED),
+                mFilter.get(Book.Status.BORROWED),
+        };
     }
 }

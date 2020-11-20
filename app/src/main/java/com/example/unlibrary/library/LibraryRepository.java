@@ -19,7 +19,6 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
-import com.example.unlibrary.util.FilterMap;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -71,7 +70,7 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
-        this.mFilter = new FilterMap(true);
+        this.mFilter = new FilterMap();
         attachListener();
     }
 

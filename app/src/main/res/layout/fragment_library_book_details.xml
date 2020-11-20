@@ -36,20 +36,6 @@
                     tools:imagePath="@{viewModel.currentBook.photo}" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/handoff_book"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:layout_marginBottom="4dp"
-                    android:contentDescription="@string/handoff_book"
-                    android:visibility="@{viewModel.showHandoffButton() ? View.VISIBLE : View.GONE}"
-                    app:backgroundTint="@color/colorAccent"
-                    app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
-                    app:layout_constraintEnd_toStartOf="@+id/edit_book"
-                    app:layout_constraintTop_toBottomOf="@+id/bookImageButton"
-                    app:srcCompat="@drawable/ic_baseline_swap_vert_24" />
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/edit_book"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

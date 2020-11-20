@@ -19,8 +19,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentUnlibraryBinding;
-import com.example.unlibrary.util.FilterMap;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -31,7 +29,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class UnlibraryFragment extends Fragment {
     private UnlibraryViewModel mViewModel;
     private FragmentUnlibraryBinding mBinding;
-    private FilterMap mUpdateFilter;
 
     /**
      * Initialize ViewModel of the fragment that will be retained when the fragment is
@@ -72,19 +69,6 @@ public class UnlibraryFragment extends Fragment {
 
 
         mViewModel.getSuccessMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
-        // Setup OnClickListener for filter button. Done in fragment because a dialog needs to be shown.
-        // TODO theme filter button to be active/highlighted when it is filtering
-        mUpdateFilter = new FilterMap(false);
-        mUpdateFilter.setMap(mViewModel.getFilter().getMap());
-        mBinding.fabFilter.setOnClickListener(v -> {
-            new MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Select status to filter by.")
-                    .setNeutralButton("Cancel", null)
-                    .setPositiveButton("Filter", (dialog, which) -> mViewModel.setFilter(mUpdateFilter))
-                    .setOnDismissListener(dialog -> mUpdateFilter.setMap(mViewModel.getFilter().getMap()))
-                    .setMultiChoiceItems(mUpdateFilter.itemStrings(), mUpdateFilter.itemBooleans(), (dialog, which, isChecked) -> mUpdateFilter.set(mUpdateFilter.itemStrings()[which], isChecked))
-                    .show();
-        });
         return mBinding.getRoot();
     }
 }

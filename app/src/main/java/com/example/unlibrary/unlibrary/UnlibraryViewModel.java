@@ -24,11 +24,8 @@ import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.exchange.ExchangeBookDetailsFragmentDirections;
 import com.example.unlibrary.exchange.ExchangeFragmentDirections;
 import com.example.unlibrary.exchange.ExchangeViewModel;
-import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
-import com.example.unlibrary.models.User;
-import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.SingleLiveEvent;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -42,12 +39,10 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
     private final LiveData<List<Book>> mBooks;
     private final UnlibraryRepository mUnlibraryRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
-    private final MutableLiveData<User> mCurrentBookOwner = new MutableLiveData<>();
     private final MutableLiveData<Request> mCurrentRequest = new MutableLiveData<>();
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessMsgEvent = new SingleLiveEvent<>();
-    private FilterMap mFilter;
 
     /**
      * Constructor for the UnLibrary ViewModel. Binds the list of books to return from the
@@ -57,27 +52,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
     public UnlibraryViewModel(UnlibraryRepository unlibraryRepository) {
         mUnlibraryRepository = unlibraryRepository;
         mBooks = mUnlibraryRepository.getBooks();
-        mFilter = new FilterMap(false);
-    }
-
-
-    /**
-     * Get the current filter settings.
-     *
-     * @return FilterMap object
-     */
-    public FilterMap getFilter() {
-        return mFilter;
-    }
-
-    /**
-     * Configure the filter settings and trigger a corresponding update to the books data.
-     *
-     * @param filter FilterMap object
-     */
-    public void setFilter(FilterMap filter) {
-        mFilter.setMap(filter.getMap());
-        mUnlibraryRepository.setFilter(mFilter);
     }
 
     /**
@@ -139,9 +113,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
         }
 
         Book book = mBooks.getValue().get(position);
-        mUnlibraryRepository.fetchOwner(book, (user -> {
-            mCurrentBookOwner.setValue(user); // Gets user to display in detailed fragment
-        }));
         Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
         Request request = new Request();
         mUnlibraryRepository.getRequest(book,
@@ -177,15 +148,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource {
                 e -> {
                     mFailureMsgEvent.setValue("Could not change status of book");
                 });
-    }
-
-    /**
-     * Getter for the mCurrentBookOwner object.
-     *
-     * @return LiveData<User> This returns the mCurrentBookOwner object
-     */
-    public MutableLiveData<User> getCurrentBookOwner() {
-        return this.mCurrentBookOwner;
     }
 
     /**

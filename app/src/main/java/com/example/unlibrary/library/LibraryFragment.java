@@ -20,7 +20,6 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
 import com.example.unlibrary.databinding.FragmentLibraryBinding;
-import com.example.unlibrary.util.FilterMap;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -82,7 +81,7 @@ public class LibraryFragment extends Fragment {
 
         // Setup OnClickListener for filter button. Done in fragment because a dialog needs to be shown.
         // TODO theme filter button to be active/highlighted when it is filtering
-        mUpdateFilter = new FilterMap(true);
+        mUpdateFilter = new FilterMap();
         mUpdateFilter.setMap(mViewModel.getFilter().getMap());
         mBinding.fabFilter.setOnClickListener(v -> {
             new MaterialAlertDialogBuilder(requireContext())
