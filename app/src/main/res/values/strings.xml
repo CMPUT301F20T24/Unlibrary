@@ -42,6 +42,4 @@
     <string name="requesters">Requesters</string>
     <string name="accept_request_fab_description">Accept request</string>
     <string name="decline_request_fab_description">Decline request</string>
-    <string name="handoff_book_fab_description">Handoff book</string>
-    <string name="handoff_book">Handoff Book</string>
 </resources>

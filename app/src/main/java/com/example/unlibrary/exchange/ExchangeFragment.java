@@ -55,13 +55,6 @@ public class ExchangeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentExchangeBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
-        mBinding.setViewModel(mViewModel);
-
-        // Add listener to enter key in search bar
-        mBinding.searchExchangeBook.setOnEditorActionListener((textView, i, keyEvent) -> {
-            mViewModel.search(textView.getText().toString());
-            return true;
-        });
 
         // Child fragments are can only be accessed on view creation, so this is the earliest
         // point where we can specify the data source

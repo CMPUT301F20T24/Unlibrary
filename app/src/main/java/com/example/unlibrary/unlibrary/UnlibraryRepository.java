@@ -8,24 +8,30 @@
 package com.example.unlibrary.unlibrary;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.unlibrary.models.User;
+
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -41,7 +47,7 @@ public class UnlibraryRepository {
     private static final String BOOK = "book";
     private static final String STATE = "state";
     private static final String STATUS = "status";
-    private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
+
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
@@ -141,26 +147,11 @@ public class UnlibraryRepository {
 
         requestCol.update(STATE, request.getState());
         bookCol.update(STATUS, book.getStatus());
-        bookCol.update(IS_READY_FOR_HANDOFF, book.getIsReadyForHandoff());
 
         batch.commit()
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
 
-    }
-
-    /**
-     * Update a book document.
-     *
-     * @param book              book object to be updated in the database.
-     * @param onSuccessListener code to call on success
-     * @param onFailureListener code to call on failure
-     */
-    public void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
-        mDb.collection(BOOK_COLLECTION).document(book.getId())
-                .set(book)
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(onFailureListener);
     }
 
     /**

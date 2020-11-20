@@ -31,6 +31,7 @@ import java.util.List;
  */
 public class ExchangeViewModel extends ViewModel implements BooksSource {
     private static final String TAG = ExchangeViewModel.class.getSimpleName();
+
     private final LiveData<List<Book>> mBooks;
     private final ExchangeRepository mExchangeRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
@@ -38,7 +39,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
-    private String mSearchText;
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
@@ -140,34 +140,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         mExchangeRepository.detachListener();
     }
 
-    /**
-     * Returns the current input in search field
-     *
-     * @return current input in search field
-     */
-    public String getSearchText() {
-        return mSearchText;
-    }
-
-    /**
-     * Updates the input to the search field
-     *
-     * @param searchText new input in search field
-     */
-    public void setSearchText(String searchText) {
-        mSearchText = searchText;
-    }
-
-
-    /**
-     * Updates the list of books according to search results for given keywords in title or author.
-     *
-     * @param keywords space separated words to search for
-     */
-    public void search(String keywords) {
-        mExchangeRepository.search(keywords);
-    }
-        
     /**
      * Fetches owner for current book
      */
