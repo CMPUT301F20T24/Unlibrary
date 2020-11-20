@@ -127,19 +127,6 @@ public class ExchangeRepository {
     }
 
     /**
-     * Save new Request into the database. Assumes Request is valid.
-     *
-     * @param request           request object to be saved in the database
-     * @param onSuccessListener code to call on success
-     * @param onFailureListener code to call on failure
-     */
-    public void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener) {
-        mDb.collection(REQUEST_COLLECTION).add(request)
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(onFailureListener);
-    }
-
-    /**
      * Gets the observable list of books that are available to be requested for. This includes all
      * books that are not currently being borrowed or has been accepted. Status is always set to
      * AVAILABLE.
