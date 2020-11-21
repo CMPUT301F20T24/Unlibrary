@@ -337,18 +337,24 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public void deleteCurrentBook() {
         if (mCurrentBook.getValue() == null) {
             mFailureMsgEvent.setValue("Failed to get current book.");
-        } else {
-            mIsLoading.setValue(true);
-            mLibraryRepository.deleteBook(mCurrentBook.getValue(),
-                    o -> {
-                        mIsLoading.setValue(false);
-                        mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
-                    },
-                    e -> {
-                        mIsLoading.setValue(false);
-                        mFailureMsgEvent.setValue("Failed to delete book.");
-                    });
+            return;
         }
+
+        if (mCurrentBookRequesters.getValue().size() != 0) {
+            mFailureMsgEvent.setValue("Cannot delete a book that is requested.");
+            return;
+        }
+
+        mIsLoading.setValue(true);
+        mLibraryRepository.deleteBook(mCurrentBook.getValue(),
+                o -> {
+                    mIsLoading.setValue(false);
+                    mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
+                },
+                e -> {
+                    mIsLoading.setValue(false);
+                    mFailureMsgEvent.setValue("Failed to delete book.");
+                });
     }
 
     /**

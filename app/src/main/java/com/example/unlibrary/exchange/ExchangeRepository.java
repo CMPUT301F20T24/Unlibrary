@@ -262,8 +262,8 @@ public class ExchangeRepository {
     /**
      * Request a book.
      *
-     * @param request request to be created
-     * @param book book to associate request with
+     * @param request           request to be created
+     * @param book              book to associate request with
      * @param onSuccessListener code to call on success
      * @param onFailureListener code to call on failure
      */
