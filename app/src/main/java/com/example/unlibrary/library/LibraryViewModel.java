@@ -613,6 +613,12 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     // If request was not successfully declined, show error message toast and log error
                     mFailureMsgEvent.setValue("Failed to decline request");
                     Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID(), e);
+                },
+                () -> {
+                    mFailureMsgEvent.setValue("Request not found");
+                    Log.e(TAG, "The request was not found for book ID " +  mCurrentBook.getValue().getId() + " and requesterID " + mSelectedRequester.getUID());
+                    mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
+
                 });
     }
 
