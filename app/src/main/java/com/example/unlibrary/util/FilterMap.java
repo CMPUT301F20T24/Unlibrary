@@ -23,6 +23,7 @@ public class FilterMap {
 
     /**
      * Construct a FilterMap. Defaults to filtering on no statuses.
+     *
      * @param avail checks whether to include request or not
      */
     public FilterMap(boolean avail) {
