@@ -58,10 +58,10 @@ public class LibraryRepository {
     private static final String STATE = "state";
     private static final String STATUS = "status";
     private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
-    private static final String REQUESTER_FIELD = "requester";
     private static final String BOOK_FIELD = "book";
     private static final String STATUS_FIELD = "status";
     private static final String STATE_FIELD = "state";
+    private static final String OWNER_FIELD = "owner";
 
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
@@ -100,7 +100,7 @@ public class LibraryRepository {
      */
     public void attachListener() {
         mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
-        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo("owner", FirebaseAuth.getInstance().getUid());
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, FirebaseAuth.getInstance().getUid());
         List<String> statusValues = new ArrayList<>();
         for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
             if (f.getValue()) {
@@ -277,8 +277,8 @@ public class LibraryRepository {
     public void attachRequestsListener(String bookID) {
         // Get all requests associated with current book that are in REQUESTED state
         Query query = mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK_FIELD, bookID)
-                .whereEqualTo(STATE_FIELD, Request.State.REQUESTED.name());
+                .whereEqualTo(BOOK, bookID)
+                .whereNotEqualTo(STATE, Request.State.ARCHIVED);
 
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
@@ -379,7 +379,7 @@ public class LibraryRepository {
                             //Sanity Check
                             if (request.getState().equals(Request.State.BORROWED) || request.getState().equals(Request.State.ACCEPTED )) {
                                 Log.e(TAG, "Unexpected requests were found for book ID " + bookRequestedID + " and requesterID " + requestedUID);
-                                return;
+                                return;  // We don't show toast here to user. Can we do that (we don't have access to mFailureMsgEvent of ViewModel)?
                             }
                         }
                     }
@@ -396,7 +396,7 @@ public class LibraryRepository {
                     // Figure out if there are any other non-archived requests on this book (made by other users)
                     boolean allOtherRequestsAreArchived = true;
                     for (Request request : requestsOnBook) {
-                        if (!request.getState().toString().equals(Request.State.ARCHIVED.name()) && !request.getId().equals(requestToUpdate.getId())) {
+                        if (!request.getState().toString().equals(Request.State.ARCHIVED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
                             allOtherRequestsAreArchived = false;
                             break;
                         }
@@ -410,9 +410,9 @@ public class LibraryRepository {
 
                     // Transaction to do both updates at once
                     mDb.runTransaction((Transaction.Function<Void>) transaction -> {
-                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.ARCHIVED.name());
+                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.ARCHIVED.toString());
                         if (updateBookStatus) {
-                            transaction.update(currentBookDocRef, STATUS_FIELD, Book.Status.AVAILABLE.name());
+                            transaction.update(currentBookDocRef, STATUS_FIELD, Book.Status.AVAILABLE.toString());
                         }
                         // Success
                         return null;
