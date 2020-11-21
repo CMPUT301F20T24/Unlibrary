@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_list.BooksFragment;
@@ -55,6 +56,13 @@ public class ExchangeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBinding = FragmentExchangeBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
+        mBinding.setViewModel(mViewModel);
+
+        // Add listener to enter key in search bar
+        mBinding.searchExchangeBook.setOnEditorActionListener((textView, i, keyEvent) -> {
+            mViewModel.search(textView.getText().toString());
+            return true;
+        });
 
         // Child fragments are can only be accessed on view creation, so this is the earliest
         // point where we can specify the data source
@@ -67,6 +75,8 @@ public class ExchangeFragment extends Fragment {
             }
         }
 
+        // Setup observer
+        mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.getRoot()).navigate(navDirections));
         mViewModel.getSuccessRequestMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
         return mBinding.getRoot();
     }
