@@ -36,7 +36,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class LibraryEditBookFragment extends Fragment {
 
-    public static final String SCAN_TAG = "com.example.unlibrary.library.LibraryEditBookFragment";
     private LibraryViewModel mViewModel;
     private FragmentLibraryEditBookBinding mBinding;
     private Uri mAutofillUri;
@@ -82,7 +81,7 @@ public class LibraryEditBookFragment extends Fragment {
         // Setup scanBarcode contract
         mScanBarcodeContract = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
             if (result) {
-                BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), mAutofillUri, SCAN_TAG, mViewModel);
+                BarcodeScanner.scanBarcode(requireActivity().getApplicationContext(), mAutofillUri, mViewModel);
             } else {
                 showToast("Failed to get photo.");
             }

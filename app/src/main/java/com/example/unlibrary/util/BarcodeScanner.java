@@ -11,9 +11,6 @@ package com.example.unlibrary.util;
 import android.content.Context;
 import android.net.Uri;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -31,10 +28,9 @@ public class BarcodeScanner {
      *
      * @param context    Application context needed to access image
      * @param uri        Uri of the image that should be scanned.
-     * @param tag        Allows a single implementation of OnFinishedScanListener to handle multiple types of scans.
      * @param onFinished Callbacks to invoke when scan succeeds or fails.
      */
-    public static void scanBarcode(Context context, Uri uri, String tag, OnFinishedScanListener onFinished) {
+    public static void scanBarcode(Context context, Uri uri, OnFinishedScanListener onFinished) {
         InputImage image = null;
         try {
             image = InputImage.fromFilePath(context, uri);
@@ -63,12 +59,12 @@ public class BarcodeScanner {
                         }
                     }
                     if (isbn == null || isbn.isEmpty()) {
-                        onFinished.onFinishedScanFailure(tag, new FailedToScan("No ISBN barcode found."));
+                        onFinished.onFinishedScanFailure(new FailedToScan("No ISBN barcode found."));
                     } else {
-                        onFinished.onFinishedScanSuccess(tag, isbn);
+                        onFinished.onFinishedScanSuccess(isbn);
                     }
                 })
-                .addOnFailureListener(e -> onFinished.onFinishedScanFailure(tag, e));
+                .addOnFailureListener(onFinished::onFinishedScanFailure);
     }
 
     /**
@@ -90,8 +86,8 @@ public class BarcodeScanner {
      * Callbacks to be invoked when scan finishes.
      */
     public interface OnFinishedScanListener {
-        void onFinishedScanSuccess(String tag, String isbn);
+        void onFinishedScanSuccess(String isbn);
 
-        void onFinishedScanFailure(String tag, Throwable e);
+        void onFinishedScanFailure(Throwable e);
     }
 }
