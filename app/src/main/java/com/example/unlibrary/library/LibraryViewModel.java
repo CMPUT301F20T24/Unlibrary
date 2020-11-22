@@ -354,6 +354,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mLibraryRepository.deleteBookPhoto(currentBook,
                 o -> {
                     mIsLoading.setValue(false);
+                    mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
                 },
                 e -> {
                     mIsLoading.setValue(false);
