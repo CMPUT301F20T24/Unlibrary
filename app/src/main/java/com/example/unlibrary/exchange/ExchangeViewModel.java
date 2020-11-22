@@ -18,23 +18,14 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
-import com.example.unlibrary.util.MySingleton;
+import com.example.unlibrary.util.SendNotification;
 import com.example.unlibrary.util.SingleLiveEvent;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Manages the Exchange flow business logic. Connects the exchange fragment to the repository.
@@ -49,6 +40,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
+    private final SendNotification msender = new SendNotification();
     private String mSearchText;
     private final String FCM_API = "https://fcm.googleapis.com/fcm/send";
     final private String serverKey = "key=" + "AAAAAkUm6fE:APA91bE_uyTQS3tH0vG_JG7qDTkwxqGvL9tmwlPo1mPhd8jwF714tTa_tJzq6Kg16MoqJotD3zAejCkvqN2xfjjaQ9qR_T4R6GxGctES6DNhlANWR7QtvDDMNfUzIys3OZK1SsNUzgSO";
@@ -158,6 +150,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
 
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
+        sendRequestNotification(view);
         mExchangeRepository.fetchCurrentRequest(mCurrentBook.getValue());
         mNavigationEvent.setValue(ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment());
     }
@@ -215,6 +208,9 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         return this.mCurrentBookOwner;
     }
 
+    public void sendRequestNotification(View view) {
+        msender.generateNotification(view, mCurrentBook.getValue());
+    }
     /**
      * Should the request button be shown i.e. has the book already been requested or not.
      *
@@ -222,50 +218,5 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
      */
     public LiveData<Boolean> showRequestButton() {
         return Transformations.map(mCurrentRequest, input -> input == null);
-    }
-
-    public void generateNotification (View view) {
-        String TOPIC = "/topics/" + mCurrentBook.getValue().getOwner();
-        String NOTIFICATION_TITLE = "NEW BOOK REQUEST";
-        String NOTIFICATION_MESSAGE = mCurrentBook.getValue().getTitle() + " has a new request";
-
-        JSONObject notification = new JSONObject();
-        JSONObject notifcationBody = new JSONObject();
-        try {
-            notifcationBody.put("title", NOTIFICATION_TITLE);
-            notifcationBody.put("message", NOTIFICATION_MESSAGE);
-
-            notification.put("to", TOPIC);
-            notification.put("data", notifcationBody);
-        } catch (JSONException e) {
-            Log.e(TAG, "onCreate: " + e.getMessage() );
-        }
-        sendNotification(notification, view);
-    }
-
-    private void sendNotification(JSONObject notification, View view) {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i(TAG, "onResponse: " + response.toString());
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.i(TAG, "onErrorResponse: Didn't work");
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization", serverKey);
-                params.put("Content-Type", contentType);
-                return params;
-            }
-        };
-
-        MySingleton.getInstance(view.getContext()).addToRequestQueue(jsonObjectRequest);
     }
 }

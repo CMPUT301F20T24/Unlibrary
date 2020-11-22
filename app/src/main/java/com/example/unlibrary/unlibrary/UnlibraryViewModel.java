@@ -20,25 +20,15 @@ import androidx.lifecycle.ViewModel;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.FilterMap;
-import com.example.unlibrary.util.MySingleton;
 import com.example.unlibrary.util.SingleLiveEvent;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Manages the Unlibrary flow business logic. Connects the  fragments to the repository.
@@ -54,10 +44,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessMsgEvent = new SingleLiveEvent<>();
     private FilterMap mFilter;
-    private final String FCM_API = "https://fcm.googleapis.com/fcm/send";
-    final private String serverKey = "key=" + "AAAAAkUm6fE:APA91bE_uyTQS3tH0vG_JG7qDTkwxqGvL9tmwlPo1mPhd8jwF714tTa_tJzq6Kg16MoqJotD3zAejCkvqN2xfjjaQ9qR_T4R6GxGctES6DNhlANWR7QtvDDMNfUzIys3OZK1SsNUzgSO";
-    final private String contentType = "application/json";
-
 
     /**
      * Constructor for the UnLibrary ViewModel. Binds the list of books to return from the
@@ -160,7 +146,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
      * @param position list position of selected book.
      */
     public void selectCurrentBook(View view, int position) {
-        GenerateNotification(view);
         if (mBooks.getValue() == null) {
             mFailureMsgEvent.setValue("Failed to show details for book");
             return;
@@ -262,50 +247,5 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     public void onFinishedScanFailure(String tag, Throwable e) {
         mFailureMsgEvent.setValue("Failed to scan barcode.");
         Log.e(TAG, "Failed to scan barcode.", e);
-    }
-
-    public void GenerateNotification (View view) {
-        String TOPIC = "/topics/TestTopic";
-        String NOTIFICATION_TITLE =  "TestNotificationTitle";
-        String NOTIFICATION_MESSAGE = "TestNotificationTitle";
-
-        JSONObject notification = new JSONObject();
-        JSONObject notifcationBody = new JSONObject();
-        try {
-            notifcationBody.put("title", NOTIFICATION_TITLE);
-            notifcationBody.put("message", NOTIFICATION_MESSAGE);
-
-            notification.put("to", TOPIC);
-            notification.put("data", notifcationBody);
-        } catch (JSONException e) {
-            Log.e(TAG, "onCreate: " + e.getMessage() );
-        }
-        sendNotification(notification, view);
-    }
-
-    private void sendNotification(JSONObject notification, View view) {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i(TAG, "onResponse: " + response.toString());
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.i(TAG, "onErrorResponse: Didn't work");
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization", serverKey);
-                params.put("Content-Type", contentType);
-                return params;
-            }
-        };
-
-        MySingleton.getInstance(view.getContext()).addToRequestQueue(jsonObjectRequest);
     }
 }
