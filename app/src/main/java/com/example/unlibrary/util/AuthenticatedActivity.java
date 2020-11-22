@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.unlibrary.auth.AuthActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
  * This abstract activity locks any activities that extend it behind a layer of Firebase authentication.
@@ -41,6 +42,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
             goToAuth();
         }
 
+        FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid());
         FirebaseAuth.getInstance().addAuthStateListener((auth) -> {
             mUser = auth.getCurrentUser();
 

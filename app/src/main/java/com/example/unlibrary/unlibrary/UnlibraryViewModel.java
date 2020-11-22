@@ -30,6 +30,7 @@ import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.FilterMap;
+import com.example.unlibrary.util.MySingleton;
 import com.example.unlibrary.util.SingleLiveEvent;
 
 import org.json.JSONException;
