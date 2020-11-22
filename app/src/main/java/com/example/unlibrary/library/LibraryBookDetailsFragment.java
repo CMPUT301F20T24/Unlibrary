@@ -136,7 +136,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
         });
 
         // Set up map
-        mViewModel.getAcceptedRequestLocation().observe(getViewLifecycleOwner(), s ->
+        mViewModel.getHandoffLocation().observe(getViewLifecycleOwner(), s ->
                 mBinding.map.getMapAsync(this));
 
         return mBinding.getRoot();
@@ -165,8 +165,8 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Set the bitmap to the handoff location (defaults to Edmonton if no handoff location is set)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getAcceptedRequestLocation().getValue(), 12));
-        googleMap.addMarker(new MarkerOptions().position(mViewModel.getAcceptedRequestLocation().getValue()));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getHandoffLocation().getValue(), 12));
+        googleMap.addMarker(new MarkerOptions().position(mViewModel.getHandoffLocation().getValue()));
 
         // Sets UI and click listener
         googleMap.getUiSettings().setMapToolbarEnabled(false);

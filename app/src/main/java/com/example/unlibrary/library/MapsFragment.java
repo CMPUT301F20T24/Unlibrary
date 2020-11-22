@@ -50,7 +50,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng latLng = mViewModel.getAcceptedRequestLocation().getValue();
+        LatLng latLng = mViewModel.getHandoffLocation().getValue();
 
         if (latLng == null) {
             latLng = new LatLng(53.5461, -113.4938);
@@ -83,7 +83,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.confirmButton).navigate(navDirections));
 
         mBinding.confirmButton.setOnClickListener(v -> {
-            if (mViewModel.getAcceptedRequestLocation().getValue() != null) {
+            if (mViewModel.getHandoffLocation().getValue() != null) {
                 mViewModel.updateHandoffLocation(mLatLng);
             } else {
                 mViewModel.acceptSelectedRequester(mLatLng);
