@@ -99,7 +99,9 @@
         tools:layout="@layout/fragment_maps">
         <action
             android:id="@+id/action_mapsFragment_to_libraryBookDetailsFragment"
-            app:destination="@id/libraryBookDetailsFragment" />
+            app:destination="@id/libraryBookDetailsFragment"
+            app:popUpTo="@+id/libraryBookDetailsFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/libraryRequesterProfileFragment"
