@@ -342,6 +342,24 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryEditBookFragment());
     }
 
+    // Golnoush
+    public void deleteCurrentBookPhoto(){
+        if (mCurrentBook.getValue().getPhoto() == null) {
+            mFailureMsgEvent.setValue("Failed to get current book's photo.");
+            return;
+        }
+        // mIsLoading.setValue(true);
+        mCurrentBook.getValue().setPhoto(null);
+        mLibraryRepository.deleteBookPhoto(mCurrentBook.getValue(),
+                o -> {
+                    mIsLoading.setValue(false);
+                },
+                e -> {
+                    mIsLoading.setValue(false);
+                    mFailureMsgEvent.setValue("Failed to delete book's photo.");
+                });
+    }
+
     /**
      * Delete the current book.
      */

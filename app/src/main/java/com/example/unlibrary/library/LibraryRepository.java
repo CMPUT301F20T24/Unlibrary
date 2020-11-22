@@ -8,6 +8,7 @@
 
 package com.example.unlibrary.library;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -184,6 +185,14 @@ public class LibraryRepository {
                         Log.e(TAG, "Unable to delete book " + book.getId(), e);
                     }
                 });
+    }
+
+    // Golnoush
+    public void deleteBookPhoto(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
+        mDb.collection(BOOKS_COLLECTION).document(book.getId())
+                .set(book)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     /**
