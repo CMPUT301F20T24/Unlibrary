@@ -42,9 +42,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
     private final SendNotification msender = new SendNotification();
     private String mSearchText;
-    private final String FCM_API = "https://fcm.googleapis.com/fcm/send";
-    final private String serverKey = "key=" + "AAAAAkUm6fE:APA91bE_uyTQS3tH0vG_JG7qDTkwxqGvL9tmwlPo1mPhd8jwF714tTa_tJzq6Kg16MoqJotD3zAejCkvqN2xfjjaQ9qR_T4R6GxGctES6DNhlANWR7QtvDDMNfUzIys3OZK1SsNUzgSO";
-    final private String contentType = "application/json";
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
