@@ -1,3 +1,10 @@
+/*
+ * MapsFragment
+ *
+ * November 21, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary.library;
 
 import android.os.Bundle;
@@ -30,6 +37,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+/**
+ * Fragment to display Google Map and Autocomplete fragment to choose a handoff location
+ */
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = MapsFragment.class.getSimpleName();
