@@ -48,6 +48,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import static com.example.unlibrary.models.Request.State.ARCHIVED;
+
 /**
  * Manages all the database interaction for the Library ViewModel.
  */
@@ -290,7 +292,7 @@ public class LibraryRepository {
         // Get all requests associated with current book that are in REQUESTED state
         Query query = mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(BOOK, bookID)
-                .whereNotEqualTo(STATE, Request.State.ARCHIVED);
+                .whereNotEqualTo(STATE, ARCHIVED);
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -398,7 +400,7 @@ public class LibraryRepository {
                     // Figure out if there are any other non-archived requests on this book (made by other users)
                     boolean allOtherRequestsAreArchived = true;
                     for (Request request : requestsOnBook) {
-                        if (!request.getState().toString().equals(Request.State.ARCHIVED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
+                        if (!request.getState().toString().equals(ARCHIVED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
                             allOtherRequestsAreArchived = false;
                             break;
                         }
@@ -413,7 +415,7 @@ public class LibraryRepository {
 
                     // Transaction to do both updates at once
                     mDb.runTransaction((Transaction.Function<Void>) transaction -> {
-                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.ARCHIVED.toString());
+                        transaction.update(requestToUpdateDocRef, STATE_FIELD, ARCHIVED.toString());
                         if (finalAllOtherRequestsAreArchived) {
                             transaction.update(currentBookDocRef, STATUS_FIELD, Book.Status.AVAILABLE.toString());
                         }
@@ -436,6 +438,7 @@ public class LibraryRepository {
     public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(BOOK, bookRequestedID)
+                .whereNotEqualTo(STATE, ARCHIVED)
                 .get()
                 .addOnCompleteListener(requestTask -> {
                     if (requestTask.isSuccessful()) {
@@ -450,7 +453,7 @@ public class LibraryRepository {
                                     transaction.update(requestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
                                     transaction.update(requestDocument, STATE, Request.State.ACCEPTED.toString());
                                 } else {
-                                    transaction.update(requestDocument, STATE, Request.State.ARCHIVED.toString());
+                                    transaction.update(requestDocument, STATE, ARCHIVED.toString());
                                 }
                             }
 
@@ -479,6 +482,7 @@ public class LibraryRepository {
         mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(REQUESTER, requestedUID)
                 .whereEqualTo(BOOK, bookRequestedID)
+                .whereNotEqualTo(STATE, ARCHIVED)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -508,6 +512,7 @@ public class LibraryRepository {
         mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(BOOK, bookRequestedID)
                 .whereEqualTo(REQUESTER, requestedUID)
+                .whereNotEqualTo(STATE, ARCHIVED)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
