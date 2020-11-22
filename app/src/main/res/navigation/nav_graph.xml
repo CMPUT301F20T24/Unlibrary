@@ -92,9 +92,7 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_libraryBookDetailsFragment_to_libraryRequesterProfileFragment"
-            app:destination="@id/libraryRequesterProfileFragment"
-            app:popUpTo="@id/libraryBookDetailsFragment"
-            app:popUpToInclusive="true" />
+            app:destination="@id/libraryRequesterProfileFragment" />
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
