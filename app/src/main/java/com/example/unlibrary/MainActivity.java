@@ -21,6 +21,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.androidnetworking.AndroidNetworking;
 import com.example.unlibrary.databinding.ActivityMainBinding;
 import com.example.unlibrary.util.AuthenticatedActivity;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +55,7 @@ public class MainActivity extends AuthenticatedActivity {
         setUpBottomNavigation();
 
         AndroidNetworking.initialize(getApplicationContext());
+        FirebaseMessaging.getInstance().subscribeToTopic("TestTopic");
     }
 
     /**
