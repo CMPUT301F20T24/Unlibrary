@@ -290,7 +290,7 @@ public class LibraryRepository {
         // Get all requests associated with current book that are in REQUESTED state
         Query query = mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(BOOK, bookID)
-                .whereNotEqualTo(STATE, Request.State.DECLINED);
+                .whereNotEqualTo(STATE, Request.State.ARCHIVED);
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -398,7 +398,7 @@ public class LibraryRepository {
                     // Figure out if there are any other non-archived requests on this book (made by other users)
                     boolean allOtherRequestsAreArchived = true;
                     for (Request request : requestsOnBook) {
-                        if (!request.getState().toString().equals(Request.State.DECLINED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
+                        if (!request.getState().toString().equals(Request.State.ARCHIVED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
                             allOtherRequestsAreArchived = false;
                             break;
                         }
@@ -413,7 +413,7 @@ public class LibraryRepository {
 
                     // Transaction to do both updates at once
                     mDb.runTransaction((Transaction.Function<Void>) transaction -> {
-                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.DECLINED.toString());
+                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.ARCHIVED.toString());
                         if (finalAllOtherRequestsAreArchived) {
                             transaction.update(currentBookDocRef, STATUS_FIELD, Book.Status.AVAILABLE.toString());
                         }
@@ -450,7 +450,7 @@ public class LibraryRepository {
                                     transaction.update(requestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
                                     transaction.update(requestDocument, STATE, Request.State.ACCEPTED.toString());
                                 } else {
-                                    transaction.update(requestDocument, STATE, Request.State.DECLINED.toString());
+                                    transaction.update(requestDocument, STATE, Request.State.ARCHIVED.toString());
                                 }
                             }
 

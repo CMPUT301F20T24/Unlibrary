@@ -245,7 +245,7 @@ public class ExchangeRepository {
         com.google.firebase.firestore.Query query = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo("book", book.getId())
                 .whereEqualTo("requester", mUID)
-                .whereNotEqualTo("state", Request.State.DECLINED.toString());
+                .whereNotEqualTo("state", Request.State.ARCHIVED.toString());
 
         query.get().addOnSuccessListener(qds -> {
             List<DocumentSnapshot> documents = qds.getDocuments();

@@ -8,9 +8,6 @@
 
 package com.example.unlibrary.models;
 
-import androidx.core.util.Pair;
-
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.DocumentId;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -109,10 +106,10 @@ public class Request {
     /**
      * Gets the state of a request.
      * <p>
-     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
-     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
+     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/archived by the owner
+     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to archived
      * BORROWED - Owner has handed off the book to the borrower
-     * DECLINED - Request has completed either by returning the book to the owner or request was declined
+     * ARCHIVED - Request has completed either by returning the book to the owner or request was archived
      *
      * @return one of the above state
      */
@@ -123,10 +120,10 @@ public class Request {
     /**
      * Updates the state of the request.
      * <p>
-     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
-     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
+     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/archived by the owner
+     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to archived
      * BORROWED - Owner has handed off the book to the borrower
-     * DECLINED - Request has completed either by returning the book to the owner or request was declined
+     * ARCHIVED - Request has completed either by returning the book to the owner or request was archived
      *
      * @param state one of the states above
      */
@@ -157,6 +154,6 @@ public class Request {
         REQUESTED,
         ACCEPTED,
         BORROWED,
-        DECLINED
+        ARCHIVED
     }
 }
