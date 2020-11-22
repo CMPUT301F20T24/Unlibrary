@@ -79,6 +79,7 @@ public class UnlibraryRepository {
     public void attachListeners() {
         mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo(REQUESTER, FirebaseAuth.getInstance().getUid())
+                .whereNotEqualTo(STATE, Request.State.ARCHIVED.toString())
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
                         Log.e(TAG, "Unable to get requests from database", error);

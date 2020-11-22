@@ -44,7 +44,7 @@
                     android:layout_margin="16dp"
                     android:layout_marginBottom="4dp"
                     android:contentDescription="@string/handoff_book"
-                    android:visibility="@{viewModel.showHandoffButton() ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{viewModel.showHandoffButton()? View.VISIBLE : View.GONE}"
                     app:backgroundTint="@color/colorAccent"
                     app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
                     app:layout_constraintEnd_toStartOf="@+id/edit_book"
@@ -181,6 +181,7 @@
                     android:layout_marginTop="@dimen/text_margin"
                     android:text="@string/requesters"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
+                    android:visibility="@{viewModel.requesters.size() == 0? View.GONE: View.VISIBLE}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/status" />
 

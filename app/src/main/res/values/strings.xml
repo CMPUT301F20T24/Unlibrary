@@ -43,4 +43,6 @@
     <string name="handoff_book_fab_description">Handoff book</string>
     <string name="handoff_book">Handoff Book</string>
     <string name="owner">OWNER</string>
+    <string name="accept_request_fab_description">Accept request</string>
+    <string name="decline_request_fab_description">Decline request</string>
 </resources>
