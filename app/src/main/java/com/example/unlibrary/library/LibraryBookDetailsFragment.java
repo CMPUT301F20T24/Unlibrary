@@ -106,7 +106,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         mViewModel.fetchRequestersForCurrentBook();
-        RequestersRecyclerViewAdapter adapter = new RequestersRecyclerViewAdapter(mViewModel.getRequesters().getValue());
+        RequestersRecyclerViewAdapter adapter = new RequestersRecyclerViewAdapter(mViewModel.getRequesters().getValue(), mViewModel::selectRequester);
 
         // Bind ViewModel books to RecyclerViewAdapter
         recyclerView.setAdapter(adapter);
@@ -118,7 +118,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
-      
+
         mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.libraryBookFrame, mBinding.bookImageButton, mBinding.bookImage));
 
         return mBinding.getRoot();

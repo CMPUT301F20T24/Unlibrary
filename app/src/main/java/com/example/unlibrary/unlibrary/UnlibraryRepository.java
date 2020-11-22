@@ -9,13 +9,12 @@ package com.example.unlibrary.unlibrary;
 
 import android.util.Log;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
+import com.example.unlibrary.util.FilterMap;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -209,7 +208,7 @@ public class UnlibraryRepository {
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
     }
-    
+
     /**
      * Gets an observable list of books that are requested or borrowed by the current user.
      *

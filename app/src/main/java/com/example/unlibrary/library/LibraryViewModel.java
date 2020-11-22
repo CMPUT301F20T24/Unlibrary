@@ -60,6 +60,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private LiveData<List<Book>> mBooks;
     private final LibraryRepository mLibraryRepository;
     private final LiveData<List<User>> mCurrentBookRequesters;
+    private User mSelectedRequester;
 
     public enum InputKey {
         TITLE,
@@ -176,6 +177,16 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public LiveData<List<User>> getRequesters() {
         return this.mCurrentBookRequesters;
     }
+
+    /**
+     * Getter for the mSelectedRequester object.
+     *
+     * @return the requester that the user has selected
+     */
+    public User getSelectedRequester() {
+        return mSelectedRequester;
+    }
+
 
     /**
      * Cleans up resources, removes the snapshot listener from the repository.
@@ -337,18 +348,24 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public void deleteCurrentBook() {
         if (mCurrentBook.getValue() == null) {
             mFailureMsgEvent.setValue("Failed to get current book.");
-        } else {
-            mIsLoading.setValue(true);
-            mLibraryRepository.deleteBook(mCurrentBook.getValue(),
-                    o -> {
-                        mIsLoading.setValue(false);
-                        mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
-                    },
-                    e -> {
-                        mIsLoading.setValue(false);
-                        mFailureMsgEvent.setValue("Failed to delete book.");
-                    });
+            return;
         }
+
+        if (mCurrentBookRequesters.getValue().size() != 0) {
+            mFailureMsgEvent.setValue("Cannot delete a book that is requested.");
+            return;
+        }
+
+        mIsLoading.setValue(true);
+        mLibraryRepository.deleteBook(mCurrentBook.getValue(),
+                o -> {
+                    mIsLoading.setValue(false);
+                    mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryFragment());
+                },
+                e -> {
+                    mIsLoading.setValue(false);
+                    mFailureMsgEvent.setValue("Failed to delete book.");
+                });
     }
 
     /**
@@ -567,6 +584,48 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     protected void detachRequestersListener() {
         mLibraryRepository.detachRequestersListener();
+    }
+
+    /**
+     * Used in the onClick method for selecting a requester from recycler view of requesters in detailed book view.
+     * Sets mSelectedRequester to the right user and navigates to a fragment with their profile.
+     */
+    public void selectRequester(View v, int position) {
+        mSelectedRequester = mCurrentBookRequesters.getValue().get(position);
+        mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryRequesterProfileFragment());
+    }
+
+    /**
+     * Used as the onClick method for the accept button in the requester's profile fragment
+     * Navigates to a google map fragment to allow the selection of a location
+     */
+    public void acceptSelectedRequester() {
+        //mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
+    }
+
+    /**
+     * Used as the onClick method for the decline button in the requester's profile fragment.
+     * Calls a method in the library repository to make required changes in the database by passing
+     * in the required information about the currently selected book and requester, and lambdas to
+     * be used in onSuccess/onFailure listeners.
+     */
+    public void declineSelectedRequester() {
+        mLibraryRepository.declineRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(),
+                o -> {
+                    // If request is successfully declined, navigate back to detailed book fragment
+                    mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
+                },
+                e -> {
+                    // If request was not successfully declined, show error message toast and log error
+                    mFailureMsgEvent.setValue("Failed to decline request");
+                    Log.e(TAG, "Failed to decline request of requester " + mSelectedRequester.getUID(), e);
+                },
+                () -> {
+                    mFailureMsgEvent.setValue("Request not found");
+                    Log.e(TAG, "The request was not found for book ID " +  mCurrentBook.getValue().getId() + " and requesterID " + mSelectedRequester.getUID());
+                    mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
+
+                });
     }
 
 }
