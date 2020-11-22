@@ -41,7 +41,6 @@ import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +66,6 @@ public class LibraryRepository {
     private static final String STATE_FIELD = "state";
     private static final String OWNER_FIELD = "owner";
 
-    private static final String STATUS_FIELD = "status";
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
     private static final String REQUESTER = "requester";
@@ -292,12 +290,7 @@ public class LibraryRepository {
         // Get all requests associated with current book that are in REQUESTED state
         Query query = mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(BOOK, bookID)
-                .whereNotEqualTo(STATE, Request.State.ARCHIVED);
-
-        // Get all requests associated with current book filtering out the ones that are declined
-        // TODO: figur this out, i think will be resolved with Taran's PR
-        // Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, bookID).whereNotEqualTo(STATE, Request.State.DECLINED)
-        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo("book", bookID);
+                .whereNotEqualTo(STATE, Request.State.DECLINED);
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -377,14 +370,11 @@ public class LibraryRepository {
     /**
      * Make the required changes in FireBase to decline a request
      *
-     * @param requestedUID           User ID of requester who made the request
-     * @param bookRequestedID        Book ID of book that was requested
-     * @param onDeclineSuccess       code to call on successfully declining request
-     * @param onDeclineFailure       code to call on failure to decline request
-     * @param onStatusChangeSuccess  code to call when status of book is changed successfully from REQUESTED to ACCEPTED
-     *                               (only if there are no more active requests on the book after declining this one)
-     * @param onStatusChangeFailure  code to call on failure to change status of book back to ACCEPTED (if required)
-     * @param onFetchRequestsFailure code to call on failure of fetching requests necessary to potentially change status of book to ACCEPTED
+     * @param requestedUID          User ID of requester who made the request
+     * @param bookRequestedID       Book ID of book that was requested
+     * @param onDeclineSuccess      code to call on successfully declining request
+     * @param onDeclineFailure      code to call on failure to decline request
+     * @param onRequestNotFoundInDB code to call on failure of fetching requests necessary to potentially change status of book to ACCEPTED
      */
     public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, Runnable onRequestNotFoundInDB) {
         // Query to find all documents in Requests collection associated with the given book
@@ -400,7 +390,7 @@ public class LibraryRepository {
                         }
                     }
                     // Check to make sure requestToUpdate is non-null
-                    if (requestToUpdate  == null) {
+                    if (requestToUpdate == null) {
                         onRequestNotFoundInDB.run();
                         return;
                     }
@@ -408,7 +398,7 @@ public class LibraryRepository {
                     // Figure out if there are any other non-archived requests on this book (made by other users)
                     boolean allOtherRequestsAreArchived = true;
                     for (Request request : requestsOnBook) {
-                        if (!request.getState().toString().equals(Request.State.ARCHIVED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
+                        if (!request.getState().toString().equals(Request.State.DECLINED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
                             allOtherRequestsAreArchived = false;
                             break;
                         }
@@ -423,7 +413,7 @@ public class LibraryRepository {
 
                     // Transaction to do both updates at once
                     mDb.runTransaction((Transaction.Function<Void>) transaction -> {
-                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.ARCHIVED.toString());
+                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.DECLINED.toString());
                         if (finalAllOtherRequestsAreArchived) {
                             transaction.update(currentBookDocRef, STATUS_FIELD, Book.Status.AVAILABLE.toString());
                         }
@@ -526,38 +516,5 @@ public class LibraryRepository {
 
     public interface OnFinishedHandoffLocationListener {
         void onFinished(GeoPoint geoPoint);
-    }
-
-     /** Get the borrowed request associated with the current book.
-     *
-     * @param book              book request is associated with
-     * @param onSuccessListener code to call on success
-     * @param onFailureListener code to call on failure
-     */
-    public void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
-        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, book.getId()).whereEqualTo(STATE, Request.State.BORROWED.toString());
-        query.get().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
-    }
-
-    /**
-     * Update state and status of request and book
-     *
-     * @param request           request object to be updated in the database
-     * @param book              book object to update
-     * @param onSuccessListener code to call on success
-     * @param onFailureListener code to call on failure
-     */
-    public void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
-        WriteBatch batch = mDb.batch();
-        DocumentReference requestCol = mDb.collection(REQUESTS_COLLECTION).document(request.getId());
-        DocumentReference bookCol = mDb.collection(BOOKS_COLLECTION).document(book.getId());
-
-        requestCol.update(STATE, request.getState());
-        bookCol.update(STATUS, book.getStatus());
-        bookCol.update(IS_READY_FOR_HANDOFF, book.getIsReadyForHandoff());
-
-        batch.commit()
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(onFailureListener);
     }
 }

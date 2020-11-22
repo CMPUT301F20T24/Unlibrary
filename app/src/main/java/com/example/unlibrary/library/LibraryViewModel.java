@@ -62,10 +62,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final LibraryRepository mLibraryRepository;
     private final LiveData<List<User>> mCurrentBookRequesters;
     private User mSelectedRequester;
-    private LatLng mAcceptedRequestLocation = new LatLng(53.5461, -113.4938); // default is Edmonton
-    private LiveData<List<User>> mCurrentBookRequesters;
-    private User mSelectedRequester = new User();
-    private MutableLiveData<LatLng> mAcceptedRequestLocation = new MutableLiveData<>();
+    private MutableLiveData<LatLng> mAcceptedRequestLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
 
     public enum InputKey {
         TITLE,
@@ -93,8 +90,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public MutableLiveData<Book> getCurrentBook() {
         return this.mCurrentBook;
     }
-
-    public LiveData<Book.Status> getCurrentBookStatus() { return this.mCurrentBookStatus; }
 
     /**
      * Getter for the mTakenPhoto object.
