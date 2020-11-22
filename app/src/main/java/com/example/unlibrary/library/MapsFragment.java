@@ -43,6 +43,7 @@ import java.util.Arrays;
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = MapsFragment.class.getSimpleName();
+    private static final Float ZOOM_LEVEL = 10.0f;
     GoogleMap mMap;
     FragmentMapsBinding mBinding;
     LibraryViewModel mViewModel;
@@ -65,7 +66,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         } else {
             mMap.addMarker(new MarkerOptions().position(latLng));
         }
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
     }
 
     /**

@@ -45,6 +45,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class LibraryBookDetailsFragment extends BookDetailFragment implements OnMapReadyCallback {
 
     public static final String SCAN_TAG = "com.example.unlibrary.library.LibraryBookDetailsFragment";
+    private static final Float ZOOM_LEVEL = 12.0f;
     private FragmentLibraryBookDetailsBinding mBinding;
     private LibraryViewModel mViewModel;
     private Uri mHandoffIsbnUri;
@@ -165,7 +166,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
     @Override
     public void onMapReady(GoogleMap googleMap) {
         // Set the bitmap to the handoff location (defaults to Edmonton if no handoff location is set)
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getHandoffLocation().getValue(), 12));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getHandoffLocation().getValue(), ZOOM_LEVEL));
         googleMap.addMarker(new MarkerOptions().position(mViewModel.getHandoffLocation().getValue()));
 
         // Sets UI and click listener
