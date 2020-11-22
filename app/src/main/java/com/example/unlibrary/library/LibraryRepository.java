@@ -70,7 +70,7 @@ public class LibraryRepository {
     // TODO: Consider using POJOs for algolia
     private static final String ALGOLIA_TITLE_FIELD = "title";
     private static final String ALGOLIA_AUTHOR_FIELD = "author";
-    private static final String ALGOLIA_ID_FIELD = "id";
+    private static final String ALGOLIA_ID_FIELD = "objectID";
     private final Client mAlgoliaClient;
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
@@ -177,6 +177,13 @@ public class LibraryRepository {
                 .delete()
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
+
+        mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME)
+                .deleteObjectAsync(book.getId(), (jsonObject, e) -> {
+                    if (e != null) {
+                        Log.e(TAG, "Unable to delete book " + book.getId(), e);
+                    }
+                });
     }
 
     /**
