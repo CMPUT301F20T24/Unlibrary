@@ -344,13 +344,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     // Golnoush
     public void deleteCurrentBookPhoto(){
-        if (mCurrentBook.getValue().getPhoto() == null) {
+        Book currentBook = mCurrentBook.getValue();
+        if (currentBook.getPhoto() == null) {
             mFailureMsgEvent.setValue("Failed to get current book's photo.");
             return;
         }
-        // mIsLoading.setValue(true);
-        mCurrentBook.getValue().setPhoto(null);
-        mLibraryRepository.deleteBookPhoto(mCurrentBook.getValue(),
+        mIsLoading.setValue(true);
+        currentBook.setPhoto(null);
+        mLibraryRepository.deleteBookPhoto(currentBook,
                 o -> {
                     mIsLoading.setValue(false);
                 },
