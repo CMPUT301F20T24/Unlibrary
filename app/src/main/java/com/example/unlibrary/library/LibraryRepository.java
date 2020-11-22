@@ -440,14 +440,9 @@ public class LibraryRepository {
                 .whereEqualTo(BOOK, bookRequestedID)
                 .whereNotEqualTo(STATE, ARCHIVED)
                 .get()
-                .addOnCompleteListener(requestTask -> {
-                    if (!requestTask.isSuccessful()) {
-                        Log.e(TAG, "Error in fetching requests", requestTask.getException());
-                        return;
-                    }
-
-                    List<Request> requests = requestTask.getResult().toObjects(Request.class);
-                    mDb.runTransaction((Transaction.Function<Void>) transaction -> {
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
+                    mDb.runTransaction(transaction -> {
 
                         // Firestore transactions do not allow reads to occur after a write
                         DocumentReference acceptedRequestDocument = null;
@@ -465,7 +460,7 @@ public class LibraryRepository {
                             }
                         }
 
-                        if (acceptedRequestDocument != null) {
+                        if (acceptedRequestDocument == null) {
                             onFailureListener.onFailure(new Exception("Failed to accept requester"));
                             return null;
                         }
@@ -485,7 +480,8 @@ public class LibraryRepository {
                     })
                             .addOnSuccessListener(onSuccessListener)
                             .addOnFailureListener(onFailureListener);
-                });
+                })
+                .addOnFailureListener(onFailureListener);
     }
 
     /**
@@ -503,20 +499,19 @@ public class LibraryRepository {
                 .whereEqualTo(BOOK, bookRequestedID)
                 .whereNotEqualTo(STATE, ARCHIVED)
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<Request> requests = task.getResult().toObjects(Request.class);
-                        if (requests.size() != 1) {
-                            onFailureListener.onFailure(new Exception("Unexpected number of requests returned during update location.  " + requests.size() + " requests found."));
-                            return;
-                        }
-                        Request request = requests.get(0);
-                        mDb.collection(REQUESTS_COLLECTION).document(request.getId())
-                                .update(LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
-                                .addOnSuccessListener(onSuccessListener)
-                                .addOnFailureListener(onFailureListener);
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
+                    if (requests.size() != 1) {
+                        onFailureListener.onFailure(new Exception("Unexpected number of requests returned during update location.  " + requests.size() + " requests found."));
+                        return;
                     }
-                });
+                    Request request = requests.get(0);
+                    mDb.collection(REQUESTS_COLLECTION).document(request.getId())
+                            .update(LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
+                            .addOnSuccessListener(onSuccessListener)
+                            .addOnFailureListener(onFailureListener);
+                })
+                .addOnFailureListener(onFailureListener);
     }
 
     /**
@@ -533,15 +528,13 @@ public class LibraryRepository {
                 .whereEqualTo(REQUESTER, requestedUID)
                 .whereNotEqualTo(STATE, ARCHIVED)
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<Request> requests = task.getResult().toObjects(Request.class);
-                        if (requests.size() != 1) {
-                            onFailureListener.onFailure(new Exception("Unexpected number of requests returned when fetching location.  " + requests.size() + " requests found."));
-                            return;
-                        }
-                        onFinished.onFinished(requests.get(0).getLocation());
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
+                    if (requests.size() != 1) {
+                        onFailureListener.onFailure(new Exception("Unexpected number of requests returned when fetching location.  " + requests.size() + " requests found."));
+                        return;
                     }
+                    onFinished.onFinished(requests.get(0).getLocation());
                 })
                 .addOnFailureListener(onFailureListener);
     }
