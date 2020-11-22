@@ -640,7 +640,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 },
                 () -> {
                     mFailureMsgEvent.setValue("Request not found");
-                    Log.e(TAG, "The request was not found for book ID " +  mCurrentBook.getValue().getId() + " and requesterID " + mSelectedRequester.getUID());
+                    Log.e(TAG, "The request was not found for book ID " + mCurrentBook.getValue().getId() + " and requesterID " + mSelectedRequester.getUID());
                     mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
 
                 });

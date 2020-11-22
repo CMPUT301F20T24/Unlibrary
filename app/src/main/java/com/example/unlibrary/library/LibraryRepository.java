@@ -450,7 +450,6 @@ public class LibraryRepository {
                                     transaction.update(requestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
                                     transaction.update(requestDocument, STATE, Request.State.ACCEPTED.toString());
                                 } else {
-                                    // TODO: Switch to ARCHIVE
                                     transaction.update(requestDocument, STATE, Request.State.DECLINED.toString());
                                 }
                             }
@@ -514,6 +513,9 @@ public class LibraryRepository {
                 .addOnFailureListener(onFailureListener);
     }
 
+    /**
+     * Callback for fetching handoff location
+     */
     public interface OnFinishedHandoffLocationListener {
         void onFinished(GeoPoint geoPoint);
     }
