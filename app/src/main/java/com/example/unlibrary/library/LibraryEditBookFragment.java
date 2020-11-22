@@ -23,6 +23,7 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.databinding.FragmentLibraryEditBookBinding;
 import com.example.unlibrary.util.BarcodeScanner;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -113,6 +114,16 @@ public class LibraryEditBookFragment extends Fragment {
             } catch (IOException e) {
                 showToast("Failed to build uri.");
             }
+        });
+
+        // Setup delete button. This is done in fragment because a confirmation dialog should be displayed first
+        mBinding.deleteBookPhoto.setOnClickListener(v -> {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Delete " + mViewModel.getCurrentBook().getValue().getTitle() + "'s Photo?")
+                    .setMessage("Do you really want to delete this photo?")
+                    .setNegativeButton("No", null)
+//                    .setPositiveButton("Yes", (dialog, which) -> mViewModel.deleteCurrentBook())
+                    .show();
         });
 
         return mBinding.getRoot();

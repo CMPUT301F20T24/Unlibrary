@@ -28,7 +28,7 @@
             tools:imageUri="@{viewModel.takenPhoto}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/delete_book_image"
+            android:id="@+id/delete_book_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -51,7 +51,7 @@
             android:contentDescription="@string/add_photo_of_book"
             app:backgroundTint="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="@+id/bookImage"
-            app:layout_constraintEnd_toStartOf="@+id/delete_book_image"
+            app:layout_constraintEnd_toStartOf="@+id/delete_book_photo"
             app:layout_constraintTop_toBottomOf="@+id/bookImage"
             app:srcCompat="@drawable/ic_baseline_photo_camera_24" />
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
