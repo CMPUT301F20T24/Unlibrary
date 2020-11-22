@@ -444,18 +444,32 @@ public class LibraryRepository {
                     if (requestTask.isSuccessful()) {
                         List<Request> requests = requestTask.getResult().toObjects(Request.class);
                         mDb.runTransaction((Transaction.Function<Void>) transaction -> {
+
+                            // Firestore transactions do not allow writes to occur after a read
+                            DocumentReference acceptedRequestDocument = null;
+                            ArrayList<DocumentReference> declinedRequestDocuments = new ArrayList<>();
                             for (Request r : requests) {
                                 String id = r.getId();
                                 DocumentReference requestDocument = mDb.collection(REQUESTS_COLLECTION).document(id);
                                 DocumentSnapshot snapshot = transaction.get(requestDocument);
 
                                 if (snapshot.get(REQUESTER).equals(requestedUID)) {
-                                    transaction.update(requestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
-                                    transaction.update(requestDocument, STATE, Request.State.ACCEPTED.toString());
+                                    acceptedRequestDocument = requestDocument;
+
                                 } else {
-                                    transaction.update(requestDocument, STATE, ARCHIVED.toString());
+                                    declinedRequestDocuments.add(requestDocument);
                                 }
                             }
+
+                            if (acceptedRequestDocument != null) {
+                                transaction.update(acceptedRequestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
+                                transaction.update(acceptedRequestDocument, STATE, Request.State.ACCEPTED.toString());
+                            }
+
+                            for (DocumentReference doc : declinedRequestDocuments) {
+                                transaction.update(doc, STATE, ARCHIVED.toString());
+                            }
+
 
                             final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
                             transaction.update(bookDocument, STATUS, Status.ACCEPTED.toString());
