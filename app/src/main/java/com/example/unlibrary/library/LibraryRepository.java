@@ -37,6 +37,7 @@ import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,11 @@ public class LibraryRepository {
     private static final String STATE = "state";
     private static final String STATUS = "status";
     private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
+    private static final String BOOK_FIELD = "book";
+    private static final String STATUS_FIELD = "status";
+    private static final String STATE_FIELD = "state";
+    private static final String OWNER_FIELD = "owner";
+
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
 
@@ -93,7 +99,8 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
-        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo("owner", FirebaseAuth.getInstance().getUid());
+        mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, FirebaseAuth.getInstance().getUid());
         List<String> statusValues = new ArrayList<>();
         for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
             if (f.getValue()) {
@@ -275,7 +282,11 @@ public class LibraryRepository {
      * @param bookID requests on this book will be listened to
      */
     public void attachRequestsListener(String bookID) {
-        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, bookID).whereNotEqualTo(STATE, Request.State.ARCHIVED);
+        // Get all requests associated with current book that are in REQUESTED state
+        Query query = mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo(BOOK, bookID)
+                .whereNotEqualTo(STATE, Request.State.ARCHIVED);
+
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -349,5 +360,62 @@ public class LibraryRepository {
         batch.commit()
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Delete book from the database.
+     * Make the required changes in FireBase to decline a request
+     *
+     * @param requestedUID     User ID of requester who made the request
+     * @param bookRequestedID  Book ID of book that was requested
+     * @param onDeclineSuccess code to call on successfully declining request
+     * @param onDeclineFailure code to call on failure to decline request
+     */
+    public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, Runnable onRequestNotFoundInDB) {
+        // Query to find all documents in Requests collection associated with the given book
+        mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, bookRequestedID).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requestsOnBook = queryDocumentSnapshots.toObjects(Request.class);
+                    // Find the request associated to given requester that is in state "REQUESTED"
+                    Request requestToUpdate = null;
+                    for (Request request : requestsOnBook) {
+                        if (request.getRequester().equals(requestedUID) && request.getState().equals(Request.State.REQUESTED)) {
+                            requestToUpdate = request;
+                            break;
+                        }
+                    }
+                    // Check to make sure requestToUpdate is non-null
+                    if (requestToUpdate  == null) {
+                        onRequestNotFoundInDB.run();
+                        return;
+                    }
+
+                    // Figure out if there are any other non-archived requests on this book (made by other users)
+                    boolean allOtherRequestsAreArchived = true;
+                    for (Request request : requestsOnBook) {
+                        if (!request.getState().toString().equals(Request.State.ARCHIVED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
+                            allOtherRequestsAreArchived = false;
+                            break;
+                        }
+                    }
+
+                    // Get DocumentReferences required for transaction
+                    DocumentReference requestToUpdateDocRef = mDb.collection(REQUESTS_COLLECTION).document(requestToUpdate.getId());
+                    DocumentReference currentBookDocRef = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
+
+                    // Convert to a final variable; only then it can be referenced later in transaction
+                    final boolean finalAllOtherRequestsAreArchived = allOtherRequestsAreArchived;
+
+                    // Transaction to do both updates at once
+                    mDb.runTransaction((Transaction.Function<Void>) transaction -> {
+                        transaction.update(requestToUpdateDocRef, STATE_FIELD, Request.State.ARCHIVED.toString());
+                        if (finalAllOtherRequestsAreArchived) {
+                            transaction.update(currentBookDocRef, STATUS_FIELD, Book.Status.AVAILABLE.toString());
+                        }
+                        // Success
+                        return null;
+                    }).addOnSuccessListener(onDeclineSuccess).addOnFailureListener(onDeclineFailure);
+                })
+                .addOnFailureListener(onDeclineFailure);
     }
 }
