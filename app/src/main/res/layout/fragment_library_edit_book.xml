@@ -28,6 +28,20 @@
             tools:imageUri="@{viewModel.takenPhoto}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/delete_book_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="4dp"
+            android:contentDescription="@string/delete_book_fab_description"
+            app:backgroundTint="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="@+id/bookImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bookImage"
+            app:srcCompat="@drawable/ic_baseline_delete_24" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_book_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,10 +51,9 @@
             android:contentDescription="@string/add_photo_of_book"
             app:backgroundTint="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="@+id/bookImage"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/delete_book_image"
             app:layout_constraintTop_toBottomOf="@+id/bookImage"
             app:srcCompat="@drawable/ic_baseline_photo_camera_24" />
-
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/auto_fill_button"
             android:layout_width="wrap_content"
