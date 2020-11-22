@@ -141,7 +141,6 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
             if (s != null) {
                 mBinding.map.getMapAsync(this);
             }
-            ;
         });
 
         return mBinding.getRoot();
