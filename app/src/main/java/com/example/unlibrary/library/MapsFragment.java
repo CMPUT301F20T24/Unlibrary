@@ -41,7 +41,6 @@ import java.util.Arrays;
  * Fragment to display Google Map and Autocomplete fragment to choose a handoff location
  */
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
-
     private static final String TAG = MapsFragment.class.getSimpleName();
     private static final Float ZOOM_LEVEL = 10.0f;
     GoogleMap mMap;
@@ -84,6 +83,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
         mBinding = FragmentMapsBinding.inflate(inflater, container, false);
+        mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
         // Initialize the SDK
         if (!Places.isInitialized()) {

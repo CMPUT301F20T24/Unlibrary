@@ -202,6 +202,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     /**
      * Getter for the mHandoffLocation object
+     *
      * @return the lat lng of the accepted request location
      */
     public LiveData<LatLng> getHandoffLocation() {
@@ -651,6 +652,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     /**
      * Accepts the selected requester and sets the handoff location
+     *
+     * @param latLng location for handoff given by its latitude longitude coordinates
      */
     public void acceptSelectedRequester(LatLng latLng) {
         mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), latLng,
@@ -669,6 +672,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     /**
      * Updates the handoff location for the current book
+     *
+     * @param latLng location for handoff given by its latitude longitude coordinat
      */
     public void updateHandoffLocation(LatLng latLng) {
         mLibraryRepository.updateHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(), latLng,

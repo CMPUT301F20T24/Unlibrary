@@ -441,45 +441,50 @@ public class LibraryRepository {
                 .whereNotEqualTo(STATE, ARCHIVED)
                 .get()
                 .addOnCompleteListener(requestTask -> {
-                    if (requestTask.isSuccessful()) {
-                        List<Request> requests = requestTask.getResult().toObjects(Request.class);
-                        mDb.runTransaction((Transaction.Function<Void>) transaction -> {
-
-                            // Firestore transactions do not allow writes to occur after a read
-                            DocumentReference acceptedRequestDocument = null;
-                            ArrayList<DocumentReference> declinedRequestDocuments = new ArrayList<>();
-                            for (Request r : requests) {
-                                String id = r.getId();
-                                DocumentReference requestDocument = mDb.collection(REQUESTS_COLLECTION).document(id);
-                                DocumentSnapshot snapshot = transaction.get(requestDocument);
-
-                                if (snapshot.get(REQUESTER).equals(requestedUID)) {
-                                    acceptedRequestDocument = requestDocument;
-
-                                } else {
-                                    declinedRequestDocuments.add(requestDocument);
-                                }
-                            }
-
-                            if (acceptedRequestDocument != null) {
-                                transaction.update(acceptedRequestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
-                                transaction.update(acceptedRequestDocument, STATE, Request.State.ACCEPTED.toString());
-                            }
-
-                            for (DocumentReference doc : declinedRequestDocuments) {
-                                transaction.update(doc, STATE, ARCHIVED.toString());
-                            }
-
-
-                            final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
-                            transaction.update(bookDocument, STATUS, Status.ACCEPTED.toString());
-
-                            // Success
-                            return null;
-                        }).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
-                    } else {
+                    if (!requestTask.isSuccessful()) {
                         Log.e(TAG, "Error in fetching requests", requestTask.getException());
+                        return;
                     }
+
+                    List<Request> requests = requestTask.getResult().toObjects(Request.class);
+                    mDb.runTransaction((Transaction.Function<Void>) transaction -> {
+
+                        // Firestore transactions do not allow reads to occur after a write
+                        DocumentReference acceptedRequestDocument = null;
+                        ArrayList<DocumentReference> declinedRequestDocuments = new ArrayList<>();
+                        for (Request r : requests) {
+                            String id = r.getId();
+                            DocumentReference requestDocument = mDb.collection(REQUESTS_COLLECTION).document(id);
+                            DocumentSnapshot snapshot = transaction.get(requestDocument);
+
+                            if (snapshot.get(REQUESTER).equals(requestedUID)) {
+                                acceptedRequestDocument = requestDocument;
+
+                            } else {
+                                declinedRequestDocuments.add(requestDocument);
+                            }
+                        }
+
+                        if (acceptedRequestDocument != null) {
+                            onFailureListener.onFailure(new Exception("Failed to accept requester"));
+                            return null;
+                        }
+
+                        transaction.update(acceptedRequestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
+                        transaction.update(acceptedRequestDocument, STATE, Request.State.ACCEPTED.toString());
+
+                        for (DocumentReference doc : declinedRequestDocuments) {
+                            transaction.update(doc, STATE, ARCHIVED.toString());
+                        }
+
+                        final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
+                        transaction.update(bookDocument, STATUS, Status.ACCEPTED.toString());
+
+                        // Success
+                        return null;
+                    })
+                            .addOnSuccessListener(onSuccessListener)
+                            .addOnFailureListener(onFailureListener);
                 });
     }
 
@@ -502,7 +507,7 @@ public class LibraryRepository {
                     if (task.isSuccessful()) {
                         List<Request> requests = task.getResult().toObjects(Request.class);
                         if (requests.size() != 1) {
-                            onFailureListener.onFailure(new Exception("Error updating handoff location"));
+                            onFailureListener.onFailure(new Exception("Unexpected number of requests returned during update location.  " + requests.size() + " requests found."));
                             return;
                         }
                         Request request = requests.get(0);
@@ -532,7 +537,7 @@ public class LibraryRepository {
                     if (task.isSuccessful()) {
                         List<Request> requests = task.getResult().toObjects(Request.class);
                         if (requests.size() != 1) {
-                            onFailureListener.onFailure(new Exception("Error fetching handoff location"));
+                            onFailureListener.onFailure(new Exception("Unexpected number of requests returned when fetching location.  " + requests.size() + " requests found."));
                             return;
                         }
                         onFinished.onFinished(requests.get(0).getLocation());
