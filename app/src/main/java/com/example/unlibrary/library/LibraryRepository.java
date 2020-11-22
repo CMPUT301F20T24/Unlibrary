@@ -482,7 +482,12 @@ public class LibraryRepository {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Request request = task.getResult().toObjects(Request.class).get(0);
+                        List<Request> requests = task.getResult().toObjects(Request.class);
+                        if (requests.size() != 1) {
+                            onFailureListener.onFailure(new Exception("Error updating handoff location"));
+                            return;
+                        }
+                        Request request = requests.get(0);
                         mDb.collection(REQUESTS_COLLECTION).document(request.getId())
                                 .update(LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
                                 .addOnSuccessListener(onSuccessListener)
@@ -507,6 +512,10 @@ public class LibraryRepository {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         List<Request> requests = task.getResult().toObjects(Request.class);
+                        if (requests.size() != 1) {
+                            onFailureListener.onFailure(new Exception("Error fetching handoff location"));
+                            return;
+                        }
                         onFinished.onFinished(requests.get(0).getLocation());
                     }
                 })

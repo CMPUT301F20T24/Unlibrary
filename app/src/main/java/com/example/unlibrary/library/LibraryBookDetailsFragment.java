@@ -29,6 +29,7 @@ import com.example.unlibrary.util.BarcodeScanner;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -137,8 +138,11 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
         });
 
         // Set up map
-        mViewModel.getHandoffLocation().observe(getViewLifecycleOwner(), s ->
-                mBinding.map.getMapAsync(this));
+        mViewModel.getHandoffLocation().observe(getViewLifecycleOwner(), s -> {
+            if (s != null) {
+                mBinding.map.getMapAsync(this);
+            };
+        });
 
         return mBinding.getRoot();
     }
