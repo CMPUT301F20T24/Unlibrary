@@ -1,3 +1,11 @@
+/*
+ * MyFirebaseMessagingService
+ *
+ * November 22, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.util;
 
 import android.app.NotificationManager;
@@ -16,13 +24,21 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Random;
 
-// https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
+/**
+ * Handels incoming message from FCM
+ */
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private final String ADMIN_CHANNEL_ID ="admin_channel";
 
+    /**
+     * Handles the incoming message.
+     * @param remoteMessage the message begin handled
+     */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+
+        // https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
         final Intent intent = new Intent(this, MainActivity.class);
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         int notificationID = new Random().nextInt(3000);

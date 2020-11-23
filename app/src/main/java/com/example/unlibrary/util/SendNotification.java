@@ -1,3 +1,11 @@
+/*
+ * SendNotification
+ *
+ * November 22, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
+
 package com.example.unlibrary.util;
 
 import android.util.Log;
@@ -21,10 +29,16 @@ public class SendNotification {
     private final String serverKey = "key=" + "AAAAAkUm6fE:APA91bE_uyTQS3tH0vG_JG7qDTkwxqGvL9tmwlPo1mPhd8jwF714tTa_tJzq6Kg16MoqJotD3zAejCkvqN2xfjjaQ9qR_T4R6GxGctES6DNhlANWR7QtvDDMNfUzIys3OZK1SsNUzgSO";
     private final String contentType = "application/json";
 
-
-    //https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
-    public void generateNotification (View view, String owner, String title, String body) {
-        String TOPIC = "/topics/" + owner;
+    /**
+     * Create the JSONObject that will be sent to FCM
+     * @param  view, view from which the application context will be gotten.
+     * @param target the user that the message is intended for
+     * @param title the title of the message
+     * @param body the body of the message
+     */
+    public void generateNotification (View view, String target, String title, String body) {
+        //https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
+        String TOPIC = "/topics/" + target;
         String NOTIFICATION_TITLE = title;
         String NOTIFICATION_MESSAGE = body;
 
@@ -43,8 +57,14 @@ public class SendNotification {
         sendNotification(notification, view);
     }
 
-    //https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
+
+    /**
+     * Create the JSONObject that will be sent to FCM
+     * @param notification the JSONObject that is going to be sent
+     * @param  view, view from which the application context will be gotten.
+     */
     private void sendNotification(JSONObject notification, View view) {
+        //https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
                 new Response.Listener<JSONObject>() {
                     @Override
