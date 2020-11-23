@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.unlibrary.databinding.FragmentProfileBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -87,6 +88,7 @@ public class ProfileFragment extends Fragment {
      * User logs out of account and will re-launch AuthActivity to initiate login again
      */
     public void logout() {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(mViewModel.getUser().getValue().getUID());
         FirebaseAuth.getInstance().signOut();
     }
 

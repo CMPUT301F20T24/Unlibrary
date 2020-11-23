@@ -22,6 +22,7 @@ import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
+import com.example.unlibrary.util.SendNotificationInterface;
 import com.example.unlibrary.util.SingleLiveEvent;
 
 import java.util.List;
@@ -40,6 +41,9 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
     private String mSearchText;
+    static final String TITLE = "NEW BOOK REQUEST";
+    static final String NEW_REQUEST_TEMPLATE = " has a new request";
+
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
@@ -101,7 +105,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     /**
      * Generates and saves the request into firestore.
      */
-    public void sendRequest() {
+    public void sendRequest(SendNotificationInterface notification) {
         // Cannot send request if you have already sent one
         if (mCurrentRequest.getValue() != null) {
             return;
@@ -125,6 +129,11 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         mExchangeRepository.sendRequest(request, book, aVoid -> {
             mSuccessRequestMsgEvent.setValue("Request successfully sent");
             mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
+
+            String target = book.getOwner();
+            String body = book.getTitle() + NEW_REQUEST_TEMPLATE;
+            notification.send(target, TITLE, body);
+
         }, e -> {
             mFailureMsgEvent.setValue("Failed to send request.");
             Log.e(TAG, "Failed to send request.", e);
