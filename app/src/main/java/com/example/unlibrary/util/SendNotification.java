@@ -7,7 +7,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.unlibrary.models.Book;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,10 +23,10 @@ public class SendNotification {
 
 
     //https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
-    public void generateNotification (View view, Book book) {
-        String TOPIC = "/topics/" + book.getOwner();
-        String NOTIFICATION_TITLE = "NEW BOOK REQUEST";
-        String NOTIFICATION_MESSAGE = book.getTitle() + " has a new request";
+    public void generateNotification (View view, String owner, String title, String body) {
+        String TOPIC = "/topics/" + owner;
+        String NOTIFICATION_TITLE = title;
+        String NOTIFICATION_MESSAGE = body;
 
         JSONObject notification = new JSONObject();
         JSONObject notifcationBody = new JSONObject();

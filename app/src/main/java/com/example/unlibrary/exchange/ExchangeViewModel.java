@@ -206,7 +206,9 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     }
 
     public void sendRequestNotification(View view) {
-        msender.generateNotification(view, mCurrentBook.getValue());
+        Book book = mCurrentBook.getValue();
+        String body = book.getTitle() + " has a new request!";
+        msender.generateNotification(view, book.getOwner(), "NEW BOOK REQUEST", body);
     }
     /**
      * Should the request button be shown i.e. has the book already been requested or not.
