@@ -22,7 +22,7 @@ import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
-import com.example.unlibrary.util.SendNotification;
+import com.example.unlibrary.util.SendNotificationInterface;
 import com.example.unlibrary.util.SingleLiveEvent;
 
 import java.util.List;
@@ -40,7 +40,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
-    private final SendNotification msender = new SendNotification();
     private String mSearchText;
 
     /**
@@ -103,7 +102,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     /**
      * Generates and saves the request into firestore.
      */
-    public void sendRequest() {
+    public void sendRequest(SendNotificationInterface notification) {
         // Cannot send request if you have already sent one
         if (mCurrentRequest.getValue() != null) {
             return;
@@ -127,6 +126,12 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         mExchangeRepository.sendRequest(request, book, aVoid -> {
             mSuccessRequestMsgEvent.setValue("Request successfully sent");
             mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
+
+            String target = book.getOwner();
+            String title = "NEW BOOK REQUEST";
+            String body = book.getTitle() + " has a new request!";
+            notification.send(target, title, body);
+
         }, e -> {
             mFailureMsgEvent.setValue("Failed to send request.");
             Log.e(TAG, "Failed to send request.", e);
@@ -204,11 +209,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
         return this.mCurrentBookOwner;
     }
 
-    public void sendRequestNotification(View view) {
-        Book book = mCurrentBook.getValue();
-        String body = book.getTitle() + " has a new request!";
-        msender.generateNotification(view, book.getOwner(), "NEW BOOK REQUEST", body);
-    }
     /**
      * Should the request button be shown i.e. has the book already been requested or not.
      *

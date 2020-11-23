@@ -21,6 +21,8 @@ import androidx.navigation.Navigation;
 
 import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentMapsBinding;
+import com.example.unlibrary.util.SendNotification;
+import com.example.unlibrary.util.SendNotificationInterface;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -47,6 +49,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     FragmentMapsBinding mBinding;
     LibraryViewModel mViewModel;
     LatLng mLatLng;
+    private final SendNotification msender = new SendNotification();
 
     /**
      * Manipulates the map once available.
@@ -89,17 +92,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         if (!Places.isInitialized()) {
             Places.initialize(getActivity().getApplicationContext(), getString(R.string.api_key));
         }
-        mViewModel.getNavigationEvent().observe(this, navDirections -> {
-            mViewModel.sendAcceptNotification(this.getView());
-            Navigation.findNavController(mBinding.confirmButton).navigate(navDirections);
-        });
+        mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.confirmButton).navigate(navDirections));
 
         mBinding.confirmButton.setOnClickListener(v -> {
             if (mViewModel.getHandoffLocation().getValue() != null) {
                 mViewModel.updateHandoffLocation(mLatLng);
             } else {
-                mViewModel.acceptSelectedRequester(mLatLng);
-
+                SendNotificationInterface send = (target, title, body) -> msender.generateNotification(v, target, title, body);
+                mViewModel.acceptSelectedRequester(mLatLng, send);
             }
         });
 

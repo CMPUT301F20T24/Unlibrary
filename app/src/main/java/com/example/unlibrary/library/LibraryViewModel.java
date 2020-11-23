@@ -28,7 +28,7 @@ import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.FilterMap;
-import com.example.unlibrary.util.SendNotification;
+import com.example.unlibrary.util.SendNotificationInterface;
 import com.example.unlibrary.util.SingleLiveEvent;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.storage.FirebaseStorage;
@@ -64,7 +64,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final LiveData<List<User>> mCurrentBookRequesters;
     private User mSelectedRequester;
     private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
-    private final SendNotification msender = new SendNotification();
 
     public enum InputKey {
         TITLE,
@@ -657,7 +656,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      *
      * @param latLng location for handoff given by its latitude longitude coordinates
      */
-    public void acceptSelectedRequester(LatLng latLng) {
+    public void acceptSelectedRequester(LatLng latLng, SendNotificationInterface notification) {
         mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), latLng,
                 o -> {
                     Book book = mCurrentBook.getValue();
@@ -665,17 +664,16 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     mCurrentBook.setValue(book);
                     mHandoffLocation.setValue(latLng);
                     mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
+
+                    String target = mSelectedRequester.getUID();
+                    String title = "REQUEST ACCEPTED";
+                    String body = "Request accepted for: " + book.getTitle();
+                    notification.send(target, title, body);
                 },
                 e -> {
                     mFailureMsgEvent.setValue("Failed to accept request");
                     Log.e(TAG, e.toString());
                 });
-    }
-
-    public void sendAcceptNotification(View view) {
-        Book book = mCurrentBook.getValue();
-        String body = "Request accepted for: " + book.getTitle();
-        msender.generateNotification(view, book.getOwner(), "REQUEST ACCEPTED", body);
     }
 
     /**

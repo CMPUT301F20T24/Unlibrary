@@ -41,7 +41,6 @@
                 android:layout_marginBottom="24dp"
                 android:backgroundTint="@color/colorAccent"
                 android:contentDescription="@string/edit_book_fab_description"
-                android:onClick="@{()->viewModel.sendRequest()}"
                 android:visibility="@{viewModel.showRequestButton() ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="@+id/bookImageButton"
                 app:layout_constraintEnd_toEndOf="parent"

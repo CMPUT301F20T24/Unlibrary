@@ -18,6 +18,8 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentExchangeBookDetailsBinding;
+import com.example.unlibrary.util.SendNotification;
+import com.example.unlibrary.util.SendNotificationInterface;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class ExchangeBookDetailsFragment extends BookDetailFragment {
 
     private FragmentExchangeBookDetailsBinding mBinding;
+    private final SendNotification msender = new SendNotification();
 
     /**
      * Setup the fragment
@@ -52,6 +55,11 @@ public class ExchangeBookDetailsFragment extends BookDetailFragment {
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.addRequest).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
         mViewModel.fetchOwnerForCurrentBook();
+
+        mBinding.addRequest.setOnClickListener(v -> {
+            SendNotificationInterface send = (target, title, body) -> msender.generateNotification(v, target, title, body);
+            mViewModel.sendRequest(send);
+        });
 
         mBinding.bookImageButton.setOnClickListener(v -> zoomImageFromThumb(mBinding.exchangeBookFrame, mBinding.bookImageButton, mBinding.bookImage));
         return mBinding.getRoot();
