@@ -1,5 +1,6 @@
 package com.example.unlibrary.unlibrary;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.unlibrary.models.Book;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class UnlibraryViewModelTest {
@@ -41,7 +43,9 @@ public class UnlibraryViewModelTest {
      */
     @Test
     public void testGetBooks() {
-        assertEquals(mMockBooks.getValue(), mViewModel.getBooks().getValue());
+        LiveData<List<Book>> viewModelBooks = mViewModel.getBooks();
+        verify(mMockRepository).getBooks();
+        assertEquals(mMockBooks.getValue(), viewModelBooks.getValue());
     }
 
 }
