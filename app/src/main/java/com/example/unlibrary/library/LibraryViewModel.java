@@ -366,6 +366,28 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
+     * Delete the book's photo when the owner clicks on yes on the dialog
+     */
+    public void deleteCurrentBookPhoto(){
+        Book currentBook = mCurrentBook.getValue();
+        if (currentBook.getPhoto() == null) {
+            mFailureMsgEvent.setValue("Failed to get current book's photo.");
+            return;
+        }
+        mIsLoading.setValue(true);
+        currentBook.setPhoto(null);
+        mLibraryRepository.updateBook(currentBook,
+                o -> {
+                    mIsLoading.setValue(false);
+                    mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());
+                },
+                e -> {
+                    mIsLoading.setValue(false);
+                    mFailureMsgEvent.setValue("Failed to delete book's photo.");
+                });
+    }
+
+    /**
      * Delete the current book.
      */
     public void deleteCurrentBook() {
@@ -511,6 +533,15 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public void takePhoto(Uri uri) {
         mTakenPhoto.setValue(uri);
+    }
+
+
+    /**
+     * Should the delete button be shown i.e. does the book currently have a photo?
+     * @return True when the book has a photo
+     */
+    public Boolean showBookPhotoDeleteButton() {
+        return (mCurrentBook.getValue().getPhoto() != null);
     }
 
     /**
