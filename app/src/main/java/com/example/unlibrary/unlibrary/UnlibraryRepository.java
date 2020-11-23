@@ -89,6 +89,7 @@ public class UnlibraryRepository {
                     List<Request> requests = snapshot.toObjects(Request.class);
 
                     ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
+                    mAllBooks.clear();
 
                     for (Request r : requests) {
                         addBookTasks.add(
@@ -103,7 +104,6 @@ public class UnlibraryRepository {
                         );
                     }
 
-                    mAllBooks.clear();
                     Tasks.whenAllComplete(addBookTasks)
                             .addOnSuccessListener(aVoid -> {
                                 filter();
