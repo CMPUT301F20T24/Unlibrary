@@ -29,6 +29,7 @@ import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -61,6 +62,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final LibraryRepository mLibraryRepository;
     private final LiveData<List<User>> mCurrentBookRequesters;
     private User mSelectedRequester;
+    private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
 
     public enum InputKey {
         TITLE,
@@ -122,6 +124,17 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 return false;
             }
         });
+    }
+
+    /**
+     * Should map fragment be shown
+     *
+     * @return ShowHandoffLocation LiveData
+     */
+    public LiveData<Boolean> showHandoffLocation() {
+        return Transformations.switchMap(mCurrentBook, book ->
+                Transformations.map(mCurrentBookRequesters, requester ->
+                        book.getStatus() == Book.Status.ACCEPTED && requester.size() > 0));
     }
 
     /**
@@ -187,6 +200,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         return mSelectedRequester;
     }
 
+    /**
+     * Getter for the mHandoffLocation object
+     *
+     * @return the lat lng of the accepted request location
+     */
+    public LiveData<LatLng> getHandoffLocation() {
+        return mHandoffLocation;
+    }
 
     /**
      * Cleans up resources, removes the snapshot listener from the repository.
@@ -596,11 +617,12 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
-     * Used as the onClick method for the accept button in the requester's profile fragment
-     * Navigates to a google map fragment to allow the selection of a location
+     * onClick method for the accept request button in the requester's profile fragment.
+     * Navigated to the map fragment
      */
-    public void acceptSelectedRequester() {
-        //mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
+    public void initMapsFragment() {
+        mHandoffLocation.setValue(null);
+        mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToMapsFragment());
     }
 
     /**
@@ -622,9 +644,58 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 },
                 () -> {
                     mFailureMsgEvent.setValue("Request not found");
-                    Log.e(TAG, "The request was not found for book ID " +  mCurrentBook.getValue().getId() + " and requesterID " + mSelectedRequester.getUID());
+                    Log.e(TAG, "The request was not found for book ID " + mCurrentBook.getValue().getId() + " and requesterID " + mSelectedRequester.getUID());
                     mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
 
+                });
+    }
+
+    /**
+     * Accepts the selected requester and sets the handoff location
+     *
+     * @param latLng location for handoff given by its latitude longitude coordinates
+     */
+    public void acceptSelectedRequester(LatLng latLng) {
+        mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), latLng,
+                o -> {
+                    Book book = mCurrentBook.getValue();
+                    book.setStatus(Book.Status.ACCEPTED);
+                    mCurrentBook.setValue(book);
+                    mHandoffLocation.setValue(latLng);
+                    mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
+                },
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to accept request");
+                    Log.e(TAG, e.toString());
+                });
+    }
+
+    /**
+     * Updates the handoff location for the current book
+     *
+     * @param latLng location for handoff given by its latitude longitude coordinat
+     */
+    public void updateHandoffLocation(LatLng latLng) {
+        mLibraryRepository.updateHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(), latLng,
+                o -> {
+                    mHandoffLocation.setValue(latLng);
+                    mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
+                },
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to update handoff location");
+                    Log.e(TAG, e.toString());
+                });
+    }
+
+    /**
+     * Fetches the handoff location for the current book
+     */
+    public void fetchHandoffLocation() {
+        mLibraryRepository.fetchHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(),
+                geoPoint -> mHandoffLocation.setValue(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())),
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to get handoff location");
+                    Log.e(TAG, e.toString());
                 });
     }
 
