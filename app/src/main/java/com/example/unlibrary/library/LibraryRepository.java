@@ -187,14 +187,6 @@ public class LibraryRepository {
                 });
     }
 
-    // Golnoush
-    public void deleteBookPhoto(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
-        mDb.collection(BOOKS_COLLECTION).document(book.getId())
-                .set(book)
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(onFailureListener);
-    }
-
     /**
      * Fetch the title and author of a book with Google Books API via ISBN.
      *

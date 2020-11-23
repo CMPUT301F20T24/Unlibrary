@@ -342,7 +342,9 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mNavigationEvent.setValue(LibraryBookDetailsFragmentDirections.actionLibraryBookDetailsFragmentToLibraryEditBookFragment());
     }
 
-    // Golnoush
+    /**
+     * Delete the book's photo when the owner clicks on yes on the dialog
+     */
     public void deleteCurrentBookPhoto(){
         Book currentBook = mCurrentBook.getValue();
         if (currentBook.getPhoto() == null) {
@@ -351,7 +353,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         }
         mIsLoading.setValue(true);
         currentBook.setPhoto(null);
-        mLibraryRepository.deleteBookPhoto(currentBook,
+        mLibraryRepository.updateBook(currentBook,
                 o -> {
                     mIsLoading.setValue(false);
                     mNavigationEvent.setValue(LibraryEditBookFragmentDirections.actionLibraryEditBookFragmentToLibraryBookDetailsFragment());

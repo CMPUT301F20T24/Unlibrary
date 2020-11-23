@@ -116,8 +116,7 @@ public class LibraryEditBookFragment extends Fragment {
             }
         });
 
-        // Golnoush
-        // Setup delete button. This is done in fragment because a confirmation dialog should be displayed first
+        // Setup delete button for book's photo . This is done in fragment because a confirmation dialog should be displayed first
         mBinding.deleteBookPhoto.setOnClickListener(v -> {
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Delete " + mViewModel.getCurrentBook().getValue().getTitle() + "'s Photo?")
