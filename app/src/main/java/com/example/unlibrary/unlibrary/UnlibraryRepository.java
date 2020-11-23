@@ -103,7 +103,7 @@ public class UnlibraryRepository {
                         );
                     }
 
-
+                    mAllBooks.clear();
                     Tasks.whenAllComplete(addBookTasks)
                             .addOnSuccessListener(aVoid -> {
                                 filter();
