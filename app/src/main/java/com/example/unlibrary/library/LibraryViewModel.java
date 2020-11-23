@@ -512,6 +512,15 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mTakenPhoto.setValue(uri);
     }
 
+
+    /**
+     * Should the delete button be shown i.e. does the book currently have a photo?
+     * @return True when the book has a photo
+     */
+    public Boolean showBookPhotoDeleteButton() {
+        return (mCurrentBook.getValue().getPhoto() != null);
+    }
+
     /**
      * Code to be called when a barcode scan fails.
      *
