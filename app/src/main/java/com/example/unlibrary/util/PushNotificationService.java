@@ -38,7 +38,6 @@ public class PushNotificationService extends FirebaseMessagingService {
      */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-
         // https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
         final Intent intent = new Intent(this, MainActivity.class);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

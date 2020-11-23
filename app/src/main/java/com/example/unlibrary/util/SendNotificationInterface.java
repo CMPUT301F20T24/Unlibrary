@@ -12,5 +12,5 @@ package com.example.unlibrary.util;
  * Used to start the message sending for notifications
  */
 public interface SendNotificationInterface {
-    public void send (String target, String title, String body);
+    public void send(String target, String title, String body);
 }

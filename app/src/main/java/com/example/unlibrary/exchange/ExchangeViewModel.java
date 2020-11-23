@@ -42,7 +42,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
     private String mSearchText;
     static final String TITLE = "NEW BOOK REQUEST";
-    static final String NEWREQUEST = " has a new request";
+    static final String NEW_REQUEST_TEMPLATE = " has a new request";
 
 
     /**
@@ -131,7 +131,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
             mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
 
             String target = book.getOwner();
-            String body = book.getTitle() + NEWREQUEST;
+            String body = book.getTitle() + NEW_REQUEST_TEMPLATE;
             notification.send(target, TITLE, body);
 
         }, e -> {

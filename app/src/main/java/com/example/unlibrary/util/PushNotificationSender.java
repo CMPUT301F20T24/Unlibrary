@@ -26,8 +26,8 @@ public class PushNotificationSender {
 
     private static final String TAG = PushNotificationSender.class.getSimpleName();
     private static final String FCM_API = "https://fcm.googleapis.com/fcm/send";
-    private static final String SERVERKEY = "key=AAAAAkUm6fE:APA91bE_uyTQS3tH0vG_JG7qDTkwxqGvL9tmwlPo1mPhd8jwF714tTa_tJzq6Kg16MoqJotD3zAejCkvqN2xfjjaQ9qR_T4R6GxGctES6DNhlANWR7QtvDDMNfUzIys3OZK1SsNUzgSO";
-    private static final String CONTENTTYPE = "application/json";
+    private static final String SERVER_KEY = "key=AAAAAkUm6fE:APA91bE_uyTQS3tH0vG_JG7qDTkwxqGvL9tmwlPo1mPhd8jwF714tTa_tJzq6Kg16MoqJotD3zAejCkvqN2xfjjaQ9qR_T4R6GxGctES6DNhlANWR7QtvDDMNfUzIys3OZK1SsNUzgSO";
+    private static final String CONTENT_TYPE = "application/json";
     private static final String TOPIC = "/topics/";
 
     /**
@@ -73,8 +73,8 @@ public class PushNotificationSender {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> params = new HashMap<>();
-                params.put("Authorization", SERVERKEY);
-                params.put("Content-Type", CONTENTTYPE);
+                params.put("Authorization", SERVER_KEY);
+                params.put("Content-Type", CONTENT_TYPE);
                 return params;
             }
         };
