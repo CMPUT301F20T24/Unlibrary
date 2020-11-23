@@ -86,8 +86,22 @@
             app:popUpTo="@+id/libraryFragment"
             app:popUpToInclusive="true" />
         <action
+            android:id="@+id/action_libraryBookDetailsFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
+        <action
             android:id="@+id/action_libraryBookDetailsFragment_to_libraryRequesterProfileFragment"
             app:destination="@id/libraryRequesterProfileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.example.unlibrary.library.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps">
+        <action
+            android:id="@+id/action_mapsFragment_to_libraryBookDetailsFragment"
+            app:destination="@id/libraryBookDetailsFragment"
+            app:popUpTo="@+id/libraryBookDetailsFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/libraryRequesterProfileFragment"
@@ -98,6 +112,9 @@
             app:destination="@id/libraryBookDetailsFragment"
             app:popUpTo="@id/libraryBookDetailsFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_libraryRequesterProfileFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
     </fragment>
 
 </navigation>

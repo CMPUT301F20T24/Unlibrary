@@ -124,7 +124,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     /**
      * Getter for mCurrentBook live data object
      *
-     * @return LiveData<Book> This returns the mBooks object
+     * @return LiveData<Book> This returns the mCurrentBook object
      */
     public LiveData<Book> getCurrentBook() {
         return mCurrentBook;
