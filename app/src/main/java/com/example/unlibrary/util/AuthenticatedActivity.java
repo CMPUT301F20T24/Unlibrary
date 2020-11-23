@@ -10,6 +10,7 @@ package com.example.unlibrary.util;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,7 +26,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
  * will be protected by the authentication.
  */
 public abstract class AuthenticatedActivity extends AppCompatActivity {
-
+    private static final String TAG = AuthenticatedActivity.class.getSimpleName();
     private FirebaseUser mUser;
 
     /**
@@ -42,7 +43,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
             goToAuth();
         }
 
-        FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid());
+        subscribe();
         FirebaseAuth.getInstance().addAuthStateListener((auth) -> {
             mUser = auth.getCurrentUser();
 
@@ -74,5 +75,10 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
             goToAuth();
         }
         return mUser;
+    }
+
+    private void subscribe () {
+        FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid())
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to subsribe to notifications, e"));
     }
 }

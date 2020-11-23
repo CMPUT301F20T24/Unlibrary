@@ -18,7 +18,7 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.MainActivity;
 import com.example.unlibrary.book_detail.BookDetailFragment;
 import com.example.unlibrary.databinding.FragmentExchangeBookDetailsBinding;
-import com.example.unlibrary.util.SendNotification;
+import com.example.unlibrary.util.PushNotificationSender;
 import com.example.unlibrary.util.SendNotificationInterface;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class ExchangeBookDetailsFragment extends BookDetailFragment {
 
     private FragmentExchangeBookDetailsBinding mBinding;
-    private final SendNotification msender = new SendNotification();
+    private final PushNotificationSender mSender = new PushNotificationSender();
 
     /**
      * Setup the fragment
@@ -57,7 +57,7 @@ public class ExchangeBookDetailsFragment extends BookDetailFragment {
         mViewModel.fetchOwnerForCurrentBook();
 
         mBinding.addRequest.setOnClickListener(v -> {
-            SendNotificationInterface send = (target, title, body) -> msender.generateNotification(v, target, title, body);
+            SendNotificationInterface send = (target, title, body) -> mSender.generateNotification(v, target, title, body);
             mViewModel.sendRequest(send);
         });
 

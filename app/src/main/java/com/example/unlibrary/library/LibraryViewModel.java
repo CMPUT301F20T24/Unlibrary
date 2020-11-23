@@ -64,7 +64,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final LiveData<List<User>> mCurrentBookRequesters;
     private User mSelectedRequester;
     private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
-
+    static final String title = "REQUEST ACCEPTED";
+    static final String acceptRequest = "Request accepted for: ";
     public enum InputKey {
         TITLE,
         AUTHOR,
@@ -666,8 +667,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
 
                     String target = mSelectedRequester.getUID();
-                    String title = "REQUEST ACCEPTED";
-                    String body = "Request accepted for: " + book.getTitle();
+                    String body = acceptRequest + book.getTitle();
                     notification.send(target, title, body);
                 },
                 e -> {

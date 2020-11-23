@@ -20,8 +20,8 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" /> <!-- Prevent need to display in app that camera is unavailable -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
     <!-- Prevent need to display in app that camera is unavailable -->
     <queries>
         <intent>
@@ -62,7 +62,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".util.MyFirebaseMessagingService">
+        <service android:name=".util.PushNotificationService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />

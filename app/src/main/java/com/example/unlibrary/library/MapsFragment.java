@@ -21,7 +21,7 @@ import androidx.navigation.Navigation;
 
 import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentMapsBinding;
-import com.example.unlibrary.util.SendNotification;
+import com.example.unlibrary.util.PushNotificationSender;
 import com.example.unlibrary.util.SendNotificationInterface;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -49,7 +49,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     FragmentMapsBinding mBinding;
     LibraryViewModel mViewModel;
     LatLng mLatLng;
-    private final SendNotification msender = new SendNotification();
+    private final PushNotificationSender mSender = new PushNotificationSender();
 
     /**
      * Manipulates the map once available.
@@ -98,7 +98,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             if (mViewModel.getHandoffLocation().getValue() != null) {
                 mViewModel.updateHandoffLocation(mLatLng);
             } else {
-                SendNotificationInterface send = (target, title, body) -> msender.generateNotification(v, target, title, body);
+                SendNotificationInterface send = (target, title, body) -> mSender.generateNotification(v, target, title, body);
                 mViewModel.acceptSelectedRequester(mLatLng, send);
             }
         });

@@ -89,6 +89,7 @@ public class UnlibraryRepository {
                     List<Request> requests = snapshot.toObjects(Request.class);
 
                     ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
+
                     for (Request r : requests) {
                         addBookTasks.add(
                                 mDb.collection(BOOK_COLLECTION).document(r.getBook()).get()

@@ -41,6 +41,9 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
     private String mSearchText;
+    static final String title = "NEW BOOK REQUEST";
+    static final String newRquest = " has a new request";
+
 
     /**
      * Constructor for the ExchangeViewModel. Instantiates listener to Firestore.
@@ -128,8 +131,7 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
             mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
 
             String target = book.getOwner();
-            String title = "NEW BOOK REQUEST";
-            String body = book.getTitle() + " has a new request!";
+            String body = book.getTitle() + newRquest;
             notification.send(target, title, body);
 
         }, e -> {
