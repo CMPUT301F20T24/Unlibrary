@@ -147,7 +147,6 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
 
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
-        sendRequestNotification(view);
         mExchangeRepository.fetchCurrentRequest(mCurrentBook.getValue());
         mNavigationEvent.setValue(ExchangeFragmentDirections.actionExchangeFragmentToExchangeBookDetailsFragment());
     }
