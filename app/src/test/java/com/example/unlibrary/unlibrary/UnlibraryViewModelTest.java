@@ -63,8 +63,8 @@ public class UnlibraryViewModelTest {
 
         // Mock fetchOwner
         doAnswer(invocation -> {
-            OnSuccessListener successCallback = invocation.getArgument(1, OnSuccessListener.class);
-            Book targetBook = invocation.getArgument(0, Book.class);
+            OnSuccessListener<User> successCallback = invocation.getArgument(1);
+            Book targetBook = invocation.getArgument(0);
             String ownerId = null;
             for (Book book: mockBooks) {
                 if (book.getId().equals(targetBook.getId())) {
