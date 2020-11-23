@@ -17,43 +17,45 @@ import com.android.volley.toolbox.Volley;
 
 /**
  * Sends jsonobject request to FCM
+ *
  */
 public class SingletonQueue {
-    private static SingletonQueue minstance;
-    private RequestQueue mrequestQueue;
-    private Context mctx;
+    private static SingletonQueue mInstance;
+    private RequestQueue mRequestQueue;
+    private Context mCtx;
 
     /**
      * Constructor for queue
+     * @param context context of the app
      */
     private SingletonQueue(Context context) {
-        mctx = context;
+        mCtx = context;
     }
 
     /**
      * Gets single instance of queue
-     *
      * @param context that it was called share lifecycle with
      */
     public static synchronized SingletonQueue getInstance(Context context) {
-        if (minstance == null) {
-            minstance = new SingletonQueue(context);
+        if (mInstance == null) {
+            mInstance = new SingletonQueue(context);
         }
-        return minstance;
+        return mInstance;
     }
 
     /**
      * Queue that handles send the messages
      */
     public RequestQueue getRequestQueue() {
-        if (mrequestQueue == null) {
-            mrequestQueue = Volley.newRequestQueue(mctx.getApplicationContext());
+        if (mRequestQueue == null) {
+            mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext());
         }
-        return mrequestQueue;
+        return mRequestQueue;
     }
 
     /**
      * Adds request obect to queue to be sent
+     * @param req request to be sent
      */
     public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);

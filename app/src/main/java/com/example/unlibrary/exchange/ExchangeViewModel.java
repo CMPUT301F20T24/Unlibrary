@@ -41,8 +41,8 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessRequestMsgEvent = new SingleLiveEvent<>();
     private String mSearchText;
-    static final String title = "NEW BOOK REQUEST";
-    static final String newRquest = " has a new request";
+    static final String TITLE = "NEW BOOK REQUEST";
+    static final String NEWREQUEST = " has a new request";
 
 
     /**
@@ -131,8 +131,8 @@ public class ExchangeViewModel extends ViewModel implements BooksSource {
             mNavigationEvent.setValue(ExchangeBookDetailsFragmentDirections.actionExchangeBookDetailsFragmentToExchangeFragment());
 
             String target = book.getOwner();
-            String body = book.getTitle() + newRquest;
-            notification.send(target, title, body);
+            String body = book.getTitle() + NEWREQUEST;
+            notification.send(target, TITLE, body);
 
         }, e -> {
             mFailureMsgEvent.setValue("Failed to send request.");

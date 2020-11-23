@@ -64,8 +64,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final LiveData<List<User>> mCurrentBookRequesters;
     private User mSelectedRequester;
     private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
-    static final String title = "REQUEST ACCEPTED";
-    static final String acceptRequest = "Request accepted for: ";
+    static final String TITLE = "REQUEST ACCEPTED";
+    static final String ACCEPTREQUEST = "Request accepted for: ";
     public enum InputKey {
         TITLE,
         AUTHOR,
@@ -656,6 +656,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      * Accepts the selected requester and sets the handoff location
      *
      * @param latLng location for handoff given by its latitude longitude coordinates
+     * @param notification lamda to send notification about accepted request
      */
     public void acceptSelectedRequester(LatLng latLng, SendNotificationInterface notification) {
         mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), latLng,
@@ -667,8 +668,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
 
                     String target = mSelectedRequester.getUID();
-                    String body = acceptRequest + book.getTitle();
-                    notification.send(target, title, body);
+                    String body = ACCEPTREQUEST + book.getTitle();
+                    notification.send(target, TITLE, body);
                 },
                 e -> {
                     mFailureMsgEvent.setValue("Failed to accept request");

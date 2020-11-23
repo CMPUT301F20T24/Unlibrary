@@ -26,9 +26,9 @@ public class PushNotificationSender {
 
     private static final String TAG = PushNotificationSender.class.getSimpleName();
     private static final String FCM_API = "https://fcm.googleapis.com/fcm/send";
-    private static final String serverKey = "key=AAAAAkUm6fE:APA91bE_uyTQS3tH0vG_JG7qDTkwxqGvL9tmwlPo1mPhd8jwF714tTa_tJzq6Kg16MoqJotD3zAejCkvqN2xfjjaQ9qR_T4R6GxGctES6DNhlANWR7QtvDDMNfUzIys3OZK1SsNUzgSO";
-    private static final String contentType = "application/json";
-    private static final String topic = "/topics/";
+    private static final String SERVERKEY = "key=AAAAAkUm6fE:APA91bE_uyTQS3tH0vG_JG7qDTkwxqGvL9tmwlPo1mPhd8jwF714tTa_tJzq6Kg16MoqJotD3zAejCkvqN2xfjjaQ9qR_T4R6GxGctES6DNhlANWR7QtvDDMNfUzIys3OZK1SsNUzgSO";
+    private static final String CONTENTTYPE = "application/json";
+    private static final String TOPIC = "/topics/";
 
     /**
      * Create the JSONObject that will be sent to FCM
@@ -39,10 +39,9 @@ public class PushNotificationSender {
      * @param body   the body of the message
      */
     public void generateNotification(View view, String target, String title, String body) {
-        //https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
+        // https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
         // Create the json object that will be sent
-        String jsonTopic = topic + target;
-
+        String jsonTopic = TOPIC + target;
 
         JSONObject notification = new JSONObject();
         JSONObject notifcationBody = new JSONObject();
@@ -66,7 +65,7 @@ public class PushNotificationSender {
      * @param view,        view from which the application context will be gotten.
      */
     private void sendNotification(JSONObject notification, View view) {
-        //https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
+        // https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
         // Jsonobject into a request object
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
                 (response) -> Log.i(TAG, "onResponse: " + response.toString()),
@@ -74,8 +73,8 @@ public class PushNotificationSender {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> params = new HashMap<>();
-                params.put("Authorization", serverKey);
-                params.put("Content-Type", contentType);
+                params.put("Authorization", SERVERKEY);
+                params.put("Content-Type", CONTENTTYPE);
                 return params;
             }
         };
