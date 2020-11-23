@@ -45,6 +45,9 @@ public class UnlibraryViewModelTest {
     @Rule
     public InstantTaskExecutorRule rule = new InstantTaskExecutorRule();
 
+    /**
+     * Mock implementations
+     */
     public void setupMocks() {
         mockStatic(Toast.class);
 
@@ -77,9 +80,13 @@ public class UnlibraryViewModelTest {
             return null;
         }).when(mMockRepository).fetchOwner(any(), any());
 
+        // Mock toast
         when(Toast.makeText(any(), anyString(), anyInt())).thenReturn(mock(Toast.class));
     }
 
+    /**
+     * Initializes the mock objects and the viewmodel
+     */
     @Before
     public void setup() {
         mMockRepository = mock(UnlibraryRepository.class);
