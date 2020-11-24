@@ -44,7 +44,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessMsgEvent = new SingleLiveEvent<>();
-    private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(null); // default is Edmonton
+    private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(null);
     private FilterMap mFilter;
 
     /**
