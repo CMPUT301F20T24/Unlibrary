@@ -46,4 +46,5 @@
     <string name="handoff_location">Handoff Location</string>
     <string name="accept_request_fab_description">Accept request</string>
     <string name="decline_request_fab_description">Decline request</string>
+    <string name="accept_handoff_location">Accept Handoff Location</string>
 </resources>

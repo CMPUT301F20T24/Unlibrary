@@ -27,6 +27,7 @@ import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
 import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
@@ -43,6 +44,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessMsgEvent = new SingleLiveEvent<>();
+    private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(null); // default is Edmonton
     private FilterMap mFilter;
 
     /**
@@ -120,6 +122,38 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
             }
         });
     }
+
+    /**
+     * Should map fragment be shown
+     *
+     * @return ShowHandoffLocation LiveData
+     */
+    public LiveData<Boolean> showHandoffLocation() {
+        return Transformations.map(mCurrentBook, book ->
+                book.getStatus() == Book.Status.ACCEPTED);
+    }
+
+    /**
+     * Getter for the mHandoffLocation object
+     *
+     * @return the lat lng of the accepted request location
+     */
+    public LiveData<LatLng> getHandoffLocation() {
+        return mHandoffLocation;
+    }
+
+    /**
+     * Fetches the handoff location for the current book
+     */
+    public void fetchHandoffLocation() {
+        mUnlibraryRepository.fetchHandoffLocation(mCurrentBook.getValue().getId(),
+                geoPoint -> mHandoffLocation.setValue(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())),
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to get handoff location");
+                    Log.e(TAG, e.toString());
+                });
+    }
+
 
     /**
      * Getter for mCurrentBook live data object

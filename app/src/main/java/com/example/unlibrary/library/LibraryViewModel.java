@@ -66,6 +66,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
     static final String TITLE = "REQUEST ACCEPTED";
     static final String ACCEPT_REQUEST_TEMPLATE = "Request accepted for: ";
+
     public enum InputKey {
         TITLE,
         AUTHOR,
@@ -368,7 +369,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Delete the book's photo when the owner clicks on yes on the dialog
      */
-    public void deleteCurrentBookPhoto(){
+    public void deleteCurrentBookPhoto() {
         Book currentBook = mCurrentBook.getValue();
         if (currentBook.getPhoto() == null) {
             mFailureMsgEvent.setValue("Failed to get current book's photo.");
@@ -538,6 +539,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
 
     /**
      * Should the delete button be shown i.e. does the book currently have a photo?
+     *
      * @return True when the book has a photo
      */
     public Boolean showBookPhotoDeleteButton() {
@@ -686,7 +688,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Accepts the selected requester and sets the handoff location
      *
-     * @param latLng location for handoff given by its latitude longitude coordinates
+     * @param latLng       location for handoff given by its latitude longitude coordinates
      * @param notification lamda to send notification about accepted request
      */
     public void acceptSelectedRequester(LatLng latLng, SendNotificationInterface notification) {
@@ -696,7 +698,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                     book.setStatus(Book.Status.ACCEPTED);
                     mCurrentBook.setValue(book);
                     mHandoffLocation.setValue(latLng);
-                    mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
+                    mNavigationEvent.setValue(LibraryMapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
 
                     String target = mSelectedRequester.getUID();
                     String body = ACCEPT_REQUEST_TEMPLATE + book.getTitle();
@@ -717,7 +719,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         mLibraryRepository.updateHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(), latLng,
                 o -> {
                     mHandoffLocation.setValue(latLng);
-                    mNavigationEvent.setValue(MapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
+                    mNavigationEvent.setValue(LibraryMapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
                 },
                 e -> {
                     mFailureMsgEvent.setValue("Failed to update handoff location");
