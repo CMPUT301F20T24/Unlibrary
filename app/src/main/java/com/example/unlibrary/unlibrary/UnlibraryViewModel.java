@@ -154,7 +154,6 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
                 });
     }
 
-
     /**
      * Getter for mCurrentBook live data object
      *

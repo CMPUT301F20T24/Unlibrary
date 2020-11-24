@@ -127,7 +127,6 @@ public class UnlibraryBookDetailsFragment extends BookDetailFragment implements 
         // Sets UI and click listener
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.setOnMapClickListener(v -> Navigation.findNavController(mBinding.map).navigate(UnlibraryBookDetailsFragmentDirections.actionUnlibraryBookDetailsFragmentToUnlibraryMapsFragment()));
-
     }
 
     /**

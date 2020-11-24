@@ -91,6 +91,5 @@ public class UnlibraryMapsFragment extends Fragment implements OnMapReadyCallbac
         if (mapFragment != null) {
             mapFragment.getMapAsync(this::onMapReady);
         }
-
     }
 }
