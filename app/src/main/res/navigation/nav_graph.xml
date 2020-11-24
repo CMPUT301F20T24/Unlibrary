@@ -41,6 +41,9 @@
         <action
             android:id="@+id/action_unlibraryBookDetailsFragment_to_unlibraryFragment"
             app:destination="@id/unlibraryFragment" />
+        <action
+            android:id="@+id/action_unlibraryBookDetailsFragment_to_unlibraryMapsFragment"
+            app:destination="@id/unlibraryMapsFragment" />
     </fragment>
 
     <fragment
@@ -87,14 +90,14 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_libraryBookDetailsFragment_to_mapsFragment"
-            app:destination="@id/mapsFragment" />
+            app:destination="@id/libraryMapsFragment" />
         <action
             android:id="@+id/action_libraryBookDetailsFragment_to_libraryRequesterProfileFragment"
             app:destination="@id/libraryRequesterProfileFragment" />
     </fragment>
     <fragment
-        android:id="@+id/mapsFragment"
-        android:name="com.example.unlibrary.library.MapsFragment"
+        android:id="@+id/libraryMapsFragment"
+        android:name="com.example.unlibrary.library.LibraryMapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps">
         <action
@@ -114,7 +117,15 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_libraryRequesterProfileFragment_to_mapsFragment"
-            app:destination="@id/mapsFragment" />
+            app:destination="@id/libraryMapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/unlibraryMapsFragment"
+        android:name="com.example.unlibrary.unlibrary.UnlibraryMapsFragment"
+        android:label="UnlibraryMapsFragment">
+        <action
+            android:id="@+id/action_unlibraryMapsFragment_to_unlibraryBookDetailsFragment"
+            app:destination="@id/unlibraryBookDetailsFragment" />
     </fragment>
 
 </navigation>

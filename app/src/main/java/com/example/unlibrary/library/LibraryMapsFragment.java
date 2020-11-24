@@ -1,5 +1,5 @@
 /*
- * MapsFragment
+ * LibraryMapsFragment
  *
  * November 21, 2020
  *
@@ -42,13 +42,13 @@ import java.util.Arrays;
 /**
  * Fragment to display Google Map and Autocomplete fragment to choose a handoff location
  */
-public class MapsFragment extends Fragment implements OnMapReadyCallback {
-    private static final String TAG = MapsFragment.class.getSimpleName();
+public class LibraryMapsFragment extends Fragment implements OnMapReadyCallback {
+    private static final String TAG = LibraryMapsFragment.class.getSimpleName();
     private static final Float ZOOM_LEVEL = 10.0f;
-    GoogleMap mMap;
-    FragmentMapsBinding mBinding;
-    LibraryViewModel mViewModel;
-    LatLng mLatLng;
+    private GoogleMap mMap;
+    private FragmentMapsBinding mBinding;
+    private LibraryViewModel mViewModel;
+    private LatLng mLatLng;
     private final PushNotificationSender mSender = new PushNotificationSender();
 
     /**
