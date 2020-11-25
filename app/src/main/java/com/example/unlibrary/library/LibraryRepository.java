@@ -19,8 +19,11 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Book.Status;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
+import com.example.unlibrary.util.FilterMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -29,9 +32,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONException;
@@ -42,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import static com.example.unlibrary.models.Request.State.ARCHIVED;
 
 /**
  * Manages all the database interaction for the Library ViewModel.
@@ -56,14 +63,21 @@ public class LibraryRepository {
     private static final String STATE = "state";
     private static final String STATUS = "status";
     private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
+    private static final String BOOK_FIELD = "book";
+    private static final String STATUS_FIELD = "status";
+    private static final String STATE_FIELD = "state";
+    private static final String OWNER_FIELD = "owner";
+
     private static final String TAG = LibraryRepository.class.getSimpleName();
     private static final String ALGOLIA_INDEX_NAME = "books";
+    private static final String REQUESTER = "requester";
+    private static final String LOCATION = "location";
 
     // Algolia field names
     // TODO: Consider using POJOs for algolia
     private static final String ALGOLIA_TITLE_FIELD = "title";
     private static final String ALGOLIA_AUTHOR_FIELD = "author";
-    private static final String ALGOLIA_ID_FIELD = "id";
+    private static final String ALGOLIA_ID_FIELD = "objectID";
     private final Client mAlgoliaClient;
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
@@ -83,7 +97,7 @@ public class LibraryRepository {
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
         mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
-        this.mFilter = new FilterMap();
+        this.mFilter = new FilterMap(true);
         attachListener();
     }
 
@@ -92,7 +106,8 @@ public class LibraryRepository {
      * and update the books object.
      */
     public void attachListener() {
-        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo("owner", FirebaseAuth.getInstance().getUid());
+        mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, FirebaseAuth.getInstance().getUid());
         List<String> statusValues = new ArrayList<>();
         for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
             if (f.getValue()) {
@@ -169,6 +184,13 @@ public class LibraryRepository {
                 .delete()
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
+
+        mAlgoliaClient.getIndex(ALGOLIA_INDEX_NAME)
+                .deleteObjectAsync(book.getId(), (jsonObject, e) -> {
+                    if (e != null) {
+                        Log.e(TAG, "Unable to delete book " + book.getId(), e);
+                    }
+                });
     }
 
     /**
@@ -267,7 +289,10 @@ public class LibraryRepository {
      * @param bookID requests on this book will be listened to
      */
     public void attachRequestsListener(String bookID) {
-        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, bookID).whereNotEqualTo(STATE, Request.State.ARCHIVED);
+        // Get all requests associated with current book that are in REQUESTED state
+        Query query = mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo(BOOK, bookID)
+                .whereNotEqualTo(STATE, ARCHIVED);
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -341,5 +366,183 @@ public class LibraryRepository {
         batch.commit()
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);
+    }
+
+
+    /**
+     * Make the required changes in FireBase to decline a request
+     *
+     * @param requestedUID          User ID of requester who made the request
+     * @param bookRequestedID       Book ID of book that was requested
+     * @param onDeclineSuccess      code to call on successfully declining request
+     * @param onDeclineFailure      code to call on failure to decline request
+     * @param onRequestNotFoundInDB code to call on failure of fetching requests necessary to potentially change status of book to ACCEPTED
+     */
+    public void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, Runnable onRequestNotFoundInDB) {
+        // Query to find all documents in Requests collection associated with the given book
+        mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, bookRequestedID).get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requestsOnBook = queryDocumentSnapshots.toObjects(Request.class);
+                    // Find the request associated to given requester that is in state "REQUESTED"
+                    Request requestToUpdate = null;
+                    for (Request request : requestsOnBook) {
+                        if (request.getRequester().equals(requestedUID) && request.getState().equals(Request.State.REQUESTED)) {
+                            requestToUpdate = request;
+                            break;
+                        }
+                    }
+                    // Check to make sure requestToUpdate is non-null
+                    if (requestToUpdate == null) {
+                        onRequestNotFoundInDB.run();
+                        return;
+                    }
+
+                    // Figure out if there are any other non-archived requests on this book (made by other users)
+                    boolean allOtherRequestsAreArchived = true;
+                    for (Request request : requestsOnBook) {
+                        if (!request.getState().toString().equals(ARCHIVED.toString()) && !request.getId().equals(requestToUpdate.getId())) {
+                            allOtherRequestsAreArchived = false;
+                            break;
+                        }
+                    }
+
+                    // Get DocumentReferences required for transaction
+                    DocumentReference requestToUpdateDocRef = mDb.collection(REQUESTS_COLLECTION).document(requestToUpdate.getId());
+                    DocumentReference currentBookDocRef = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
+
+                    // Convert to a final variable; only then it can be referenced later in transaction
+                    final boolean finalAllOtherRequestsAreArchived = allOtherRequestsAreArchived;
+
+                    // Transaction to do both updates at once
+                    mDb.runTransaction((Transaction.Function<Void>) transaction -> {
+                        transaction.update(requestToUpdateDocRef, STATE_FIELD, ARCHIVED.toString());
+                        if (finalAllOtherRequestsAreArchived) {
+                            transaction.update(currentBookDocRef, STATUS_FIELD, Book.Status.AVAILABLE.toString());
+                        }
+                        // Success
+                        return null;
+                    }).addOnSuccessListener(onDeclineSuccess).addOnFailureListener(onDeclineFailure);
+                })
+                .addOnFailureListener(onDeclineFailure);
+    }
+
+    /**
+     * Accepts the selected requester, sets the handoff location, and clears the other requesters
+     *
+     * @param requestedUID      accepted requester user ID
+     * @param bookRequestedID   book ID request is associated with
+     * @param handoffLocation   LatLng of handoff location
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
+        mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo(BOOK, bookRequestedID)
+                .whereNotEqualTo(STATE, ARCHIVED)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
+                    mDb.runTransaction(transaction -> {
+
+                        // Firestore transactions do not allow reads to occur after a write
+                        DocumentReference acceptedRequestDocument = null;
+                        ArrayList<DocumentReference> declinedRequestDocuments = new ArrayList<>();
+                        for (Request r : requests) {
+                            String id = r.getId();
+                            DocumentReference requestDocument = mDb.collection(REQUESTS_COLLECTION).document(id);
+                            DocumentSnapshot snapshot = transaction.get(requestDocument);
+
+                            if (snapshot.get(REQUESTER).equals(requestedUID)) {
+                                acceptedRequestDocument = requestDocument;
+
+                            } else {
+                                declinedRequestDocuments.add(requestDocument);
+                            }
+                        }
+
+                        if (acceptedRequestDocument == null) {
+                            onFailureListener.onFailure(new Exception("Failed to accept requester"));
+                            return null;
+                        }
+
+                        transaction.update(acceptedRequestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
+                        transaction.update(acceptedRequestDocument, STATE, Request.State.ACCEPTED.toString());
+
+                        for (DocumentReference doc : declinedRequestDocuments) {
+                            transaction.update(doc, STATE, ARCHIVED.toString());
+                        }
+
+                        final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
+                        transaction.update(bookDocument, STATUS, Status.ACCEPTED.toString());
+
+                        // Success
+                        return null;
+                    })
+                            .addOnSuccessListener(onSuccessListener)
+                            .addOnFailureListener(onFailureListener);
+                })
+                .addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Updates the handoff location for the book
+     *
+     * @param requestedUID      accepted requester user ID
+     * @param bookRequestedID   book ID request is associated with
+     * @param handoffLocation   LatLng of handoff location
+     * @param onSuccessListener code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
+        mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo(REQUESTER, requestedUID)
+                .whereEqualTo(BOOK, bookRequestedID)
+                .whereNotEqualTo(STATE, ARCHIVED)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
+                    if (requests.size() != 1) {
+                        onFailureListener.onFailure(new Exception("Unexpected number of requests returned during update location.  " + requests.size() + " requests found."));
+                        return;
+                    }
+                    Request request = requests.get(0);
+                    mDb.collection(REQUESTS_COLLECTION).document(request.getId())
+                            .update(LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
+                            .addOnSuccessListener(onSuccessListener)
+                            .addOnFailureListener(onFailureListener);
+                })
+                .addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Fetches the handoff location for the selected book
+     *
+     * @param requestedUID      accepted requester user ID
+     * @param bookRequestedID   book ID request is associated with
+     * @param onFinished        code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
+        mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo(BOOK, bookRequestedID)
+                .whereEqualTo(REQUESTER, requestedUID)
+                .whereNotEqualTo(STATE, ARCHIVED)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
+                    if (requests.size() != 1) {
+                        onFailureListener.onFailure(new Exception("Unexpected number of requests returned when fetching location.  " + requests.size() + " requests found."));
+                        return;
+                    }
+                    onFinished.onFinished(requests.get(0).getLocation());
+                })
+                .addOnFailureListener(onFailureListener);
+    }
+
+    /**
+     * Callback for fetching handoff location
+     */
+    public interface OnFinishedHandoffLocationListener {
+        void onFinished(GeoPoint geoPoint);
     }
 }

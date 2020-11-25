@@ -8,9 +8,8 @@
 
 package com.example.unlibrary.models;
 
-import androidx.core.util.Pair;
-
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.GeoPoint;
 
 /**
  * Represents a borrow request in our application domain.
@@ -21,7 +20,7 @@ public class Request {
     private String mRequester;
     private String mBook;
     private State mState;
-    private Pair<Double, Double> mLocation; // TODO: Check whether this can be stored in Firestore
+    private GeoPoint mLocation;
 
     /**
      * Empty constructor. Needed for Firestore.
@@ -107,10 +106,10 @@ public class Request {
     /**
      * Gets the state of a request.
      * <p>
-     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
-     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
+     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/archived by the owner
+     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to archived
      * BORROWED - Owner has handed off the book to the borrower
-     * ARCHIVED - Request has completed either by returning the book to the owner or request was declined
+     * ARCHIVED - Request has completed either by returning the book to the owner or request was archived
      *
      * @return one of the above state
      */
@@ -121,10 +120,10 @@ public class Request {
     /**
      * Updates the state of the request.
      * <p>
-     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/declined by the owner
-     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to declined
+     * REQUESTED - Borrower initiates a request to borrow a book, may be accepted/archived by the owner
+     * ACCEPTED - Owner has accepted to lend the book to a borrower, other borrowers are moved to archived
      * BORROWED - Owner has handed off the book to the borrower
-     * ARCHIVED - Request has completed either by returning the book to the owner or request was declined
+     * ARCHIVED - Request has completed either by returning the book to the owner or request was archived
      *
      * @param state one of the states above
      */
@@ -137,7 +136,7 @@ public class Request {
      *
      * @return latitude-longitude pair of handoff location.
      */
-    public Pair<Double, Double> getLocation() {
+    public GeoPoint getLocation() {
         return mLocation;
     }
 
@@ -147,7 +146,7 @@ public class Request {
      *
      * @param location described in latitude-longitude
      */
-    public void setLocation(Pair<Double, Double> location) {
+    public void setLocation(GeoPoint location) {
         mLocation = location;
     }
 
