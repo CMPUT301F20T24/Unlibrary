@@ -102,6 +102,13 @@ public class CreateAccountPageUITest {
         checkableImageButton.perform(click());
     }
 
+    /**
+     * verifies the position of the child in a given view
+     * @param parentMatcher
+     * @param position
+     * @return
+     */
+
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
 
