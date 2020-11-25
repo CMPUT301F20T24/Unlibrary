@@ -22,10 +22,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onIdle;
@@ -64,6 +67,9 @@ public class LibraryFlowTest {
     private static final String IDLING_NAME = "com.example.unlibrary.FireBaseTest.key.IDLING_NAME";
     private static final CountingIdlingResource idlingResource = new CountingIdlingResource(IDLING_NAME);
 
+    @Rule
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+
     @Before
     public void prepare() {
         // https://github.com/cutiko/espressofirebase Relevant resource
@@ -72,16 +78,10 @@ public class LibraryFlowTest {
         int apps = FirebaseApp.getApps(context).size();
         if (apps == 0) {
             fail("App not initialized");
-//            FirebaseOptions options = new FirebaseOptions.Builder()
-//                    .setApiKey(BuildConfig.apiKey)
-//                    .setApplicationId(BuildConfig.applicationId)
-//                    .setDatabaseUrl(BuildConfig.databaseUrl)
-//                    .setProjectId(BuildConfig.projectId)
-//                    .build();
-//            FirebaseApp.initializeApp(context, options);
         }
+        IdlingRegistry.getInstance().register(idlingResource);
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            IdlingRegistry.getInstance().register(idlingResource);
+            // User is logged in. Must log in as correct user
             FirebaseAuth.getInstance()
                     .signInWithEmailAndPassword(mEmail, mPassword)
                     .addOnCompleteListener(task -> {
@@ -95,11 +95,36 @@ public class LibraryFlowTest {
                     });
             idlingResource.increment();
             onIdle();
+        } else {
+            AtomicReference<Boolean> once = new AtomicReference<>(false);
+            // User is logged in. Must log out and log back in as proper user
+            FirebaseAuth.getInstance().addAuthStateListener(firebaseAuth -> {
+                // Logout finished. Log back in
+                if (once.get()) {
+                    return;
+                }
+                once.set(true);
+                firebaseAuth.signInWithEmailAndPassword(mEmail, mPassword)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                idlingResource.decrement();
+                                Intent intent = new Intent(context, MainActivity.class);
+                                mActivityTestRule.getActivity().startActivity(intent);
+                            } else {
+                                fail("The user was not logged in successfully");
+                            }
+                        });
+            });
+            idlingResource.increment();
+            FirebaseAuth.getInstance().signOut();
+            onIdle();
         }
     }
 
-    @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    @After
+    public void cleanup() {
+        FirebaseAuth.getInstance().signOut();
+    }
 
     @Test
     public void libraryFlowTest() throws InterruptedException {
