@@ -54,9 +54,7 @@ import static org.junit.Assert.fail;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class LibraryFlowTest {
-    private final String mEmail = "uitests@gmail.com";
-    private final String mPassword = "password";
+public class LibraryFlowTest extends MockLogin{
     private final String mTitle1 = "DO NOT INTERACT WITH THIS BOOK";
     private final String mTitle2 = "DO NOT INTERACT WITH THIS BOOK!";
     private final String mAuthor1 = "IT WILL BREAK THE TESTS";
@@ -64,67 +62,6 @@ public class LibraryFlowTest {
     private final String mIsbn1 = "1234567890123";
     private final String mIsbn2 = "1234567890129";
     private final int SLEEP_TIME = 800; // milliseconds
-    private static final String IDLING_NAME = "com.example.unlibrary.FireBaseTest.key.IDLING_NAME";
-    private static final CountingIdlingResource idlingResource = new CountingIdlingResource(IDLING_NAME);
-
-    @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
-
-    @Before
-    public void prepare() {
-        // https://github.com/cutiko/espressofirebase Relevant resource
-        // TODO extract
-        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        int apps = FirebaseApp.getApps(context).size();
-        if (apps == 0) {
-            fail("App not initialized");
-        }
-        IdlingRegistry.getInstance().register(idlingResource);
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            // User is logged in. Must log in as correct user
-            FirebaseAuth.getInstance()
-                    .signInWithEmailAndPassword(mEmail, mPassword)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            idlingResource.decrement();
-                            Intent intent = new Intent(context, MainActivity.class);
-                            mActivityTestRule.getActivity().startActivity(intent);
-                        } else {
-                            fail("The user was not logged successfully");
-                        }
-                    });
-            idlingResource.increment();
-            onIdle();
-        } else {
-            AtomicReference<Boolean> once = new AtomicReference<>(false);
-            // User is logged in. Must log out and log back in as proper user
-            FirebaseAuth.getInstance().addAuthStateListener(firebaseAuth -> {
-                // Logout finished. Log back in
-                if (once.get()) {
-                    return;
-                }
-                once.set(true);
-                firebaseAuth.signInWithEmailAndPassword(mEmail, mPassword)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                idlingResource.decrement();
-                                Intent intent = new Intent(context, MainActivity.class);
-                                mActivityTestRule.getActivity().startActivity(intent);
-                            } else {
-                                fail("The user was not logged in successfully");
-                            }
-                        });
-            });
-            idlingResource.increment();
-            FirebaseAuth.getInstance().signOut();
-            onIdle();
-        }
-    }
-
-    @After
-    public void cleanup() {
-        FirebaseAuth.getInstance().signOut();
-    }
 
     @Test
     public void libraryFlowTest() throws InterruptedException {
