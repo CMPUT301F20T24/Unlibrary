@@ -32,6 +32,9 @@ public abstract class MockLogin {
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
+    /**
+     * Ensures that app is on MainActivity authenticated as the correct test user.
+     */
     @Before
     public void prepare() {
         // https://github.com/cutiko/espressofirebase Relevant resource
@@ -83,6 +86,9 @@ public abstract class MockLogin {
         }
     }
 
+    /**
+     * Logs out when test is done.
+     */
     @After
     public void cleanup() {
         FirebaseAuth.getInstance().signOut();
