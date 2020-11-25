@@ -1,37 +1,22 @@
 package com.example.unlibrary;
 
 
-import android.content.Context;
-import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import androidx.test.espresso.DataInteraction;
-import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.idling.CountingIdlingResource;
 import androidx.test.filters.LargeTest;
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
-
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import static androidx.test.espresso.Espresso.onData;
-import static androidx.test.espresso.Espresso.onIdle;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -50,11 +35,10 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.fail;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class LibraryFlowTest extends MockLogin{
+public class LibraryFlowTest extends MockLogin {
     private final String mTitle1 = "DO NOT INTERACT WITH THIS BOOK";
     private final String mTitle2 = "DO NOT INTERACT WITH THIS BOOK!";
     private final String mAuthor1 = "IT WILL BREAK THE TESTS";
