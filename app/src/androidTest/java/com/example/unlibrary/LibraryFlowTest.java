@@ -103,27 +103,25 @@ public class LibraryFlowTest {
 
     @Test
     public void libraryFlowTest() throws InterruptedException {
-        // Add book button is there
-        // TODO descriptions are flipped
+        // Filter button is there
         ViewInteraction imageButton = onView(
-                allOf(withId(R.id.fabFilter), withContentDescription("Add book"),
+                allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
                         withParent(allOf(withId(R.id.frameLayout2),
                                 withParent(withId(R.id.nav_host_fragment)))),
                         isDisplayed()));
         imageButton.check(matches(isDisplayed()));
 
-        // Filter button is there
+        // Add book button is there
         ViewInteraction imageButton2 = onView(
-                allOf(withId(R.id.fabAdd), withContentDescription("Filter"),
+                allOf(withId(R.id.fabAdd), withContentDescription("Add book"),
                         withParent(allOf(withId(R.id.frameLayout2),
                                 withParent(withId(R.id.nav_host_fragment)))),
                         isDisplayed()));
         imageButton2.check(matches(isDisplayed()));
 
         // Click on add book button
-        // TODO wrong button
         ViewInteraction floatingActionButton = onView(
-                allOf(withId(R.id.fabAdd), withContentDescription("Filter"),
+                allOf(withId(R.id.fabAdd), withContentDescription("Add book"),
                         childAtPosition(
                                 allOf(withId(R.id.frameLayout2),
                                         childAtPosition(
@@ -281,10 +279,9 @@ public class LibraryFlowTest {
                         isDisplayed()));
         view2.check(matches(isDisplayed()));
 
-        // TODO wrong descrip
         // Click on filter button
         ViewInteraction floatingActionButton2 = onView(
-                allOf(withId(R.id.fabFilter), withContentDescription("Add book"),
+                allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
                         childAtPosition(
                                 allOf(withId(R.id.frameLayout2),
                                         childAtPosition(
@@ -320,7 +317,7 @@ public class LibraryFlowTest {
 
         // Click filter button
         ViewInteraction floatingActionButton3 = onView(
-                allOf(withId(R.id.fabFilter), withContentDescription("Add book"),
+                allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
                         childAtPosition(
                                 allOf(withId(R.id.frameLayout2),
                                         childAtPosition(
@@ -368,7 +365,7 @@ public class LibraryFlowTest {
 
         // Click filter button
         ViewInteraction floatingActionButton4 = onView(
-                allOf(withId(R.id.fabFilter), withContentDescription("Add book"),
+                allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
                         childAtPosition(
                                 allOf(withId(R.id.frameLayout2),
                                         childAtPosition(
