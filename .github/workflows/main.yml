@@ -62,10 +62,10 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       # Upload test results as artifacts
-      - name: Archive code coverage results
+      - name: Archive test results
         uses: actions/upload-artifact@v2
         with:
-          name: code-coverage-report
+          name: test-results
           path: app/build/reports/tests
 
       # Step 5: Assemble debug apk to send to firebase test lab
