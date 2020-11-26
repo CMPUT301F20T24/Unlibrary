@@ -11,8 +11,11 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.unlibrary.library.LibraryRepository;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
+import com.example.unlibrary.util.FilterMap;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -27,8 +30,11 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
+
+import static com.example.unlibrary.models.Request.State.ARCHIVED;
 
 /**
  * Manages all the database interaction for {@link UnlibraryViewModel}
@@ -37,6 +43,7 @@ public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOK_COLLECTION = "books";
     private static final String REQUEST_COLLECTION = "requests";
+    private static final String USER_COLLECTION = "users";
     private static final String REQUESTER = "requester";
     private static final String BOOK = "book";
     private static final String STATE = "state";
@@ -45,8 +52,11 @@ public class UnlibraryRepository {
 
     private final FirebaseFirestore mDb;
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
-    private final ListenerRegistration mListenerRegistration;
+    private List<Book> mAllBooks;
+    private ListenerRegistration mListenerRegistration;
+
     private String mUID;
+    private FilterMap mFilter;
 
     /**
      * Constructor for UnlibraryRepository. Sets up Firestore
@@ -56,9 +66,23 @@ public class UnlibraryRepository {
     @Inject
     public UnlibraryRepository(FirebaseFirestore db) {
         mDb = db;
+
+        mAllBooks = new ArrayList<>();
         // TODO: Get document changes only to minimize payload from Firestore
+        this.mFilter = new FilterMap(true);
+        attachListeners();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        mUID = user.getUid();
+    }
+
+    /**
+     * Attach a listener to a QuerySnapshot from Firestore. Listen to any changes in the database
+     * and update the books object.
+     */
+    public void attachListeners() {
         mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo(REQUESTER, FirebaseAuth.getInstance().getUid())
+                .whereNotEqualTo(STATE, Request.State.ARCHIVED.toString())
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
                         Log.e(TAG, "Unable to get requests from database", error);
@@ -68,14 +92,14 @@ public class UnlibraryRepository {
                     List<Request> requests = snapshot.toObjects(Request.class);
 
                     ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
-                    ArrayList<Book> books = new ArrayList<>();
+                    mAllBooks.clear();
 
                     for (Request r : requests) {
                         addBookTasks.add(
                                 mDb.collection(BOOK_COLLECTION).document(r.getBook()).get()
                                         .addOnSuccessListener(documentSnapshot -> {
                                             Book book = documentSnapshot.toObject(Book.class);
-                                            books.add(book);
+                                            mAllBooks.add(book);
                                         })
                                         .addOnFailureListener(e -> {
                                             Log.e(TAG, "Unable to get book " + r.getBook() + "from database", e);
@@ -83,18 +107,43 @@ public class UnlibraryRepository {
                         );
                     }
 
-
                     Tasks.whenAllComplete(addBookTasks)
                             .addOnSuccessListener(aVoid -> {
-                                mBooks.setValue(books);
+                                filter();
                             })
                             .addOnFailureListener(e -> {
                                 Log.e("TAG", "Failed to update book list", e);
                             });
                 });
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        mUID = user.getUid();
+    }
+
+    /**
+     * Filter the results of the books query.
+     *
+     * @param filter What to filter for
+     */
+    public void setFilter(FilterMap filter) {
+        mFilter = filter;
+        filter();
+    }
+
+    public void filter() {
+        List<Book> filtered = new ArrayList<>();
+        List<String> statusValues = new ArrayList<>();
+        for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
+            if (f.getValue()) {
+                statusValues.add(f.getKey().toString());
+            }
+        }
+
+        for (Book book : mAllBooks) {
+            if (statusValues.isEmpty() || statusValues.contains(book.getStatus().toString())) {
+                filtered.add(book);
+            }
+        }
+
+        mBooks.setValue(filtered);
     }
 
     /**
@@ -179,6 +228,47 @@ public class UnlibraryRepository {
         mListenerRegistration.remove();
     }
 
+    /**
+     * Fetches the owner for a newly selected book by clearing the previous book's owner information and
+     * adding a snapshot listener for the book's owner
+     *
+     * @param book
+     */
+    public void fetchOwner(Book book, OnSuccessListener<User> onSuccessListener) {
+
+        mDb.collection(USER_COLLECTION).document(book.getOwner()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    User user = documentSnapshot.toObject(User.class);
+                    onSuccessListener.onSuccess(user);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Unable to get owner " + book + "from database", e);
+                });
+    }
+
+    /**
+     * Fetches the handoff location for the selected book
+     *
+     * @param bookRequestedID   book ID request is associated with
+     * @param onFinished        code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void fetchHandoffLocation(String bookRequestedID, LibraryRepository.OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
+        mDb.collection(REQUEST_COLLECTION)
+                .whereEqualTo(BOOK, bookRequestedID)
+                .whereEqualTo(REQUESTER, mUID)
+                .whereNotEqualTo(STATE, ARCHIVED)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
+                    if (requests.size() != 1) {
+                        onFailureListener.onFailure(new Exception("Unexpected number of requests returned when fetching location.  " + requests.size() + " requests found."));
+                        return;
+                    }
+                    onFinished.onFinished(requests.get(0).getLocation());
+                })
+                .addOnFailureListener(onFailureListener);
+    }
 
     /**
      * Simple callback interface for asynchronous events
