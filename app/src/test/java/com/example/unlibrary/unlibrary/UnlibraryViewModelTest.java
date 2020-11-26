@@ -1,3 +1,10 @@
+/*
+ * UnlibraryViewModelTest
+ *
+ * November 26, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary.unlibrary;
 
 import android.view.View;
@@ -33,6 +40,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
+/**
+ * Tests UnlibraryViewModel to ensure that it is forwarding the right information
+ * from Repository and the appropriate calls to Repository are made during certain
+ * actions.
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Toast.class)
 public class UnlibraryViewModelTest {
@@ -115,5 +127,4 @@ public class UnlibraryViewModelTest {
         verify(mMockRepository).fetchOwner(any(), any());
         assertEquals(mMockBooks.getValue().get(0).getOwner(), mViewModel.getCurrentBookOwner().getValue().getUID());
     }
-
 }
