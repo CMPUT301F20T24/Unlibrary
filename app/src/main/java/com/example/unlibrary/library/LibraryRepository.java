@@ -54,7 +54,6 @@ import static com.example.unlibrary.models.Request.State.ARCHIVED;
  * Manages all the database interaction for the Library ViewModel.
  */
 public class LibraryRepository {
-
     private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
     private static final String REQUESTS_COLLECTION = "requests";
@@ -79,13 +78,15 @@ public class LibraryRepository {
     private static final String ALGOLIA_AUTHOR_FIELD = "author";
     private static final String ALGOLIA_ID_FIELD = "objectID";
     private final Client mAlgoliaClient;
+
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
+
     private ListenerRegistration mBookListenerRegistration;
     private ListenerRegistration mBooksListenerRegistration;
     private ListenerRegistration mRequestsListenerRegistration;
+
     private MutableLiveData<List<Book>> mBooks;
-    private MutableLiveData<List<User>> mCurrentBookRequesters;
     private FilterMap mFilter;
 
     /**
@@ -97,18 +98,18 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
-        mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
         this.mFilter = new FilterMap(true);
         attachListener();
     }
 
     /**
-     * Attach a listener to a QuerySnapshot from Firestore. Listen to any changes in the database
-     * and update the books object.
+     * Listen to any changes in the database and update the books list.
      */
     public void attachListener() {
         mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
         Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, FirebaseAuth.getInstance().getUid());
+
+        // Filter according to status in UI if any
         List<String> statusValues = new ArrayList<>();
         for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
             if (f.getValue()) {
@@ -262,64 +263,19 @@ public class LibraryRepository {
         }
     }
 
-    /**
-     * Getter for the LiveData List of requesters on a selected book.
-     *
-     * @return LiveData<ArrayList < String>> This returns the books object.
-     */
-    public LiveData<List<User>> getRequesters() {
-        return this.mCurrentBookRequesters;
-    }
-
-    /**
-     * Fetches the list of requesters for a newly selected book by clearing the previous book's requesters and
-     * adding a snapshot listener for the new book's requesters
-     *
-     * @param currentBookID
-     */
-    public void fetchRequestersForCurrentBook(String currentBookID) {
-        // Clear the previous book's requesters in time before requesters list gets displayed
-        mCurrentBookRequesters.setValue(new ArrayList<>());
-        // Attach snapshot listener for requesters on current book
-        attachRequestsListener(currentBookID);
-    }
-
-    /**
-     * Sets up a listener to callback to for whenever book details are updated (e.g. status)
-     *
-     * @param bookId Firestore assigned bookId (use Book::getId())
-     */
-    public void addBookListener(String bookId, OnSuccessListener<Book> listener) {
-        if (mBookListenerRegistration != null) {
-            mBookListenerRegistration.remove();
+    public void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener) {
+        if (mRequestsListenerRegistration != null) {
+            mRequestsListenerRegistration.remove();
         }
 
-         mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) {
-                        Log.e(TAG, "Error updating book details", error);
-                        return;
-                    }
-
-                    listener.onSuccess(value.toObject(Book.class));
-                });
-    }
-
-    /**
-     * Attaches snapshot listener for requests on a given book
-     *
-     * @param bookID requests on this book will be listened to
-     */
-    public void attachRequestsListener(String bookID) {
-        // Get all requests associated with current book that are in REQUESTED state
         Query query = mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK, bookID)
+                .whereEqualTo(BOOK, bookId)
                 .whereNotEqualTo(STATE, ARCHIVED);
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
             if (error != null) {
-                Log.w(TAG, "Error fetching requests for book" + bookID, error);
+                Log.w(TAG, "Error fetching requests for book" + bookId, error);
                 return;
             }
 
@@ -341,12 +297,39 @@ public class LibraryRepository {
                 );
             }
 
+            // There are no more active requests on this book
+            if (addRequesterTasks.size() == 0) {
+                listener.onSuccess(new ArrayList<>());
+                return;
+            }
 
-            Tasks.whenAllComplete(addRequesterTasks)    //This task will never fail
+            // No failure listener added because this task will never fail
+            Tasks.whenAllComplete(addRequesterTasks)
                     .addOnSuccessListener(aVoid -> {
-                        mCurrentBookRequesters.setValue(requesters);
+                        listener.onSuccess(requesters);
                     });
         });
+    }
+
+    /**
+     * Sets up a listener to callback to for whenever book details are updated (e.g. status)
+     *
+     * @param bookId Firestore assigned bookId (use Book::getId())
+     */
+    public void addBookListener(String bookId, OnSuccessListener<Book> listener) {
+        if (mBookListenerRegistration != null) {
+            mBookListenerRegistration.remove();
+        }
+
+         mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error updating book details", error);
+                        return;
+                    }
+
+                    listener.onSuccess(value.toObject(Book.class));
+                });
     }
 
     /**
