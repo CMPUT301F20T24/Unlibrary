@@ -58,9 +58,6 @@ public class LibraryRepository {
     private static final String BOOKS_COLLECTION = "books";
     private static final String REQUESTS_COLLECTION = "requests";
     private static final String USERS_COLLECTION = "users";
-    private static final String BOOK = "book";
-    private static final String STATE = "state";
-    private static final String STATUS = "status";
     private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
     private static final String BOOK_FIELD = "book";
     private static final String STATUS_FIELD = "status";
@@ -263,14 +260,20 @@ public class LibraryRepository {
         }
     }
 
+    /**
+     * Listens to requesters on given book.
+     *
+     * @param bookId Firestore assigned bookId
+     * @param listener to give back the list of users actively requesting for the given book
+     */
     public void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener) {
         if (mRequestsListenerRegistration != null) {
             mRequestsListenerRegistration.remove();
         }
 
         Query query = mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK, bookId)
-                .whereNotEqualTo(STATE, ARCHIVED);
+                .whereEqualTo(BOOK_FIELD, bookId)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED);
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
@@ -300,6 +303,55 @@ public class LibraryRepository {
             // There are no more active requests on this book
             if (addRequesterTasks.size() == 0) {
                 listener.onSuccess(new ArrayList<>());
+                return;
+            }
+
+            // No failure listener added because this task will never fail
+            Tasks.whenAllComplete(addRequesterTasks)
+                    .addOnSuccessListener(aVoid -> {
+                        listener.onSuccess(requesters);
+                    });
+        });
+    }
+
+    /**
+     * Fetches for the latest active requesters on given bookId
+     *
+     * @param bookId Firestore assigned bookId
+     * @param listener to give back the list of users actively requesting for the given book
+     */
+    public void forceUpdateRequesters(String bookId, OnSuccessListener<List<User>> listener) {
+        Query query = mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo(BOOK_FIELD, bookId)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED);
+
+        query.get().addOnSuccessListener(snapshots -> {
+
+            List<Request> requests = snapshots.toObjects(Request.class);
+
+            ArrayList<Task<DocumentSnapshot>> addRequesterTasks = new ArrayList<>();
+            ArrayList<User> requesters = new ArrayList<>();
+
+            for (Request r : requests) {
+                if (r.getState() == ARCHIVED) {
+                    continue;
+                }
+
+                addRequesterTasks.add(
+                        mDb.collection(USERS_COLLECTION).document(r.getRequester()).get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    User requester = documentSnapshot.toObject(User.class);
+                                    requesters.add(requester);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e(TAG, "Unable to get requester " + r.getRequester() + "from database", e);
+                                })
+                );
+            }
+
+            // There are no more active requests on this book
+            if (addRequesterTasks.size() == 0) {
+                listener.onSuccess(requesters);
                 return;
             }
 
@@ -347,7 +399,7 @@ public class LibraryRepository {
      * @param onFailureListener code to call on failure
      */
     public void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
-        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, book.getId()).whereEqualTo(STATE, Request.State.BORROWED.toString());
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, book.getId()).whereEqualTo(STATE_FIELD, Request.State.BORROWED.toString());
         query.get().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
     }
 
@@ -364,8 +416,8 @@ public class LibraryRepository {
         DocumentReference requestCol = mDb.collection(REQUESTS_COLLECTION).document(request.getId());
         DocumentReference bookCol = mDb.collection(BOOKS_COLLECTION).document(book.getId());
 
-        requestCol.update(STATE, request.getState());
-        bookCol.update(STATUS, book.getStatus());
+        requestCol.update(STATE_FIELD, request.getState());
+        bookCol.update(STATUS_FIELD, book.getStatus());
         bookCol.update(IS_READY_FOR_HANDOFF, book.getIsReadyForHandoff());
 
         batch.commit()
@@ -442,8 +494,8 @@ public class LibraryRepository {
      */
     public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK, bookRequestedID)
-                .whereNotEqualTo(STATE, ARCHIVED)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
@@ -471,14 +523,14 @@ public class LibraryRepository {
                         }
 
                         transaction.update(acceptedRequestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
-                        transaction.update(acceptedRequestDocument, STATE, Request.State.ACCEPTED.toString());
+                        transaction.update(acceptedRequestDocument, STATE_FIELD, Request.State.ACCEPTED.toString());
 
                         for (DocumentReference doc : declinedRequestDocuments) {
-                            transaction.update(doc, STATE, ARCHIVED.toString());
+                            transaction.update(doc, STATE_FIELD, ARCHIVED.toString());
                         }
 
                         final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
-                        transaction.update(bookDocument, STATUS, Status.ACCEPTED.toString());
+                        transaction.update(bookDocument, STATUS_FIELD, Status.ACCEPTED.toString());
 
                         // Success
                         return null;
@@ -501,8 +553,8 @@ public class LibraryRepository {
     public void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(REQUESTER, requestedUID)
-                .whereEqualTo(BOOK, bookRequestedID)
-                .whereNotEqualTo(STATE, ARCHIVED)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
@@ -529,9 +581,9 @@ public class LibraryRepository {
      */
     public void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK, bookRequestedID)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
                 .whereEqualTo(REQUESTER, requestedUID)
-                .whereNotEqualTo(STATE, ARCHIVED)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);

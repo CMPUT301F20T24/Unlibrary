@@ -666,6 +666,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
                 o -> {
                     // If request is successfully declined, navigate back to detailed book fragment
                     mNavigationEvent.setValue(LibraryRequesterProfileFragmentDirections.actionLibraryRequesterProfileFragmentToLibraryBookDetailsFragment());
+                    mLibraryRepository.forceUpdateRequesters(mCurrentBook.getValue().getId(), mCurrentBookRequesters::setValue);
                 },
                 e -> {
                     // If request was not successfully declined, show error message toast and log error
