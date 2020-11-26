@@ -107,7 +107,7 @@ public class LibraryRepository {
      */
     public void attachListener() {
         mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
-        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, FirebaseAuth.getInstance().getUid());
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, mAuth.getCurrentUser().getUid());
         List<String> statusValues = new ArrayList<>();
         for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
             if (f.getValue()) {
