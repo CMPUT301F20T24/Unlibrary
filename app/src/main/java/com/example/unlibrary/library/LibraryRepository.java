@@ -315,55 +315,6 @@ public class LibraryRepository {
     }
 
     /**
-     * Fetches for the latest active requesters on given bookId
-     *
-     * @param bookId Firestore assigned bookId
-     * @param listener to give back the list of users actively requesting for the given book
-     */
-    public void forceUpdateRequesters(String bookId, OnSuccessListener<List<User>> listener) {
-        Query query = mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK_FIELD, bookId)
-                .whereNotEqualTo(STATE_FIELD, ARCHIVED);
-
-        query.get().addOnSuccessListener(snapshots -> {
-
-            List<Request> requests = snapshots.toObjects(Request.class);
-
-            ArrayList<Task<DocumentSnapshot>> addRequesterTasks = new ArrayList<>();
-            ArrayList<User> requesters = new ArrayList<>();
-
-            for (Request r : requests) {
-                if (r.getState() == ARCHIVED) {
-                    continue;
-                }
-
-                addRequesterTasks.add(
-                        mDb.collection(USERS_COLLECTION).document(r.getRequester()).get()
-                                .addOnSuccessListener(documentSnapshot -> {
-                                    User requester = documentSnapshot.toObject(User.class);
-                                    requesters.add(requester);
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e(TAG, "Unable to get requester " + r.getRequester() + "from database", e);
-                                })
-                );
-            }
-
-            // There are no more active requests on this book
-            if (addRequesterTasks.size() == 0) {
-                listener.onSuccess(requesters);
-                return;
-            }
-
-            // No failure listener added because this task will never fail
-            Tasks.whenAllComplete(addRequesterTasks)
-                    .addOnSuccessListener(aVoid -> {
-                        listener.onSuccess(requesters);
-                    });
-        });
-    }
-
-    /**
      * Sets up a listener to callback to for whenever book details are updated (e.g. status)
      *
      * @param bookId Firestore assigned bookId (use Book::getId())
