@@ -60,16 +60,23 @@ jobs:
           popd
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        
-      # Step 4: Assemble debug apk to send to firebase test lab
+
+      # Upload test results as artifacts
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: app/build/reports/tests
+
+      # Step 5: Assemble debug apk to send to firebase test lab
       - name: Assemble Debug APK
         run: ./gradlew assemble
 
-      # Step 4: Assemble debug test apk to send to firebase test lab
+      # Step 6: Assemble debug test apk to send to firebase test lab
       - name: Assemble Debug Test APK
         run: ./gradlew assembleAndroidTest
 
-      # Step 4: Run instrumented tests on firebase test lab
+      # Step 7: Run instrumented tests on firebase test lab
       - name: Run tests on Firebase Test Lab
         uses: asadmansr/Firebase-Test-Lab-Action@v1.0
         with:
