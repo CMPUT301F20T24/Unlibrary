@@ -9,6 +9,8 @@
 package com.example.unlibrary.auth;
 
 import com.example.unlibrary.models.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,19 +36,13 @@ public class AuthRepository {
     /**
      * Sign in a user.
      *
-     * @param email      User email
-     * @param password   User password
-     * @param onFinished Code to call when finished successfully or not
+     * @param email     User email
+     * @param password  User password
+     * @param onFailure Code to call when finished successfully or not
      */
-    public void signIn(String email, String password, OnFinishedListener onFinished) {
+    public void signIn(String email, String password, OnFailureListener onFailure) {
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        onFinished.finished(true, "");
-                    } else {
-                        onFinished.finished(false, task.getException().getMessage());
-                    }
-                });
+                .addOnFailureListener(onFailure::onFailure);
     }
 
     /**
@@ -76,6 +72,19 @@ public class AuthRepository {
                         .addOnFailureListener(e -> onFinished.finished(false, "Failed to register user. " + e.getMessage()));
             } else {
                 onFinished.finished(false, "Username is not globally unique.");
+            }
+        });
+    }
+
+    /**
+     * Attaches listener to call whenever a user successfully signs in
+     *
+     * @param listener Code to call when sign in passes
+     */
+    public void addOnSignInListener(OnSuccessListener<Void> listener) {
+        mAuth.addAuthStateListener(firebaseAuth -> {
+            if (firebaseAuth.getCurrentUser() != null) {
+                listener.onSuccess(null);
             }
         });
     }

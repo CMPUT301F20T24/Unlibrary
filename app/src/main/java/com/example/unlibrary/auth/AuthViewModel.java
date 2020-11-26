@@ -38,6 +38,7 @@ public class AuthViewModel extends ViewModel {
 
     public AuthViewModel() {
         this.mAuthRepository = new AuthRepository();
+        mAuthRepository.addOnSignInListener(aVoid -> mAuthenticatedEvent.call());
     }
 
     /**
@@ -162,14 +163,9 @@ public class AuthViewModel extends ViewModel {
         }
 
         // Try to authenticate the user
-        mAuthRepository.signIn(email, password, (s, msg) -> {
-            if (s) {
-                // Login succeeded, navigate away from auth activity
-                mAuthenticatedEvent.call();
-            } else {
-                // Login failed, show toast
-                mFailureMsgEvent.setValue(msg);
-            }
+        mAuthRepository.signIn(email, password, (error) -> {
+            // Login failed, show toast
+            mFailureMsgEvent.setValue(error.getMessage());
         });
     }
 
