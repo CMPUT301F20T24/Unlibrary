@@ -46,7 +46,7 @@ public class LibraryRepositoryTest {
     @Mock
     private Client mAlgoliaClient;
 
-    private final int SLEEP_TIME = 5;
+    private final int SLEEP_TIME = 10;
     private final int SLEEP_TIME_MILLIS = SLEEP_TIME * 1000;
 
     @Before
