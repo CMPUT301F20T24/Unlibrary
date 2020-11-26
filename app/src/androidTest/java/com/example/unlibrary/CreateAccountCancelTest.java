@@ -57,9 +57,7 @@ public class CreateAccountCancelTest {
                         isDisplayed()));
         materialButton.perform(click());
 
-    // https://developer.android.com/training/testing/espresso/basics
         onView(allOf(withId(R.id.register_title))).check(matches(withText("Register")));
-//        onView(allOf(withId(R.id.register_title), withText("Register")));
         onView(withId(R.id.register_username_input));
         onView(withId(R.id.register_email_input));
         onView(withId(R.id.login_password_input));
@@ -74,13 +72,12 @@ public class CreateAccountCancelTest {
                         isDisplayed()));
         materialButton2.perform(click());
 
-//        onView(allOf(withId(R.id.login_title), withText("Login")));
         onView(allOf(withId(R.id.login_title))).check(matches(withText("Login")));
 
     }
 
     /**
-     * verifies the position of the child in a given view
+     * Verifies the position of the child in a given view
      * @param parentMatcher
      * @param position
      * @return

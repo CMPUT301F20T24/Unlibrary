@@ -62,7 +62,6 @@ public class CreateAccountPageUITest {
         materialButton.perform(click());
 
         onView(allOf(withId(R.id.register_title))).check(matches(withText("Register")));
-//        onView(allOf(withId(R.id.register_title), withText("Register")));
         onView(withId(R.id.register_username_input));
         onView(withId(R.id.register_email_input));
         onView(withId(R.id.login_password_input));
@@ -73,7 +72,7 @@ public class CreateAccountPageUITest {
                                 withId(R.id.register_username_input),
                                 0),
                         1)));
-        textInputEditText.perform(replaceText("golnoush"), closeSoftKeyboard());
+        textInputEditText.perform(replaceText("test"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText2 = onView(
                 allOf(childAtPosition(
@@ -81,7 +80,7 @@ public class CreateAccountPageUITest {
                                 withId(R.id.register_email_input),
                                 0),
                         1)));
-        textInputEditText2.perform(replaceText("golnoush@gmail.com"), closeSoftKeyboard());
+        textInputEditText2.perform(replaceText("test@test.com"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText3 = onView(
                 allOf(childAtPosition(

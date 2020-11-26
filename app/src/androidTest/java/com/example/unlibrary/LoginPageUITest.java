@@ -55,7 +55,7 @@ public class LoginPageUITest {
                                 0),
                         0),
                         isDisplayed()));
-        textInputEditText.perform(replaceText("golnoush@gmail.com"), closeSoftKeyboard());
+        textInputEditText.perform(replaceText("test@test.com"), closeSoftKeyboard());
 
         ViewInteraction textInputEditText2 = onView(
                 allOf(childAtPosition(
@@ -64,7 +64,7 @@ public class LoginPageUITest {
                                 0),
                         1),
                         isDisplayed()));
-        textInputEditText2.perform(replaceText("hihihihi"), closeSoftKeyboard());
+        textInputEditText2.perform(replaceText("12345678"), closeSoftKeyboard());
 
         ViewInteraction checkableImageButton = onView(
                 allOf(withId(R.id.text_input_end_icon), withContentDescription("Show password"),
