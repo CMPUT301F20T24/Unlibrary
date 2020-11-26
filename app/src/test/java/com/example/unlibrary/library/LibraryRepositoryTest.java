@@ -26,6 +26,7 @@ import java.util.List;
 import static android.os.Looper.getMainLooper;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -87,11 +88,14 @@ public class LibraryRepositoryTest {
         Thread.sleep(SLEEP_TIME_MILLIS);
         shadowOf(getMainLooper()).idle();
 
+        boolean addTestPass = false;
         for (Book b : mRepository.getBooks().getValue()) {
             if (b.getId().equals(book.getId())) {
-                return;
+                addTestPass = true;
             }
         }
+
+        assertTrue("Add book test failed: book not found in repository", addTestPass);
 
         mRepository.deleteBook(book, aVoid -> {}, e -> fail("Unable to delete book " + e.getMessage()));
 
@@ -104,7 +108,5 @@ public class LibraryRepositoryTest {
                 fail("Book is still present");
             }
         }
-
-        fail("New book not found in repository");
     }
 }
