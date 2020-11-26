@@ -39,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,7 +62,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private FilterMap mFilter;
     private LiveData<List<Book>> mBooks;
     private final LibraryRepository mLibraryRepository;
-    private final LiveData<List<User>> mCurrentBookRequesters;
+    private final MutableLiveData<List<User>> mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
     private User mSelectedRequester;
     private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
     static final String TITLE = "REQUEST ACCEPTED";
@@ -82,7 +83,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         this.mFilter = new FilterMap(true);
         this.mLibraryRepository = libraryRepository;
         this.mBooks = this.mLibraryRepository.getBooks();
-        this.mCurrentBookRequesters = this.mLibraryRepository.getRequesters();
     }
 
     /**
@@ -355,6 +355,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
         mLibraryRepository.addBookListener(book.getId(), mCurrentBook::setValue);
+        mLibraryRepository.addBookRequestersListener(book.getId(), mCurrentBookRequesters::setValue);
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
     }
 
@@ -627,13 +628,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         public InvalidInputException(String errorMessage) {
             super(errorMessage);
         }
-    }
-
-    /**
-     * Fetches requesters for current book
-     */
-    public void fetchRequestersForCurrentBook() {
-        mLibraryRepository.fetchRequestersForCurrentBook(mCurrentBook.getValue().getId());
     }
 
     /**

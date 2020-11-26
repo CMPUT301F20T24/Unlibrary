@@ -110,7 +110,6 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
         RecyclerView recyclerView = mBinding.requestersList;
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        mViewModel.fetchRequestersForCurrentBook();
         RequestersRecyclerViewAdapter adapter = new RequestersRecyclerViewAdapter(mViewModel.getRequesters().getValue(), mViewModel::selectRequester);
 
         // Bind ViewModel books to RecyclerViewAdapter
