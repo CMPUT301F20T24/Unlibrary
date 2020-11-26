@@ -10,12 +10,14 @@ package com.example.unlibrary.util;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.unlibrary.auth.AuthActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
  * This abstract activity locks any activities that extend it behind a layer of Firebase authentication.
@@ -24,7 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
  * will be protected by the authentication.
  */
 public abstract class AuthenticatedActivity extends AppCompatActivity {
-
+    private static final String TAG = AuthenticatedActivity.class.getSimpleName();
     private FirebaseUser mUser;
 
     /**
@@ -40,6 +42,9 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
         if (mUser == null) {
             goToAuth();
         }
+
+        FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid())
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to subsribe to notifications, e"));
 
         FirebaseAuth.getInstance().addAuthStateListener((auth) -> {
             mUser = auth.getCurrentUser();

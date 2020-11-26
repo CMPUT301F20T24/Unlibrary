@@ -23,8 +23,11 @@ import androidx.navigation.Navigation;
 import com.example.unlibrary.book_list.BooksSource;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
+import com.example.unlibrary.models.User;
 import com.example.unlibrary.util.BarcodeScanner;
+import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.util.SingleLiveEvent;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
@@ -36,10 +39,13 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     private final LiveData<List<Book>> mBooks;
     private final UnlibraryRepository mUnlibraryRepository;
     private final MutableLiveData<Book> mCurrentBook = new MutableLiveData<>();
+    private final MutableLiveData<User> mCurrentBookOwner = new MutableLiveData<>();
     private final MutableLiveData<Request> mCurrentRequest = new MutableLiveData<>();
     private final SingleLiveEvent<NavDirections> mNavigationEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mFailureMsgEvent = new SingleLiveEvent<>();
     private final SingleLiveEvent<String> mSuccessMsgEvent = new SingleLiveEvent<>();
+    private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(null);
+    private FilterMap mFilter;
 
     /**
      * Constructor for the UnLibrary ViewModel. Binds the list of books to return from the
@@ -49,6 +55,27 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     public UnlibraryViewModel(UnlibraryRepository unlibraryRepository) {
         mUnlibraryRepository = unlibraryRepository;
         mBooks = mUnlibraryRepository.getBooks();
+        mFilter = new FilterMap(false);
+    }
+
+
+    /**
+     * Get the current filter settings.
+     *
+     * @return FilterMap object
+     */
+    public FilterMap getFilter() {
+        return mFilter;
+    }
+
+    /**
+     * Configure the filter settings and trigger a corresponding update to the books data.
+     *
+     * @param filter FilterMap object
+     */
+    public void setFilter(FilterMap filter) {
+        mFilter.setMap(filter.getMap());
+        mUnlibraryRepository.setFilter(mFilter);
     }
 
     /**
@@ -97,9 +124,40 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
     }
 
     /**
+     * Should map fragment be shown
+     *
+     * @return ShowHandoffLocation LiveData
+     */
+    public LiveData<Boolean> showHandoffLocation() {
+        return Transformations.map(mCurrentBook, book ->
+                book.getStatus() == Book.Status.ACCEPTED);
+    }
+
+    /**
+     * Getter for the mHandoffLocation object
+     *
+     * @return the lat lng of the accepted request location
+     */
+    public LiveData<LatLng> getHandoffLocation() {
+        return mHandoffLocation;
+    }
+
+    /**
+     * Fetches the handoff location for the current book
+     */
+    public void fetchHandoffLocation() {
+        mUnlibraryRepository.fetchHandoffLocation(mCurrentBook.getValue().getId(),
+                geoPoint -> mHandoffLocation.setValue(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())),
+                e -> {
+                    mFailureMsgEvent.setValue("Failed to get handoff location");
+                    Log.e(TAG, e.toString());
+                });
+    }
+
+    /**
      * Getter for mCurrentBook live data object
      *
-     * @return LiveData<Book> This returns the mBooks object
+     * @return LiveData<Book> This returns the mCurrentBook object
      */
     public LiveData<Book> getCurrentBook() {
         return mCurrentBook;
@@ -127,6 +185,9 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         }
 
         Book book = mBooks.getValue().get(position);
+        mUnlibraryRepository.fetchOwner(book, (user -> {
+            mCurrentBookOwner.setValue(user); // Gets user to display in detailed fragment
+        }));
         Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
         Request request = new Request();
         mUnlibraryRepository.getRequest(book,
@@ -175,6 +236,15 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         } else {
             Log.w(TAG, "Handoff called for an invalid book status.");
         }
+    }
+
+    /**
+     * Getter for the mCurrentBookOwner object.
+     *
+     * @return LiveData<User> This returns the mCurrentBookOwner object
+     */
+    public MutableLiveData<User> getCurrentBookOwner() {
+        return this.mCurrentBookOwner;
     }
 
     /**
