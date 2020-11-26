@@ -1,61 +1,98 @@
 package com.example.unlibrary.library;
 
+import android.content.Context;
+import android.os.Build;
+
+import androidx.test.core.app.ApplicationProvider;
+
 import com.algolia.search.saas.Client;
+import com.algolia.search.saas.Index;
 import com.example.unlibrary.models.Book;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+import org.robolectric.annotation.LooperMode;
 
 import java.util.List;
 
+import static android.os.Looper.getMainLooper;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.robolectric.Shadows.shadowOf;
+import static org.robolectric.annotation.LooperMode.Mode.PAUSED;
 
+@RunWith(RobolectricTestRunner.class)
+@LooperMode(PAUSED)
+@Config(sdk = {Build.VERSION_CODES.O_MR1})
 public class LibraryRepositoryTest {
-    private LibraryRepository repository;
+    private Context mContext = ApplicationProvider.getApplicationContext();
+    private LibraryRepository mRepository;
 
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
+    @Mock
     private Client mAlgoliaClient;
 
-    private String newBookId;
+    private String mNewBookId;
+
+    private final int SLEEP_TIME = 5;
+    private final int SLEEP_TIME_MILLIS = SLEEP_TIME * 1000;
 
     @Before
-    public void setup() {
-        // 10.0.2.2 is the special IP address to connect to the 'localhost' of
-        // the host computer from an Android emulator.
-        mDb = FirebaseFirestore.getInstance();
-        mDb.useEmulator("10.0.2.2", 8080);
+    public void setup() throws InterruptedException {
+        FirebaseApp.initializeApp(mContext);
 
-        mAuth = FirebaseAuth.getInstance();
-        mAuth.useEmulator("10.0.2.2", 9099);
+        mDb = FirebaseFirestore.getInstance();
+        mDb.useEmulator("127.0.0.1", 8080);
+
+        // TODO: Get auth emulator working
+        mAuth = mock(FirebaseAuth.class);
+        when(mAuth.getCurrentUser()).thenReturn(mock(FirebaseUser.class));
+        when(mAuth.getCurrentUser().getUid()).thenReturn("CvLZ5c6lYqeyriVnwNpGurcBZl5R");
 
         mAlgoliaClient = mock(Client.class);
+        when(mAlgoliaClient.getIndex(anyString())).thenReturn(mock(Index.class));
 
-        repository = new LibraryRepository(mDb, mAuth, mAlgoliaClient);
+        mRepository = new LibraryRepository(mDb, mAuth, mAlgoliaClient);
     }
 
     @Test
-    public void addBookTest() {
-        Book book = new Book("9780441016075", "Halting State", "Charles Stross", mAuth.getUid(), null);
+    public void addBookTest() throws InterruptedException {
+        Book book = new Book("9780441016075", "Halting State", "Charles Stross", mAuth.getCurrentUser().getUid(), null);
 
-        repository.createBook(book, documentReference -> {
-            newBookId = documentReference.getId();
+        mRepository.createBook(book, documentReference -> {
+            mNewBookId = documentReference.getId();
         }, e -> fail("Unable to create book: " + e.getMessage()));
 
-        await().atMost(5, SECONDS).until(() -> newBookId != null);
+        // Callback to set newBookId might not have been called yet
+        Thread.sleep(SLEEP_TIME_MILLIS);
+        shadowOf(getMainLooper()).idle();
 
-        List<Book> books = repository.getBooks().getValue();
+        await().atMost(SLEEP_TIME, SECONDS).until(() -> mNewBookId != null);
+
+        List<Book> books = mRepository.getBooks().getValue();
         if (books == null) {
             fail("Repository does not contain any book");
         }
 
-        for (Book b : books) {
-            if (b.getId().equals(newBookId)) {
+        // Callback to update repository books might not have been called yet
+        Thread.sleep(SLEEP_TIME_MILLIS);
+        shadowOf(getMainLooper()).idle();
+
+        for (Book b : mRepository.getBooks().getValue()) {
+            if (b.getId().equals(mNewBookId)) {
                 return;
             }
         }
