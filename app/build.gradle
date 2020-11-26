@@ -158,4 +158,8 @@ dependencies {
 
     // Algolia
     implementation 'com.algolia:algoliasearch-android:3.27.0'
+
+    // Asynchronous JUnit testing
+    // Use old version for androidTestImplementation otherwise we'll have duplicate classes
+    androidTestImplementation 'org.awaitility:awaitility:3.0.0'
 }
