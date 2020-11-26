@@ -1,0 +1,17 @@
+{
+  "name": "firestore-emulator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start-emulator": "firebase emulators:start",
+    "test": "firebase emulators:exec \"../gradlew test -p ../\" ",
+    "firebase": "firebase"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase-tools": "^8.16.2"
+  }
+}
