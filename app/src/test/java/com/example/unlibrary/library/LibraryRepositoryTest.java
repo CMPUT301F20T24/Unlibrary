@@ -37,15 +37,13 @@ import static org.robolectric.annotation.LooperMode.Mode.PAUSED;
 @LooperMode(PAUSED)
 @Config(sdk = {Build.VERSION_CODES.O_MR1})
 public class LibraryRepositoryTest {
-    private Context mContext = ApplicationProvider.getApplicationContext();
+    private final Context mContext = ApplicationProvider.getApplicationContext();
     private LibraryRepository mRepository;
 
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
     @Mock
     private Client mAlgoliaClient;
-
-    private String mNewBookId;
 
     private final int SLEEP_TIME = 5;
     private final int SLEEP_TIME_MILLIS = SLEEP_TIME * 1000;
@@ -69,18 +67,16 @@ public class LibraryRepositoryTest {
     }
 
     @Test
-    public void addBookTest() throws InterruptedException {
+    public void addDeleteBookTest() throws InterruptedException {
         Book book = new Book("9780441016075", "Halting State", "Charles Stross", mAuth.getCurrentUser().getUid(), null);
 
-        mRepository.createBook(book, documentReference -> {
-            mNewBookId = documentReference.getId();
-        }, e -> fail("Unable to create book: " + e.getMessage()));
+        mRepository.createBook(book, documentReference -> {}, e -> fail("Unable to create book: " + e.getMessage()));
 
-        // Callback to set newBookId might not have been called yet
+        // Callback to update repository books might not have been called yet
         Thread.sleep(SLEEP_TIME_MILLIS);
         shadowOf(getMainLooper()).idle();
 
-        await().atMost(SLEEP_TIME, SECONDS).until(() -> mNewBookId != null);
+        await().atMost(SLEEP_TIME, SECONDS).until(() -> book.getId() != null);
 
         List<Book> books = mRepository.getBooks().getValue();
         if (books == null) {
@@ -92,8 +88,20 @@ public class LibraryRepositoryTest {
         shadowOf(getMainLooper()).idle();
 
         for (Book b : mRepository.getBooks().getValue()) {
-            if (b.getId().equals(mNewBookId)) {
+            if (b.getId().equals(book.getId())) {
                 return;
+            }
+        }
+
+        mRepository.deleteBook(book, aVoid -> {}, e -> fail("Unable to delete book " + e.getMessage()));
+
+        // Callback to update repository books might not have been called yet
+        Thread.sleep(SLEEP_TIME_MILLIS);
+        shadowOf(getMainLooper()).idle();
+
+        for (Book b : mRepository.getBooks().getValue()) {
+            if (b.getId().equals(book.getId())) {
+                fail("Book is still present");
             }
         }
 
