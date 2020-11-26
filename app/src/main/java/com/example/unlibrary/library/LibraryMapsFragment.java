@@ -1,5 +1,5 @@
 /*
- * MapsFragment
+ * LibraryMapsFragment
  *
  * November 21, 2020
  *
@@ -21,6 +21,8 @@ import androidx.navigation.Navigation;
 
 import com.example.unlibrary.R;
 import com.example.unlibrary.databinding.FragmentMapsBinding;
+import com.example.unlibrary.util.PushNotificationSender;
+import com.example.unlibrary.util.SendNotificationInterface;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,13 +42,14 @@ import java.util.Arrays;
 /**
  * Fragment to display Google Map and Autocomplete fragment to choose a handoff location
  */
-public class MapsFragment extends Fragment implements OnMapReadyCallback {
-    private static final String TAG = MapsFragment.class.getSimpleName();
+public class LibraryMapsFragment extends Fragment implements OnMapReadyCallback {
+    private static final String TAG = LibraryMapsFragment.class.getSimpleName();
     private static final Float ZOOM_LEVEL = 10.0f;
-    GoogleMap mMap;
-    FragmentMapsBinding mBinding;
-    LibraryViewModel mViewModel;
-    LatLng mLatLng;
+    private GoogleMap mMap;
+    private FragmentMapsBinding mBinding;
+    private LibraryViewModel mViewModel;
+    private LatLng mLatLng;
+    private final PushNotificationSender mSender = new PushNotificationSender();
 
     /**
      * Manipulates the map once available.
@@ -95,7 +98,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             if (mViewModel.getHandoffLocation().getValue() != null) {
                 mViewModel.updateHandoffLocation(mLatLng);
             } else {
-                mViewModel.acceptSelectedRequester(mLatLng);
+                SendNotificationInterface send = (target, title, body) -> mSender.generateNotification(v, target, title, body);
+                mViewModel.acceptSelectedRequester(mLatLng, send);
             }
         });
 

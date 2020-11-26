@@ -11,6 +11,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.unlibrary.library.LibraryRepository;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.models.User;
@@ -32,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import static com.example.unlibrary.models.Request.State.ARCHIVED;
 
 /**
  * Manages all the database interaction for {@link UnlibraryViewModel}
@@ -89,6 +92,7 @@ public class UnlibraryRepository {
                     List<Request> requests = snapshot.toObjects(Request.class);
 
                     ArrayList<Task<DocumentSnapshot>> addBookTasks = new ArrayList<>();
+                    mAllBooks.clear();
 
                     for (Request r : requests) {
                         addBookTasks.add(
@@ -102,7 +106,6 @@ public class UnlibraryRepository {
                                         })
                         );
                     }
-
 
                     Tasks.whenAllComplete(addBookTasks)
                             .addOnSuccessListener(aVoid -> {
@@ -241,6 +244,30 @@ public class UnlibraryRepository {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Unable to get owner " + book + "from database", e);
                 });
+    }
+
+    /**
+     * Fetches the handoff location for the selected book
+     *
+     * @param bookRequestedID   book ID request is associated with
+     * @param onFinished        code to call on success
+     * @param onFailureListener code to call on failure
+     */
+    public void fetchHandoffLocation(String bookRequestedID, LibraryRepository.OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
+        mDb.collection(REQUEST_COLLECTION)
+                .whereEqualTo(BOOK, bookRequestedID)
+                .whereEqualTo(REQUESTER, mUID)
+                .whereNotEqualTo(STATE, ARCHIVED)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
+                    if (requests.size() != 1) {
+                        onFailureListener.onFailure(new Exception("Unexpected number of requests returned when fetching location.  " + requests.size() + " requests found."));
+                        return;
+                    }
+                    onFinished.onFinished(requests.get(0).getLocation());
+                })
+                .addOnFailureListener(onFailureListener);
     }
 
     /**
