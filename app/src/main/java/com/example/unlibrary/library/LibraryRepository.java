@@ -81,6 +81,7 @@ public class LibraryRepository {
     private final Client mAlgoliaClient;
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
+    private ListenerRegistration mBookListenerRegistration;
     private ListenerRegistration mBooksListenerRegistration;
     private ListenerRegistration mRequestsListenerRegistration;
     private MutableLiveData<List<Book>> mBooks;
@@ -281,6 +282,27 @@ public class LibraryRepository {
         mCurrentBookRequesters.setValue(new ArrayList<>());
         // Attach snapshot listener for requesters on current book
         attachRequestsListener(currentBookID);
+    }
+
+    /**
+     * Sets up a listener to callback to for whenever book details are updated (e.g. status)
+     *
+     * @param bookId Firestore assigned bookId to listen to
+     */
+    public void attachListenerToBook(String bookId, OnSuccessListener<Book> listener) {
+        if (mBookListenerRegistration != null) {
+            mBookListenerRegistration.remove();
+        }
+
+         mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error updating book details", error);
+                        return;
+                    }
+
+                    listener.onSuccess(value.toObject(Book.class));
+                });
     }
 
     /**

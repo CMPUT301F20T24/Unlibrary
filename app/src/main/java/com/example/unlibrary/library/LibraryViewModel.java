@@ -354,6 +354,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         }
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
+        mLibraryRepository.attachListenerToBook(book.getId(), mCurrentBook::setValue);
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
     }
 
@@ -694,14 +695,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public void acceptSelectedRequester(LatLng latLng, SendNotificationInterface notification) {
         mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), latLng,
                 o -> {
-                    Book book = mCurrentBook.getValue();
-                    book.setStatus(Book.Status.ACCEPTED);
-                    mCurrentBook.setValue(book);
                     mHandoffLocation.setValue(latLng);
                     mNavigationEvent.setValue(LibraryMapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
 
                     String target = mSelectedRequester.getUID();
-                    String body = ACCEPT_REQUEST_TEMPLATE + book.getTitle();
+                    String body = ACCEPT_REQUEST_TEMPLATE + mCurrentBook.getValue().getTitle();
                     notification.send(target, TITLE, body);
                 },
                 e -> {
