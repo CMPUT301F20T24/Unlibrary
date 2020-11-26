@@ -287,9 +287,9 @@ public class LibraryRepository {
     /**
      * Sets up a listener to callback to for whenever book details are updated (e.g. status)
      *
-     * @param bookId Firestore assigned bookId to listen to
+     * @param bookId Firestore assigned bookId (use Book::getId())
      */
-    public void attachListenerToBook(String bookId, OnSuccessListener<Book> listener) {
+    public void addBookListener(String bookId, OnSuccessListener<Book> listener) {
         if (mBookListenerRegistration != null) {
             mBookListenerRegistration.remove();
         }
