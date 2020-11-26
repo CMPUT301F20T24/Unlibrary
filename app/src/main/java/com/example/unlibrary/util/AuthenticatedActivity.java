@@ -43,9 +43,6 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
             goToAuth();
         }
 
-//        FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid())
-//                .addOnFailureListener(e -> Log.e(TAG, "Failed to subsribe to notifications, e"));
-
         try {
             FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid())
                     .addOnFailureListener(e -> Log.e(TAG, "Failed to subscribe to notifications, e"));
