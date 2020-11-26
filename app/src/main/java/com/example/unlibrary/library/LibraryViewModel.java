@@ -39,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,7 +62,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private FilterMap mFilter;
     private LiveData<List<Book>> mBooks;
     private final LibraryRepository mLibraryRepository;
-    private final LiveData<List<User>> mCurrentBookRequesters;
+    private final MutableLiveData<List<User>> mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
     private User mSelectedRequester;
     private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
     static final String TITLE = "REQUEST ACCEPTED";
@@ -82,7 +83,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         this.mFilter = new FilterMap(true);
         this.mLibraryRepository = libraryRepository;
         this.mBooks = this.mLibraryRepository.getBooks();
-        this.mCurrentBookRequesters = this.mLibraryRepository.getRequesters();
     }
 
     /**
@@ -354,6 +354,8 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         }
         Book book = mBooks.getValue().get(position);
         mCurrentBook.setValue(book);
+        mLibraryRepository.addBookListener(book.getId(), mCurrentBook::setValue);
+        mLibraryRepository.addBookRequestersListener(book.getId(), mCurrentBookRequesters::setValue);
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
     }
 
@@ -629,13 +631,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
-     * Fetches requesters for current book
-     */
-    public void fetchRequestersForCurrentBook() {
-        mLibraryRepository.fetchRequestersForCurrentBook(mCurrentBook.getValue().getId());
-    }
-
-    /**
      * Removes the repository's snapshot listener for current book's requesters.
      */
     protected void detachRequestersListener() {
@@ -694,14 +689,11 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public void acceptSelectedRequester(LatLng latLng, SendNotificationInterface notification) {
         mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), latLng,
                 o -> {
-                    Book book = mCurrentBook.getValue();
-                    book.setStatus(Book.Status.ACCEPTED);
-                    mCurrentBook.setValue(book);
                     mHandoffLocation.setValue(latLng);
                     mNavigationEvent.setValue(LibraryMapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
 
                     String target = mSelectedRequester.getUID();
-                    String body = ACCEPT_REQUEST_TEMPLATE + book.getTitle();
+                    String body = ACCEPT_REQUEST_TEMPLATE + mCurrentBook.getValue().getTitle();
                     notification.send(target, TITLE, body);
                 },
                 e -> {
