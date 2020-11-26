@@ -50,7 +50,7 @@ public class LibraryRepositoryTest {
     private final int SLEEP_TIME_MILLIS = SLEEP_TIME * 1000;
 
     @Before
-    public void setup() throws InterruptedException {
+    public void setup() {
         FirebaseApp.initializeApp(mContext);
 
         mDb = FirebaseFirestore.getInstance();
