@@ -41,6 +41,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -83,6 +84,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
         this.mFilter = new FilterMap(true);
         this.mLibraryRepository = libraryRepository;
         this.mBooks = this.mLibraryRepository.getBooks();
+    }
+
+    /**
+     * LiveData getter to determine if the user is currently logged in
+     * @return LiveData<Boolean> Returns True if user is logged in
+     */
+    public LiveData<Boolean> isUserLoggedIn() {
+        return Transformations.map(mLibraryRepository.getFirebaseUser(), Objects::nonNull);
     }
 
     /**

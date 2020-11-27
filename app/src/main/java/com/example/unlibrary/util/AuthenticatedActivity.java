@@ -41,6 +41,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null) {
             goToAuth();
+            return;
         }
 
         FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid())
@@ -58,7 +59,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
     /**
      * Starts Auth Activity
      */
-    private void goToAuth() {
+    public void goToAuth() {
         // Not logged in
         Intent intent = new Intent(this, AuthActivity.class);
         // TODO we should send an extra with the intent which is the original activity the user was trying to navigate to, this way we can route them there after signing in

@@ -59,7 +59,6 @@ public class LibraryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Get the activity viewModel
         mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
-
         // Setup data binding
         mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
@@ -75,6 +74,12 @@ public class LibraryFragment extends Fragment {
         }
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
+
+        mViewModel.isUserLoggedIn().observe(getViewLifecycleOwner(), loggedIn -> {
+            if (!loggedIn) {
+                ((MainActivity) requireActivity()).goToAuth();
+            }
+        });
 
         // Setup observers
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.fabAdd).navigate(navDirections));
