@@ -43,6 +43,8 @@ android {
     testOptions {
         unitTests {
             includeAndroidResources = true
+            // http://tools.android.com/tech-docs/unit-testing-support#TOC-Method-...-not-mocked.-
+//            returnDefaultValues = true
         }
     }
 }
