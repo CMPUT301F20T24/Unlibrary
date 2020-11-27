@@ -82,6 +82,38 @@ public class ExchangeTest extends MockLogin{
         // TODO: Verify title
     }
 
+    @Test
+    public void requestBookTest() {
+        ViewInteraction bottomNavigationItemView = onView(
+                allOf(withId(R.id.exchangeFragment), withContentDescription("Exchange"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.bottom_navigation),
+                                        0),
+                                2),
+                        isDisplayed()));
+        bottomNavigationItemView.perform(click());
+
+        ViewInteraction recyclerView = onView(
+                allOf(withId(R.id.list),
+                        childAtPosition(
+                                withId(R.id.exchange_book_list),
+                                0)));
+        recyclerView.perform(actionOnItemAtPosition(0, click()));
+
+        ViewInteraction floatingActionButton = onView(
+                allOf(withId(R.id.add_request), withContentDescription("Edit book"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.exchange_book_frame),
+                                        0),
+                                1),
+                        isDisplayed()));
+        floatingActionButton.perform(click());
+
+        // TODO: Verify request made
+    }
+
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
 
