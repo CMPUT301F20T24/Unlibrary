@@ -21,7 +21,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -55,7 +54,7 @@ public class UnlibraryRepository {
     private List<Book> mAllBooks;
     private ListenerRegistration mListenerRegistration;
 
-    private String mUID;
+    private final String mUID;
     private FilterMap mFilter;
 
     /**
@@ -64,15 +63,14 @@ public class UnlibraryRepository {
      * TODO: Add querying logic to return only books that have been requested or borrowed by the user
      */
     @Inject
-    public UnlibraryRepository(FirebaseFirestore db) {
+    public UnlibraryRepository(FirebaseFirestore db, FirebaseAuth auth) {
         mDb = db;
 
+        mUID = auth.getCurrentUser().getUid();
         mAllBooks = new ArrayList<>();
-        // TODO: Get document changes only to minimize payload from Firestore
-        this.mFilter = new FilterMap(true);
+        mFilter = new FilterMap(true);
+
         attachListeners();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        mUID = user.getUid();
     }
 
     /**
@@ -80,8 +78,9 @@ public class UnlibraryRepository {
      * and update the books object.
      */
     public void attachListeners() {
+        // TODO: Get document changes only to minimize payload from Firestore
         mListenerRegistration = mDb.collection(REQUEST_COLLECTION)
-                .whereEqualTo(REQUESTER, FirebaseAuth.getInstance().getUid())
+                .whereEqualTo(REQUESTER, mUID)
                 .whereNotEqualTo(STATE, Request.State.ARCHIVED.toString())
                 .addSnapshotListener((snapshot, error) -> {
                     if (error != null) {
@@ -153,26 +152,21 @@ public class UnlibraryRepository {
      * @param onFinished      code to call on success
      * @param onErrorListener code to call on failure
      */
-    public void getRequest(Book book, OnFinishedListener onFinished, OnErrorListener onErrorListener) {
-
+    public void getRequest(Book book, OnSuccessListener<Request> onFinished, OnFailureListener onErrorListener) {
         mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo(BOOK, book.getId())
                 .whereEqualTo(REQUESTER, mUID)
+                .whereNotEqualTo(STATE, ARCHIVED)
                 .get()
-                .addOnCompleteListener(querySnapShot -> {
-                    List<DocumentSnapshot> documents = querySnapShot.getResult().getDocuments();
-
-                    if (querySnapShot.getResult().isEmpty()) {
-                        onErrorListener.error();
+                .addOnSuccessListener(snapshots -> {
+                    List<Request> request = snapshots.toObjects(Request.class);
+                    if (request.size() != 1) {
+                        onErrorListener.onFailure(new IllegalStateException("Request not found in database"));
                         return;
                     }
-                    if (documents.size() != 1) {
-                        onErrorListener.error();
-                        return;
-                    }
-
-                    onFinished.finished(documents.get(0).toObject(Request.class));
-                });
+                    onFinished.onSuccess(request.get(0));
+                })
+                .addOnFailureListener(onErrorListener::onFailure);
     }
 
     /**
@@ -268,19 +262,5 @@ public class UnlibraryRepository {
                     onFinished.onFinished(requests.get(0).getLocation());
                 })
                 .addOnFailureListener(onFailureListener);
-    }
-
-    /**
-     * Simple callback interface for asynchronous events
-     */
-    public interface OnFinishedListener {
-        void finished(Request request);
-    }
-
-    /**
-     * Callback interface for errors with asynchronous events
-     */
-    public interface OnErrorListener {
-        void error();
     }
 }
