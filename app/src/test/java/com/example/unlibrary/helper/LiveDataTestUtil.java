@@ -18,7 +18,6 @@ import androidx.lifecycle.Observer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-
 /* Copyright 2019 Google LLC.
    SPDX-License-Identifier: Apache-2.0 */
 
@@ -40,7 +39,7 @@ public class LiveDataTestUtil {
         liveData.observeForever(observer);
         // Don't wait indefinitely if the LiveData is not set.
         try {
-            if (!latch.await(5, TimeUnit.SECONDS)) {
+            if (!latch.await(2, TimeUnit.SECONDS)) {
                 throw new RuntimeException("LiveData value was never set.");
             }
         } catch (InterruptedException e) {
