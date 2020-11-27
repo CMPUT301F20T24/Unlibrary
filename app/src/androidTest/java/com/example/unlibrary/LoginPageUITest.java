@@ -70,7 +70,7 @@ public class LoginPageUITest {
                         childAtPosition(
                                 withId(R.id.login_email_input),
                                 0),
-                        0),
+                        1),
                         isDisplayed()));
         textInputEditText.perform(replaceText("test@test.com"), closeSoftKeyboard());
 
