@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -23,8 +22,8 @@ public abstract class MockLogin {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(mEmail, mPassword);
     }
 
-    @After
-    public void logout() {
-        FirebaseAuth.getInstance().signOut();
-    }
+//    @After
+//    public void logout() {
+//        FirebaseAuth.getInstance().signOut();
+//    }
 }
