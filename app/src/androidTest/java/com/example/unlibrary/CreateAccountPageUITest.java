@@ -13,9 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
-import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,17 +54,17 @@ public class CreateAccountPageUITest {
     private static final String TAG = "CreateAccount";
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityScenarioRule<MainActivity> mActivityTestRule = new ActivityScenarioRule<>(MainActivity.class);
 
     @Before
     public void logout() {
+        Espresso.closeSoftKeyboard();
         try {
             FirebaseAuth.getInstance().signOut();
         } catch (Exception e) {
             Log.e(TAG, "Failed to logout.");
         }
     }
-
     @Test
     public void createAccountPageUITest() {
         ViewInteraction materialButton = onView(
