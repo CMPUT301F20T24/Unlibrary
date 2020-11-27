@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+
 /* Copyright 2019 Google LLC.
    SPDX-License-Identifier: Apache-2.0 */
 
