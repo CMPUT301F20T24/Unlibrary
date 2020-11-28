@@ -12,6 +12,7 @@ class LibraryFragment {
 class UnlibraryFragment {
 -UnlibraryViewModel mViewModel
 -FragmentUnlibraryBinding mBinding
+-FilterMap mUpdateFilter
 
 +void onCreate(@Nullable Bundle savedInstanceState)
 +View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,13 +29,35 @@ View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInst
 
 class ExchangeBookDetailsFragment {
 -FragmentExchangeBookDetailsBinding mBinding
+-PushNotificationSender mSender
 
 +View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 }
 
 class LibraryBookDetailsFragment {
--FragmentLibraryBookDetailsBinding mBinding;
+-FragmentLibraryBookDetailsBinding mBinding
+-LibraryViewModel mViewModel
+-Uri mHandoffIsbnUri
+-ActivityResultLauncher<Uri> mScanBarcodeContract
+
 +View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++void onDestroyView()
++void showToast(String msg)
++void onMapReady(GoogleMap googleMap)
++void onResume()
++void onPause()
+}
+
+class UnlibraryBookDetailsFragment {
+-FragmentUnlibraryBookDetailsBinding mBinding
+-UnlibraryViewModel mViewModel
+-Uri mHandoffIsbnUri
+-ActivityResultLauncher<Uri> mScanBarcodeContract
+
++View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++void onMapReady(GoogleMap googleMap)
++void onResume()
++void onPause()
 }
 
 class LibraryEditBookFragment {
@@ -61,34 +84,61 @@ class ExchangeViewModel{
 -LiveData<List<Book>> mBooks;
 -ExchangeRepository mExchangeRepository;
 -MutableLiveData<Book> mCurrentBook
+-LiveData<Request> mCurrentRequest
+-LiveData<User> mCurrentBookOwner;
 -SingleLiveEvent<NavDirections> mNavigationEvent
 -SingleLiveEvent<String> mFailureMsgEvent
+-SingleLiveEvent<String> mSuccessRequestMsgEvent
+-String mSearchText;
+
 +ExchangeViewModel()
 +SingleLiveEvent<String> getFailureMsgEvent()
 +SingleLiveEvent<NavDirections> getNavigationEvent()
++SingleLiveEvent<String> getSuccessRequestMsgEvent()
 +LiveData<List<Book>> getBooks()
 +LiveData<Book> getCurrentBook()
 +void sendRequest()
 +void selectCurrentBook(View view, int position)
 #void onCleared()
++String getSearchText()
++void setSearchText(String searchText)
++void search(String keywords)
++void fetchOwnerForCurrentBook()
++LiveData<User> getCurrentBookOwner()
++LiveData<Boolean> showRequestButton()
 }
 
 class ExchangeRepository{
 -String REQUEST_COLLECTION
 -String BOOK_COLLECTION
+-String USER_COLLECTION 
 -String OWNER
 -String STATUS
 -String TAG
--FirebaseFirestore mDb
--MutableLiveData<List<Book>> mBooks
--ListenerRegistration mListenerRegistration
--String mUID
+-String ALGOLIA_INDEX_NAME = "books";
+-String ALGOLIA_ID_FIELD = "objectID";
+-String previousSearch;
+-FirebaseFirestore mDb;
+-Client mAlgoliaClient;
+-List<Book.Status> mAllowedStatus;
+-MutableLiveData<List<Book>> mBooks;
+-MutableLiveData<User> mCurrentBookOwner;
+-MutableLiveData<Request> mCurrentRequest;
+-ListenerRegistration mListenerRegistration;
+-String mUID;
+
 +ExchangeRepository()
 +String getUid()
 +void attachListener()
 +void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
 +LiveData<List<Book>> getBooks()
 +void detachListener()
++void search(String keywords)
++LiveData<User> getOwner()
++void fetchOwnerForCurrentBook(String currentBookOwnerID)
++LiveData<Request> getCurrentRequest()
++void fetchCurrentRequest(Book book)
++void sendRequest(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
 }
 
 
@@ -105,39 +155,81 @@ class LibraryViewModel {
 -SingleLiveEvent<String> mFailureMsgEvent
 -SingleLiveEvent<Pair<InputKey, String>> mInvalidInputEvent
 -SingleLiveEvent<NavDirections> mNavigationEvent
+-FilterMap mFilter
 -LiveData<List<Book>> mBooks
 -LibraryRepository mLibraryRepository
+-MutableLiveData<List<User>> mCurrentBookRequesters
+-User mSelectedRequester;
+-MutableLiveData<LatLng> mHandoffLocation
++String TITLE
++String ACCEPT_REQUEST_TEMPLATE
+
 +LibraryViewModel()
 +MutableLiveData<Book> getCurrentBook()
 +LiveData<Uri> getTakenPhoto()
 +LiveData<Boolean> getIsLoading()
++LiveData<Boolean> showHandoffButton()
++LiveData<Boolean> showHandoffLocation()
 +SingleLiveEvent<NavDirections> getNavigationEvent()
 +SingleLiveEvent<String> getFailureMsgEvent()
 +SingleLiveEvent<Pair<InputKey, String>> getInvalidInputEvent()
 +LiveData<List<Book>> getBooks()
++LiveData<List<User>> getRequesters()
++User getSelectedRequester()
++LiveData<LatLng> getHandoffLocation()
 #void onCleared()
 +void createBook()
-+void filter()
++FilterMap getFilter()
++void setFilter(FilterMap filter)
++void filter()?
 +void saveBook()
 +void selectCurrentBook(View v, int position)
 +void editCurrentBook()
 +void deleteCurrentBook()
-+void onFinishedScanSuccess(String isbn)
++void onFinishedScanSuccess(String tag, String isbn)
++void handoff(String isbn)
 +void takePhoto(Uri uri)
 +void onFinishedScanFailure(Throwable e)
++void scanAutoFill(String isbn)
++Boolean showBookPhotoDeleteButton()
 -void validateTitle(String title)
 -void validateAuthor(String author)
 -void validateIsbn(String isbn)
+#void detachRequestersListener()
++void selectRequester(View v, int position)
++void initMapsFragment()
++void declineSelectedRequester()
++void acceptSelectedRequester(LatLng latLng, SendNotificationInterface notification)
++void updateHandoffLocation(LatLng latLng)
++void fetchHandoffLocation()
 }
 
 class LibraryRepository {
 -String ISBN_FETCH_TAG
 -String BOOKS_COLLECTION
+-String REQUESTS_COLLECTION
+-String USERS_COLLECTION
+-String IS_READY_FOR_HANDOFF
+-String BOOK_FIELD
+-String STATUS_FIELD
+-String STATE_FIELD
+-String OWNER_FIELD
 -String TAG
+-String ALGOLIA_INDEX_NAME
+-String REQUESTER
+-String LOCATION
+-String ALGOLIA_TITLE_FIELD
+-String ALGOLIA_AUTHOR_FIELD
+-String ALGOLIA_ID_FIELD
+-Client mAlgoliaClient
 -FirebaseFirestore mDb
 -FirebaseAuth mAuth
--ListenerRegistration mListenerRegistration
+-ListenerRegistration mBookListenerRegistration
+-ListenerRegistration mBooksListenerRegistration
+-ListenerRegistration mRequestsListenerRegistration
 -MutableLiveData<List<Book>> mBooks
+-FilterMap mFilter
+
 +LibraryRepository()
 +void attachListener()
 +void createBook(Book book, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
@@ -146,32 +238,85 @@ class LibraryRepository {
 +void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener)
 +void detachListener()
 +LiveData<List<Book>> getBooks()
++void setFilter(FilterMap filter)
++void addAlgoliaIndex(Book book)
++void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener)
++void addBookListener(String bookId, OnSuccessListener<Book> listener)
++void detachRequestersListener()
++void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener)
++void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
++void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, Runnable onRequestNotFoundInDB)
++void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
++void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
++void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
 }
 
 class UnlibraryRepository {
 -String TAG
--String BOOK_COLLECTION
+-String BOOKS_COLLECTION
+-String REQUESTS_COLLECTION
+-String USERS_COLLECTION
+-String IS_READY_FOR_HANDOFF
+-String BOOK
+-String STATUS
+-String STATE
+-String REQUESTER
 -FirebaseFirestore mDb
 -MutableLiveData<List<Book>> mBooks
+-List<Book> mAllBooks;
 -ListenerRegistration mListenerRegistration
-+UnlibraryRepository()
+-String mUID;
+-FilterMap mFilter;
+
++UnlibraryRepository(FirebaseFirestore db)
++void attachListeners()
++void setFilter(FilterMap filter)
++void filter()
++void getRequest(Book book, OnFinishedListener onFinished, OnErrorListener onErrorListener)
++void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
++void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
 +MutableLiveData<List<Book>> getBooks()
 +void detachListeners()
++void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void fetchHandoffLocation(String bookRequestedID, LibraryRepository.OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
 }
 
 class UnlibraryViewModel {
+-String TAG
 -LiveData<List<Book>> mBooks
 -UnlibraryRepository mUnlibraryRepository
-+UnlibraryViewModel()
+-MutableLiveData<Book> mCurrentBook
+-MutableLiveData<User> mCurrentBookOwner
+-MutableLiveData<Request> mCurrentRequest
+-SingleLiveEvent<NavDirections> mNavigationEvent
+-SingleLiveEvent<String> mFailureMsgEvent
+-SingleLiveEvent<String> mSuccessMsgEvent
+-MutableLiveData<LatLng> mHandoffLocation
+
++UnlibraryViewModel(UnlibraryRepository unlibraryRepository)
++FilterMap getFilter()
++void setFilter(FilterMap filter)
++SingleLiveEvent<String> getFailureMsgEvent()
++SingleLiveEvent<NavDirections> getNavigationEvent()
++SingleLiveEvent<String> getSuccessMsgEvent()
++LiveData<Boolean> showHandoffButton()
++LiveData<Boolean> showHandoffLocation()
++LiveData<LatLng> getHandoffLocation()
++void fetchHandoffLocation()
++LiveData<Book> getCurrentBook()
 +LiveData<List<Book>> getBooks()
++void handoff(String isbn)
++MutableLiveData<User> getCurrentBookOwner()
 #void onCleared()
 +void selectCurrentBook(View view, int position)
++void onFinishedScanSuccess(String tag, String isbn)
++void onFinishedScanFailure(String tag, Throwable e)
 }
 
 class FilterMap {
 -Map<Book.Status, Boolean> mFilter
 
-+FilterMap()
++FilterMap(boolean avail)
 +void set(String status, Boolean enable)
 +Map<Book.Status, Boolean> getMap()
 +void setMap(Map<Book.Status, Boolean> map)
