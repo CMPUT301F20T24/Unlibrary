@@ -180,6 +180,11 @@ public class ExchangeRepository {
                         .get()
                         .addOnSuccessListener(documentSnapshot -> {
                             Book book = documentSnapshot.toObject(Book.class);
+                            if (book == null) {
+                                Log.e(TAG, "Book " + bookId + " cannot be found in Firestore", null);
+                                return;
+                            }
+
                             if (!book.getOwner().equals(FirebaseAuth.getInstance().getUid()) &&
                                     mAllowedStatus.contains(book.getStatus())) {
                                 book.setStatus(Book.Status.AVAILABLE);
