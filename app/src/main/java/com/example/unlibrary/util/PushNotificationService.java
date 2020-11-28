@@ -46,7 +46,7 @@ public class PushNotificationService extends FirebaseMessagingService {
      */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-//        // https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
+        // https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
         NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
         int notificationID = new Random().nextInt(3000);
 
