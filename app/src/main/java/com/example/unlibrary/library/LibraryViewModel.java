@@ -31,6 +31,7 @@ import com.example.unlibrary.util.FilterMap;
 import com.example.unlibrary.util.SendNotificationInterface;
 import com.example.unlibrary.util.SingleLiveEvent;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -64,7 +65,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     private final LibraryRepository mLibraryRepository;
     private final MutableLiveData<List<User>> mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
     private User mSelectedRequester;
-    private MutableLiveData<LatLng> mHandoffLocation = new MutableLiveData<>(new LatLng(53.5461, -113.4938)); // default is Edmonton
+    private MutableLiveData<GeoPoint> mHandoffLocation = new MutableLiveData<>();
     static final String TITLE = "REQUEST ACCEPTED";
     static final String ACCEPT_REQUEST_TEMPLATE = "Request accepted for: ";
 
@@ -119,11 +120,16 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LiveData<Boolean> showHandoffButton() {
         return Transformations.map(mCurrentBook, input -> {
-            if (input.getStatus() == Book.Status.ACCEPTED) {
-                return true;
-            } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
-                return true;
-            } else {
+            try {
+                if (input.getStatus() == Book.Status.ACCEPTED && !input.getIsReadyForHandoff()) {
+                    return true;
+                } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                Log.d(TAG, "Failed to get book status. Probably null", e);
                 return false;
             }
         });
@@ -136,8 +142,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LiveData<Boolean> showHandoffLocation() {
         return Transformations.switchMap(mCurrentBook, book ->
-                Transformations.map(mCurrentBookRequesters, requester ->
-                        book.getStatus() == Book.Status.ACCEPTED && requester.size() > 0));
+                Transformations.map(mCurrentBookRequesters, requester -> {
+                    try {
+                        return book.getStatus() == Book.Status.ACCEPTED && requester.size() > 0;
+                    } catch (Exception e) {
+                        Log.d(TAG, "Failed get status from book. Probably null.", e);
+                        return false;
+                    }
+                }));
     }
 
     /**
@@ -208,7 +220,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      *
      * @return the lat lng of the accepted request location
      */
-    public LiveData<LatLng> getHandoffLocation() {
+    public LiveData<GeoPoint> getHandoffLocation() {
         return mHandoffLocation;
     }
 
@@ -353,9 +365,9 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             return;
         }
         Book book = mBooks.getValue().get(position);
-        mCurrentBook.setValue(book);
         mLibraryRepository.addBookListener(book.getId(), mCurrentBook::setValue);
         mLibraryRepository.addBookRequestersListener(book.getId(), mCurrentBookRequesters::setValue);
+        mLibraryRepository.addHandoffLocationListener(mCurrentBook.getValue().getId(), mHandoffLocation::setValue);
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
     }
 
@@ -689,7 +701,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public void acceptSelectedRequester(LatLng latLng, SendNotificationInterface notification) {
         mLibraryRepository.acceptRequester(mSelectedRequester.getUID(), mCurrentBook.getValue().getId(), latLng,
                 o -> {
-                    mHandoffLocation.setValue(latLng);
+                    mHandoffLocation.setValue(new GeoPoint(latLng.latitude, latLng.longitude));
                     mNavigationEvent.setValue(LibraryMapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
 
                     String target = mSelectedRequester.getUID();
@@ -705,12 +717,12 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     /**
      * Updates the handoff location for the current book
      *
-     * @param latLng location for handoff given by its latitude longitude coordinat
+     * @param latLng location for handoff given by its latitude longitude coordinate
      */
     public void updateHandoffLocation(LatLng latLng) {
         mLibraryRepository.updateHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(), latLng,
                 o -> {
-                    mHandoffLocation.setValue(latLng);
+                    mHandoffLocation.setValue(new GeoPoint(latLng.latitude, latLng.longitude));
                     mNavigationEvent.setValue(LibraryMapsFragmentDirections.actionMapsFragmentToLibraryBookDetailsFragment());
                 },
                 e -> {
@@ -720,15 +732,9 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
-     * Fetches the handoff location for the current book
+     * Detaches handoff location listener in repository
      */
-    public void fetchHandoffLocation() {
-        mLibraryRepository.fetchHandoffLocation(mCurrentBookRequesters.getValue().get(0).getUID(), mCurrentBook.getValue().getId(),
-                geoPoint -> mHandoffLocation.setValue(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())),
-                e -> {
-                    mFailureMsgEvent.setValue("Failed to get handoff location");
-                    Log.e(TAG, e.toString());
-                });
+    public void detachHandoffLocationListener() {
+        mLibraryRepository.detachHandoffLocationListener();
     }
-
 }

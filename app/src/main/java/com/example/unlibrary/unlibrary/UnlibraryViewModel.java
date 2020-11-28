@@ -115,7 +115,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         return Transformations.map(mCurrentBook, input -> {
             if (input.getStatus() == Book.Status.ACCEPTED && input.getIsReadyForHandoff()) {
                 return true;
-            } else if (input.getStatus() == Book.Status.BORROWED) {
+            } else if (input.getStatus() == Book.Status.BORROWED && !input.getIsReadyForHandoff()) {
                 return true;
             } else {
                 return false;
@@ -185,20 +185,17 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         }
 
         Book book = mBooks.getValue().get(position);
-        mUnlibraryRepository.fetchOwner(book, (user -> {
-            mCurrentBookOwner.setValue(user); // Gets user to display in detailed fragment
-        }));
-        Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
-        Request request = new Request();
+        // Gets user to display in detailed fragment
+        mUnlibraryRepository.fetchOwner(book, (mCurrentBookOwner::setValue));
+        mUnlibraryRepository.addBookListener(book.getId(), mCurrentBook::setValue);
         mUnlibraryRepository.getRequest(book,
                 r -> {
-                    mCurrentBook.setValue(book);
                     mCurrentRequest.setValue(r);
                     NavDirections direction = UnlibraryFragmentDirections.actionUnlibraryFragmentToUnlibraryBookDetailsFragment();
                     Navigation.findNavController(view).navigate(direction);
                 },
-
-                () -> {
+                e -> {
+                    Toast toast = Toast.makeText(view.getContext(), e.getMessage(), Toast.LENGTH_SHORT);
                     toast.show();
                     Log.e(TAG, "Failed to get request.");
                 });

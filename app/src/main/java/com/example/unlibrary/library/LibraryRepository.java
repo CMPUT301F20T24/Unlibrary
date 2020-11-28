@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -78,10 +79,12 @@ public class LibraryRepository {
 
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
 
     private ListenerRegistration mBookListenerRegistration;
     private ListenerRegistration mBooksListenerRegistration;
     private ListenerRegistration mRequestsListenerRegistration;
+    private ListenerRegistration mHandoffLocationListenerRegistration;
 
     private MutableLiveData<List<Book>> mBooks;
     private FilterMap mFilter;
@@ -96,7 +99,55 @@ public class LibraryRepository {
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
         this.mFilter = new FilterMap(true);
-        attachListener();
+        mAuth.addAuthStateListener((a) -> {
+            mUser = a.getCurrentUser();
+            if (mUser != null) {
+                attachListener();
+            }
+        });
+    }
+
+    /**
+     * Attaches listener to any changes to requests related to bookRequestedID to get the handoff location
+     *
+     * @param bookRequestedID id of requested book
+     * @param listener        Callback to set the handoff location of the selected book
+     */
+    public void addHandoffLocationListener(String bookRequestedID, OnSuccessListener<GeoPoint> listener) {
+        if (mHandoffLocationListenerRegistration != null) {
+            mHandoffLocationListenerRegistration.remove();
+        }
+
+        // Query returns all requests for this book that are not archived
+        mHandoffLocationListenerRegistration = mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error getting handoff location", error);
+                        return;
+                    }
+
+                    // If the request is not in either Accepted or Borrowed state, location is null
+                    // null location is handled in viewmodel / view (map is not initiated and location
+                    // pointer is not accessed)
+                    List<Request> requests = value.toObjects(Request.class);
+                    if (requests.size() == 0) {
+                        Log.e(TAG, "Error requests are empty", error);
+                        return;
+                    }
+
+                    listener.onSuccess(requests.get(0).getLocation());
+                });
+    }
+
+    /**
+     * Removes listener to handoff location for currently selected book
+     */
+    public void detachHandoffLocationListener() {
+        if (mHandoffLocationListenerRegistration != null) {
+            mHandoffLocationListenerRegistration.remove();
+        }
     }
 
     /**
@@ -104,7 +155,7 @@ public class LibraryRepository {
      */
     public void attachListener() {
         mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
-        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, mAuth.getCurrentUser().getUid());
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, mUser.getUid());
 
         // Filter according to status in UI if any
         List<String> statusValues = new ArrayList<>();
@@ -212,7 +263,9 @@ public class LibraryRepository {
      * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
-        mBooksListenerRegistration.remove();
+        if (mBookListenerRegistration != null) {
+            mBooksListenerRegistration.remove();
+        }
     }
 
     /**
@@ -263,7 +316,7 @@ public class LibraryRepository {
     /**
      * Listens to requesters on given book.
      *
-     * @param bookId Firestore assigned bookId
+     * @param bookId   Firestore assigned bookId
      * @param listener to give back the list of users actively requesting for the given book
      */
     public void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener) {
@@ -324,7 +377,7 @@ public class LibraryRepository {
             mBookListenerRegistration.remove();
         }
 
-         mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
+        mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.e(TAG, "Error updating book details", error);
@@ -339,7 +392,11 @@ public class LibraryRepository {
      * Removes the current snapshot listener for requesters
      */
     public void detachRequestersListener() {
-        mRequestsListenerRegistration.remove();
+        try {
+            mRequestsListenerRegistration.remove();
+        } catch (Exception e) {
+            Log.d(TAG, "Failed to remove listener registration. Probably was null.", e);
+        }
     }
 
     /**
@@ -518,31 +575,6 @@ public class LibraryRepository {
                             .update(LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
                             .addOnSuccessListener(onSuccessListener)
                             .addOnFailureListener(onFailureListener);
-                })
-                .addOnFailureListener(onFailureListener);
-    }
-
-    /**
-     * Fetches the handoff location for the selected book
-     *
-     * @param requestedUID      accepted requester user ID
-     * @param bookRequestedID   book ID request is associated with
-     * @param onFinished        code to call on success
-     * @param onFailureListener code to call on failure
-     */
-    public void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
-        mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK_FIELD, bookRequestedID)
-                .whereEqualTo(REQUESTER, requestedUID)
-                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
-                    if (requests.size() != 1) {
-                        onFailureListener.onFailure(new Exception("Unexpected number of requests returned when fetching location.  " + requests.size() + " requests found."));
-                        return;
-                    }
-                    onFinished.onFinished(requests.get(0).getLocation());
                 })
                 .addOnFailureListener(onFailureListener);
     }
