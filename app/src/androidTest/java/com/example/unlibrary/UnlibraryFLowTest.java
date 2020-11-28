@@ -40,15 +40,12 @@ import static org.hamcrest.Matchers.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class UnlibraryFLowTest{
+public class UnlibraryFLowTest extends MockLogin{
     static final String mTitle = "UnlibraryTest1";
     static final String mIsbn = "1234567891111";
     static final String mAuthor = "uitests2";
     static final String mStatus = "Accepted";
-    private final int SLEEP_TIME = 800; // milliseconds
-
-    @Rule
-    public final ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(MainActivity.class);
+    private final int SLEEP_TIME = 2000; // milliseconds
 
     @Before
     public void setup() throws InterruptedException {
@@ -60,7 +57,7 @@ public class UnlibraryFLowTest{
                 )
         ).perform(click());
         // This is a hack because we don't use idling resources on our network calls
-        Thread.sleep(SLEEP_TIME * 5);
+        Thread.sleep(SLEEP_TIME);
 
     }
 
