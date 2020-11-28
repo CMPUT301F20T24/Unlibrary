@@ -10,11 +10,14 @@ import com.algolia.search.saas.Index;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
 import com.example.unlibrary.util.FilterMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -257,6 +260,63 @@ public class LibraryRepositoryTest {
         }, e -> fail("Unable to delete book 2 " + e.getMessage()));
         mRepository.deleteBook(book3, aVoid -> {
         }, e -> fail("Unable to delete book 3 " + e.getMessage()));
+
+        Thread.sleep(SLEEP_TIME_MILLIS);
+        shadowOf(getMainLooper()).idle();
+    }
+
+    @Test
+    public void updateHandoffLocation() throws InterruptedException {
+        String requesterID = "CvLZ5c6lYqeyriVnwNpGurcBZc44";
+        String collection = "requests";
+        Book book = new Book("9722222111324", "To change location", "Armi Schoepp", mAuth.getCurrentUser().getUid(), null);
+        book.setStatus(Book.Status.REQUESTED);
+        mRepository.createBook(book, documentReference -> {
+        }, e -> fail("Unable to create book: " + e.getMessage()));
+
+        Thread.sleep(SLEEP_TIME_MILLIS);
+        shadowOf(getMainLooper()).idle();
+
+        List<Book> books = mRepository.getBooks().getValue();
+        if (books == null) {
+            fail("Books is null");
+        }
+        // Get book ID
+        for (Book b : books) {
+            if (!b.getIsbn().equals(book.getIsbn())) {
+                continue;
+            }
+            book = b;
+        }
+
+        // Add request to db
+        Request request = new Request(requesterID, book.getId());
+        mDb.collection(collection).add(request);
+
+        Thread.sleep(SLEEP_TIME_MILLIS);
+        shadowOf(getMainLooper()).idle();
+
+        LatLng ll = new LatLng(53.5461, -113.4938);
+        mRepository.updateHandoffLocation(requesterID, book.getId(), ll, x -> {
+        }, e -> {
+            fail("Failed to update handoff location.");
+        });
+
+        Thread.sleep(SLEEP_TIME_MILLIS);
+        shadowOf(getMainLooper()).idle();
+
+        mDb.collection(collection).whereEqualTo("requester", requesterID).get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                fail("Failed to get request.");
+            }
+            Request r = task.getResult().getDocuments().get(0).toObject(Request.class);
+            GeoPoint gp = r.getLocation();
+            mDb.collection(collection).document(r.getId()).delete();
+            assertEquals(new GeoPoint(53.5461, -113.4938), gp);
+        });
+
+        mRepository.deleteBook(book, aVoid -> {
+        }, e -> fail("Unable to delete book " + e.getMessage()));
 
         Thread.sleep(SLEEP_TIME_MILLIS);
         shadowOf(getMainLooper()).idle();
