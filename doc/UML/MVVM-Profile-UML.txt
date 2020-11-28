@@ -63,6 +63,7 @@ class User {
 +void setUsername(String username)
 +String getEmail()
 +void setEmail(String email)
++boolean equals(Object obj)
 }
 
 User ..o ProfileRepository
