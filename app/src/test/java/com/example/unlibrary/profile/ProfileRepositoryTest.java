@@ -1,3 +1,10 @@
+/*
+ * ProfileRepositoryTest
+ *
+ * November 27, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary.profile;
 
 import android.content.Context;
@@ -38,6 +45,9 @@ import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
 import static org.robolectric.annotation.LooperMode.Mode.PAUSED;
 
+/**
+ * Profile Repository unit testing using firebase emulator
+ */
 @RunWith(RobolectricTestRunner.class)
 @LooperMode(PAUSED)
 @Config(sdk = {Build.VERSION_CODES.O_MR1})
