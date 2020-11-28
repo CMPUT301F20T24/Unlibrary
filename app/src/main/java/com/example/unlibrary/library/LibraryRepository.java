@@ -97,10 +97,10 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
+        this.mFilter = new FilterMap(true);
         mAuth.addAuthStateListener((a) -> {
             mUser = a.getCurrentUser();
             if (mUser != null) {
-                this.mFilter = new FilterMap(true);
                 attachListener();
             }
         });
