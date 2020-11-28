@@ -60,7 +60,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
     /**
      * Starts Auth Activity
      */
-    public void goToAuth() {
+    private void goToAuth() {
         // Not logged in
         Intent intent = new Intent(this, AuthActivity.class);
         // TODO we should send an extra with the intent which is the original activity the user was trying to navigate to, this way we can route them there after signing in

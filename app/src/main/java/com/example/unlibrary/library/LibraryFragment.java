@@ -59,6 +59,7 @@ public class LibraryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Get the activity viewModel
         mViewModel = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
+
         // Setup data binding
         mBinding = FragmentLibraryBinding.inflate(inflater, container, false);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
