@@ -87,14 +87,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
-     * LiveData getter to determine if the user is currently logged in
-     * @return LiveData<Boolean> Returns True if user is logged in
-     */
-    public LiveData<Boolean> isUserLoggedIn() {
-        return Transformations.map(mLibraryRepository.getFirebaseUser(), Objects::nonNull);
-    }
-
-    /**
      * Getter for the mCurrentBook object.
      *
      * @return CurrentBook MutableLiveData

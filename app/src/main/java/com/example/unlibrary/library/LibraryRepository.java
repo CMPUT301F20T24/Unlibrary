@@ -77,9 +77,9 @@ public class LibraryRepository {
     private static final String ALGOLIA_ID_FIELD = "objectID";
     private final Client mAlgoliaClient;
 
-    private MutableLiveData<FirebaseUser> mUser;
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
 
     private ListenerRegistration mBookListenerRegistration;
     private ListenerRegistration mBooksListenerRegistration;
@@ -95,11 +95,15 @@ public class LibraryRepository {
     public LibraryRepository(FirebaseFirestore db, FirebaseAuth auth, Client algoliaClient) {
         mDb = db;
         mAuth = auth;
-        mUser = new MutableLiveData<>(mAuth.getCurrentUser());
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
-        this.mFilter = new FilterMap(true);
-        attachListener();
+        mAuth.addAuthStateListener((a) -> {
+            mUser = a.getCurrentUser();
+            if (mUser != null) {
+                this.mFilter = new FilterMap(true);
+                attachListener();
+            }
+        });
     }
 
     /**
@@ -107,7 +111,7 @@ public class LibraryRepository {
      */
     public void attachListener() {
         mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
-        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, mUser.getValue());
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, mUser.getUid());
 
         // Filter according to status in UI if any
         List<String> statusValues = new ArrayList<>();
@@ -215,7 +219,9 @@ public class LibraryRepository {
      * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
-        mBooksListenerRegistration.remove();
+        if (mBookListenerRegistration != null) {
+            mBooksListenerRegistration.remove();
+        }
     }
 
     /**
@@ -226,12 +232,6 @@ public class LibraryRepository {
     public LiveData<List<Book>> getBooks() {
         return this.mBooks;
     }
-
-    /**
-     * Getter for the firebase usr object
-     * @return LiveData<FirebaseUser> This returns the current firebase user object.
-     */
-    public LiveData<FirebaseUser> getFirebaseUser() { return this.mUser; }
 
     /**
      * Filter the results of the books query.

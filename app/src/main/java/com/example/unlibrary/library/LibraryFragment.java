@@ -75,12 +75,6 @@ public class LibraryFragment extends Fragment {
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
-        mViewModel.isUserLoggedIn().observe(getViewLifecycleOwner(), loggedIn -> {
-            if (!loggedIn) {
-                ((MainActivity) requireActivity()).goToAuth();
-            }
-        });
-
         // Setup observers
         mViewModel.getNavigationEvent().observe(this, navDirections -> Navigation.findNavController(mBinding.fabAdd).navigate(navDirections));
         mViewModel.getFailureMsgEvent().observe(this, s -> ((MainActivity) requireActivity()).showToast(s));
