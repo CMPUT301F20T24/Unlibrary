@@ -41,6 +41,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null) {
             goToAuth();
+            return;
         }
 
         try {
@@ -55,6 +56,10 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
 
             if (mUser == null) {
                 goToAuth();
+            } else {
+                FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid())
+                        .addOnFailureListener(e -> Log.e(TAG, "Failed to subsribe to notifications, e"));
+
             }
         });
     }

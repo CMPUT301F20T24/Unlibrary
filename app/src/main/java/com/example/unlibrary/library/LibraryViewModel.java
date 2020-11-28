@@ -119,11 +119,16 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LiveData<Boolean> showHandoffButton() {
         return Transformations.map(mCurrentBook, input -> {
-            if (input.getStatus() == Book.Status.ACCEPTED) {
-                return true;
-            } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
-                return true;
-            } else {
+            try {
+                if (input.getStatus() == Book.Status.ACCEPTED && !input.getIsReadyForHandoff()) {
+                    return true;
+                } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                Log.d(TAG, "Failed to get book status. Probably null", e);
                 return false;
             }
         });
@@ -136,8 +141,14 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
      */
     public LiveData<Boolean> showHandoffLocation() {
         return Transformations.switchMap(mCurrentBook, book ->
-                Transformations.map(mCurrentBookRequesters, requester ->
-                        book.getStatus() == Book.Status.ACCEPTED && requester.size() > 0));
+                Transformations.map(mCurrentBookRequesters, requester -> {
+                    try {
+                        return book.getStatus() == Book.Status.ACCEPTED && requester.size() > 0;
+                    } catch (Exception e) {
+                        Log.d(TAG, "Failed get status from book. Probably null.", e);
+                        return false;
+                    }
+                }));
     }
 
     /**
@@ -353,7 +364,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             return;
         }
         Book book = mBooks.getValue().get(position);
-        mCurrentBook.setValue(book);
         mLibraryRepository.addBookListener(book.getId(), mCurrentBook::setValue);
         mLibraryRepository.addBookRequestersListener(book.getId(), mCurrentBookRequesters::setValue);
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());
