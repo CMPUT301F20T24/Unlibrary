@@ -194,9 +194,8 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
                     NavDirections direction = UnlibraryFragmentDirections.actionUnlibraryFragmentToUnlibraryBookDetailsFragment();
                     Navigation.findNavController(view).navigate(direction);
                 },
-
-                () -> {
-                    Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
+                e -> {
+                    Toast toast = Toast.makeText(view.getContext(), e.getMessage(), Toast.LENGTH_SHORT);
                     toast.show();
                     Log.e(TAG, "Failed to get request.");
                 });
