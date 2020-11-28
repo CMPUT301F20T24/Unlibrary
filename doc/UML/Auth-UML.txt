@@ -26,6 +26,7 @@ class MainActivity {
 class AuthenticatedActivity {
 -FirebaseUser mUser
 #void onCreate()
++void goToAuth() 
 #FirebaseUser getUser()
 }
 
