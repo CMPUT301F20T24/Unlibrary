@@ -272,7 +272,7 @@ public class LibraryRepository {
     /**
      * Listens to requesters on given book.
      *
-     * @param bookId Firestore assigned bookId
+     * @param bookId   Firestore assigned bookId
      * @param listener to give back the list of users actively requesting for the given book
      */
     public void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener) {
@@ -333,7 +333,7 @@ public class LibraryRepository {
             mBookListenerRegistration.remove();
         }
 
-         mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
+        mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.e(TAG, "Error updating book details", error);
@@ -348,7 +348,11 @@ public class LibraryRepository {
      * Removes the current snapshot listener for requesters
      */
     public void detachRequestersListener() {
-        mRequestsListenerRegistration.remove();
+        try {
+            mRequestsListenerRegistration.remove();
+        } catch (Exception e) {
+            Log.d(TAG, "Failed to remove listener registration. Probably was null.", e);
+        }
     }
 
     /**
