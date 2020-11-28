@@ -28,7 +28,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONArray;
@@ -39,23 +38,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import dagger.hilt.android.scopes.ActivityRetainedScoped;
-
-import static com.example.unlibrary.models.Request.State.ARCHIVED;
-
 /**
  * Manages all the database interaction for the ExchangeViewModel.
  */
-@ActivityRetainedScoped
 public class ExchangeRepository {
     private static final String REQUEST_COLLECTION = "requests";
     private static final String BOOK_COLLECTION = "books";
     private static final String USER_COLLECTION = "users";
-
-    private static final String OWNER_FIELD = "owner";
-    private static final String STATUS_FIELD = "status";
-    private static final String STATE_FIELD = "state";
-    private static final String REQUESTER_FIELD = "requester";
+    private static final String OWNER = "owner";
+    private static final String STATUS = "status";
 
     // Algolia fields
     private static final String ALGOLIA_INDEX_NAME = "books";
@@ -108,8 +99,8 @@ public class ExchangeRepository {
      */
     public void attachListener() {
         mListenerRegistration = mDb.collection(BOOK_COLLECTION)
-                .whereIn(STATUS_FIELD, mAllowedStatus)
-                .whereNotEqualTo(OWNER_FIELD, FirebaseAuth.getInstance().getUid())
+                .whereIn(STATUS, mAllowedStatus)
+                .whereNotEqualTo(OWNER, FirebaseAuth.getInstance().getUid())
                 .addSnapshotListener((value, error) -> {
                     if (previousSearch != null) {
                         search(previousSearch);
@@ -124,29 +115,14 @@ public class ExchangeRepository {
                     // Update the list to reflect changes in the database
                     // TODO: use getDocumentChanges instead to minimize payload from Firestore
                     ArrayList<Book> dbBooks = new ArrayList<>();
-                    ArrayList<Task<QuerySnapshot>> tasks = new ArrayList<>();
                     for (DocumentSnapshot doc : value.getDocuments()) {
                         // Only show the book with AVAILABLE or REQUESTED status for exchange
                         Book book = doc.toObject(Book.class);
-
-                        Task<QuerySnapshot> task = mDb.collection(REQUEST_COLLECTION)
-                                .whereEqualTo(REQUESTER_FIELD, mUID)
-                                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
-                                .get()
-                                .addOnSuccessListener(snapshots -> {
-                                    List<Request> request = snapshots.toObjects(Request.class);
-                                    // User doesn't have an active request on this book, mark it as
-                                    // available
-                                    if (request.size() < 1) {
-                                        book.setStatus(Book.Status.AVAILABLE);
-                                    }
-                                    dbBooks.add(book);
-                                });
-
-                        tasks.add(task);
+                        book.setStatus(Book.Status.AVAILABLE);
+                        dbBooks.add(book);
                     }
 
-                    Tasks.whenAll(tasks).addOnSuccessListener(aVoid -> mBooks.setValue(dbBooks));
+                    mBooks.setValue(dbBooks);
                 });
     }
 
@@ -269,7 +245,7 @@ public class ExchangeRepository {
         com.google.firebase.firestore.Query query = mDb.collection(REQUEST_COLLECTION)
                 .whereEqualTo("book", book.getId())
                 .whereEqualTo("requester", mUID)
-                .whereNotEqualTo("state", ARCHIVED.toString());
+                .whereNotEqualTo("state", Request.State.ARCHIVED.toString());
 
         query.get().addOnSuccessListener(qds -> {
             List<DocumentSnapshot> documents = qds.getDocuments();
@@ -298,7 +274,7 @@ public class ExchangeRepository {
         batch.set(newRequest, request);
 
         DocumentReference updatedBook = mDb.collection(BOOK_COLLECTION).document(book.getId());
-        batch.update(updatedBook, STATUS_FIELD, book.getStatus());
+        batch.update(updatedBook, STATUS, book.getStatus());
 
         batch.commit()
                 .addOnSuccessListener(onSuccessListener)
