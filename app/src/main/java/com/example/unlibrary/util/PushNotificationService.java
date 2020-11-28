@@ -50,10 +50,6 @@ public class PushNotificationService extends FirebaseMessagingService {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
         int notificationID = new Random().nextInt(3000);
 
-         /*
-        Apps targeting SDK 26 or above (Android O) must implement notification channels and add its notifications
-        to at least one of them. Therefore, confirm if version is Oreo or higher, then setup notification channel
-      */
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             setupChannels(notificationManager);
         }
@@ -78,7 +74,6 @@ public class PushNotificationService extends FirebaseMessagingService {
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setupChannels(NotificationManager notificationManager){
-
         CharSequence name = "New notification";
         String description = "Device to device notification";
         int importance = NotificationManager.IMPORTANCE_HIGH;
@@ -87,7 +82,7 @@ public class PushNotificationService extends FirebaseMessagingService {
         channel.setShowBadge(true);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         channel.enableVibration(true);
-
+        
         // Register the channel with the system; you can't change the importance
         // or other notification behaviors after this
         if (notificationManager != null) {
