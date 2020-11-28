@@ -84,6 +84,12 @@ public class ProfileFragment extends Fragment {
         return mBinding.getRoot();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mViewModel.resetUserInfo();
+    }
+
     /**
      * User logs out of account and will re-launch AuthActivity to initiate login again
      */
