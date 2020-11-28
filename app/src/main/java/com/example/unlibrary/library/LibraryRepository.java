@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -54,14 +55,10 @@ import static com.example.unlibrary.models.Request.State.ARCHIVED;
  * Manages all the database interaction for the Library ViewModel.
  */
 public class LibraryRepository {
-
     private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
     private static final String REQUESTS_COLLECTION = "requests";
     private static final String USERS_COLLECTION = "users";
-    private static final String BOOK = "book";
-    private static final String STATE = "state";
-    private static final String STATUS = "status";
     private static final String IS_READY_FOR_HANDOFF = "isReadyForHandoff";
     private static final String BOOK_FIELD = "book";
     private static final String STATUS_FIELD = "status";
@@ -79,12 +76,16 @@ public class LibraryRepository {
     private static final String ALGOLIA_AUTHOR_FIELD = "author";
     private static final String ALGOLIA_ID_FIELD = "objectID";
     private final Client mAlgoliaClient;
+
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
+
+    private ListenerRegistration mBookListenerRegistration;
     private ListenerRegistration mBooksListenerRegistration;
     private ListenerRegistration mRequestsListenerRegistration;
+
     private MutableLiveData<List<Book>> mBooks;
-    private MutableLiveData<List<User>> mCurrentBookRequesters;
     private FilterMap mFilter;
 
     /**
@@ -96,18 +97,23 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
-        mCurrentBookRequesters = new MutableLiveData<>(new ArrayList<>());
         this.mFilter = new FilterMap(true);
-        attachListener();
+        mAuth.addAuthStateListener((a) -> {
+            mUser = a.getCurrentUser();
+            if (mUser != null) {
+                attachListener();
+            }
+        });
     }
 
     /**
-     * Attach a listener to a QuerySnapshot from Firestore. Listen to any changes in the database
-     * and update the books object.
+     * Listen to any changes in the database and update the books list.
      */
     public void attachListener() {
         mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
-        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, FirebaseAuth.getInstance().getUid());
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, mUser.getUid());
+
+        // Filter according to status in UI if any
         List<String> statusValues = new ArrayList<>();
         for (Map.Entry<Book.Status, Boolean> f : mFilter.getMap().entrySet()) {
             if (f.getValue()) {
@@ -213,7 +219,9 @@ public class LibraryRepository {
      * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
-        mBooksListenerRegistration.remove();
+        if (mBookListenerRegistration != null) {
+            mBooksListenerRegistration.remove();
+        }
     }
 
     /**
@@ -262,42 +270,24 @@ public class LibraryRepository {
     }
 
     /**
-     * Getter for the LiveData List of requesters on a selected book.
+     * Listens to requesters on given book.
      *
-     * @return LiveData<ArrayList < String>> This returns the books object.
+     * @param bookId   Firestore assigned bookId
+     * @param listener to give back the list of users actively requesting for the given book
      */
-    public LiveData<List<User>> getRequesters() {
-        return this.mCurrentBookRequesters;
-    }
+    public void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener) {
+        if (mRequestsListenerRegistration != null) {
+            mRequestsListenerRegistration.remove();
+        }
 
-    /**
-     * Fetches the list of requesters for a newly selected book by clearing the previous book's requesters and
-     * adding a snapshot listener for the new book's requesters
-     *
-     * @param currentBookID
-     */
-    public void fetchRequestersForCurrentBook(String currentBookID) {
-        // Clear the previous book's requesters in time before requesters list gets displayed
-        mCurrentBookRequesters.setValue(new ArrayList<>());
-        // Attach snapshot listener for requesters on current book
-        attachRequestsListener(currentBookID);
-    }
-
-    /**
-     * Attaches snapshot listener for requests on a given book
-     *
-     * @param bookID requests on this book will be listened to
-     */
-    public void attachRequestsListener(String bookID) {
-        // Get all requests associated with current book that are in REQUESTED state
         Query query = mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK, bookID)
-                .whereNotEqualTo(STATE, ARCHIVED);
+                .whereEqualTo(BOOK_FIELD, bookId)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED);
 
         // TODO only use getDocumentChanges instead of rebuilding the entire list
         mRequestsListenerRegistration = query.addSnapshotListener((snapshot, error) -> {
             if (error != null) {
-                Log.w(TAG, "Error fetching requests for book" + bookID, error);
+                Log.w(TAG, "Error fetching requests for book" + bookId, error);
                 return;
             }
 
@@ -319,19 +309,50 @@ public class LibraryRepository {
                 );
             }
 
+            // There are no more active requests on this book
+            if (addRequesterTasks.size() == 0) {
+                listener.onSuccess(new ArrayList<>());
+                return;
+            }
 
-            Tasks.whenAllComplete(addRequesterTasks)    //This task will never fail
+            // No failure listener added because this task will never fail
+            Tasks.whenAllComplete(addRequesterTasks)
                     .addOnSuccessListener(aVoid -> {
-                        mCurrentBookRequesters.setValue(requesters);
+                        listener.onSuccess(requesters);
                     });
         });
+    }
+
+    /**
+     * Sets up a listener to callback to for whenever book details are updated (e.g. status)
+     *
+     * @param bookId Firestore assigned bookId (use Book::getId())
+     */
+    public void addBookListener(String bookId, OnSuccessListener<Book> listener) {
+        if (mBookListenerRegistration != null) {
+            mBookListenerRegistration.remove();
+        }
+
+        mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error updating book details", error);
+                        return;
+                    }
+
+                    listener.onSuccess(value.toObject(Book.class));
+                });
     }
 
     /**
      * Removes the current snapshot listener for requesters
      */
     public void detachRequestersListener() {
-        mRequestsListenerRegistration.remove();
+        try {
+            mRequestsListenerRegistration.remove();
+        } catch (Exception e) {
+            Log.d(TAG, "Failed to remove listener registration. Probably was null.", e);
+        }
     }
 
     /**
@@ -342,7 +363,7 @@ public class LibraryRepository {
      * @param onFailureListener code to call on failure
      */
     public void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener) {
-        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK, book.getId()).whereEqualTo(STATE, Request.State.BORROWED.toString());
+        Query query = mDb.collection(REQUESTS_COLLECTION).whereEqualTo(BOOK_FIELD, book.getId()).whereEqualTo(STATE_FIELD, Request.State.BORROWED.toString());
         query.get().addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
     }
 
@@ -359,8 +380,8 @@ public class LibraryRepository {
         DocumentReference requestCol = mDb.collection(REQUESTS_COLLECTION).document(request.getId());
         DocumentReference bookCol = mDb.collection(BOOKS_COLLECTION).document(book.getId());
 
-        requestCol.update(STATE, request.getState());
-        bookCol.update(STATUS, book.getStatus());
+        requestCol.update(STATE_FIELD, request.getState());
+        bookCol.update(STATUS_FIELD, book.getStatus());
         bookCol.update(IS_READY_FOR_HANDOFF, book.getIsReadyForHandoff());
 
         batch.commit()
@@ -437,8 +458,8 @@ public class LibraryRepository {
      */
     public void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK, bookRequestedID)
-                .whereNotEqualTo(STATE, ARCHIVED)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
@@ -466,14 +487,14 @@ public class LibraryRepository {
                         }
 
                         transaction.update(acceptedRequestDocument, LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude));
-                        transaction.update(acceptedRequestDocument, STATE, Request.State.ACCEPTED.toString());
+                        transaction.update(acceptedRequestDocument, STATE_FIELD, Request.State.ACCEPTED.toString());
 
                         for (DocumentReference doc : declinedRequestDocuments) {
-                            transaction.update(doc, STATE, ARCHIVED.toString());
+                            transaction.update(doc, STATE_FIELD, ARCHIVED.toString());
                         }
 
                         final DocumentReference bookDocument = mDb.collection(BOOKS_COLLECTION).document(bookRequestedID);
-                        transaction.update(bookDocument, STATUS, Status.ACCEPTED.toString());
+                        transaction.update(bookDocument, STATUS_FIELD, Status.ACCEPTED.toString());
 
                         // Success
                         return null;
@@ -496,8 +517,8 @@ public class LibraryRepository {
     public void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
                 .whereEqualTo(REQUESTER, requestedUID)
-                .whereEqualTo(BOOK, bookRequestedID)
-                .whereNotEqualTo(STATE, ARCHIVED)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
@@ -524,9 +545,9 @@ public class LibraryRepository {
      */
     public void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
         mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK, bookRequestedID)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
                 .whereEqualTo(REQUESTER, requestedUID)
-                .whereNotEqualTo(STATE, ARCHIVED)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);

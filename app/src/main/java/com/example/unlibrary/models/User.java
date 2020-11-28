@@ -99,4 +99,28 @@ public class User {
     public void setEmail(String email) {
         mEmail = email;
     }
+
+    /**
+     * Override the equals method for User for easy testing
+     * <p>
+     * Based on: https://stackoverflow.com/questions/8180430/how-to-override-equals-method-in-java
+     *
+     * @param obj the object to compare to
+     * @return boolean whether or not obj is the same User
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        User other = (User) obj;
+        return (other.getUID() != null) && (other.getEmail() != null) &&
+                (other.getUsername() != null) && other.getUID().equals(this.mUID) &&
+                other.getEmail().equals(this.mEmail) && other.getUsername().equals(this.mUsername);
+    }
 }

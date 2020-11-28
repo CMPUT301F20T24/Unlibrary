@@ -41,13 +41,7 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null) {
             goToAuth();
-        }
-
-        try {
-            FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid())
-                    .addOnFailureListener(e -> Log.e(TAG, "Failed to subscribe to notifications, e"));
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to subscribe to notifications. This should only happen during tests.");
+            return;
         }
 
         FirebaseAuth.getInstance().addAuthStateListener((auth) -> {
@@ -55,6 +49,10 @@ public abstract class AuthenticatedActivity extends AppCompatActivity {
 
             if (mUser == null) {
                 goToAuth();
+            } else {
+                FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid())
+                        .addOnFailureListener(e -> Log.e(TAG, "Failed to subsribe to notifications, e"));
+
             }
         });
     }
