@@ -51,7 +51,7 @@ public class UnlibraryFLowTest{
     public final ActivityScenarioRule<MainActivity> activityScenarioRule = new ActivityScenarioRule<>(MainActivity.class);
 
     @Before
-    public void setup() {
+    public void setup() throws InterruptedException {
         onView(
                 allOf(
                         withText("Unlibrary"),
@@ -59,16 +59,13 @@ public class UnlibraryFLowTest{
                         isDisplayed()
                 )
         ).perform(click());
+        // This is a hack because we don't use idling resources on our network calls
+        Thread.sleep(SLEEP_TIME * 5);
 
     }
 
     @Test
-    public void unlibraryflowtest() throws InterruptedException {
-
-        // This is a hack because we don't use idling resources on our network calls
-        Thread.sleep(SLEEP_TIME);
-
-
+    public void unlibraryViewTest() {
         // Verify name on card
         ViewInteraction textView = onView(
                 allOf(withId(R.id.bookTitle),
@@ -89,7 +86,64 @@ public class UnlibraryFLowTest{
                         withParent(withParent(allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)))),
                         isDisplayed()));
         view.check(matches(isDisplayed()));
+    }
 
+    @Test
+    public void unlibraryDetailedBookViewTest() throws InterruptedException {
+        // Click on first book card in list
+        ViewInteraction recyclerView2 = onView(
+                allOf(withId(R.id.list),
+                        childAtPosition(
+                                withId(R.id.unlibrary_book_list),
+                                0)));
+        recyclerView2.perform(actionOnItemAtPosition(0, click()));
+
+        Thread.sleep(SLEEP_TIME);
+
+        // Verify title label
+        ViewInteraction textView3 = onView(withId(R.id.textView6));
+        textView3.check(matches(withText("Title")));
+        // Verify title
+        ViewInteraction textView4 = onView(withId(R.id.textView7));
+        textView4.check(matches(withText(mTitle)));
+
+        // Verify author label
+        ViewInteraction textView5 = onView(withId(R.id.textView8));
+        textView5.check(matches(withText("Author")));
+        // Verify title
+        ViewInteraction textView6 = onView(withId(R.id.textView9));
+        textView6.check(matches(withText(mAuthor)));
+
+        // Verify ISBN label
+        ViewInteraction textView7 = onView(withId(R.id.textView));
+        textView7.check(matches(withText("ISBN")));
+        // Verify ISBN
+        ViewInteraction textView8 = onView(withId(R.id.textView5));
+        textView8.check(matches(withText(mIsbn)));
+
+        // Verify request label
+        ViewInteraction textView9 = onView(withId(R.id.textView2));
+        textView9.check(matches(withText("Request Status")));
+        // Verify request
+        ViewInteraction textView10 = onView(withId(R.id.chip));
+        textView10.check(matches(withText("ACCEPTED")));
+
+
+
+        // Verify request label
+        ViewInteraction textView11 = onView(withId(R.id.ownerUsername));
+        textView11.check(matches(withText("UITests2")));
+        // Verify request
+        ViewInteraction textView12 = onView(withId(R.id.ownerEmail));
+        textView12.check(matches(withText("uitests2@gmail.com")));
+
+        // Verify request
+        ViewInteraction textView13 = onView(withId(R.id. mapTitle));
+        textView13.check(matches(withText("Handoff Location")));
+    }
+
+    @Test
+    public void unlibraryfilterTest() throws InterruptedException {
         // Filter button is there
         ViewInteraction imageButton = onView(
                 allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
@@ -263,56 +317,12 @@ public class UnlibraryFLowTest{
         // This is a hack because we don't use idling resources on our network calls
         Thread.sleep(SLEEP_TIME);
 
-        // Click on first book card in list
-        ViewInteraction recyclerView2 = onView(
-                allOf(withId(R.id.list),
-                        childAtPosition(
-                                withId(R.id.unlibrary_book_list),
-                                0)));
-        recyclerView2.perform(actionOnItemAtPosition(0, click()));
-
-        Thread.sleep(SLEEP_TIME);
-
-        // Verify title label
-        ViewInteraction textView3 = onView(withId(R.id.textView6));
-        textView3.check(matches(withText("Title")));
-        // Verify title
-        ViewInteraction textView4 = onView(withId(R.id.textView7));
-        textView4.check(matches(withText(mTitle)));
-
-        // Verify author label
-        ViewInteraction textView5 = onView(withId(R.id.textView8));
-        textView5.check(matches(withText("Author")));
-        // Verify title
-        ViewInteraction textView6 = onView(withId(R.id.textView9));
-        textView6.check(matches(withText(mAuthor)));
-
-        // Verify ISBN label
-        ViewInteraction textView7 = onView(withId(R.id.textView));
-        textView7.check(matches(withText("ISBN")));
-        // Verify ISBN
-        ViewInteraction textView8 = onView(withId(R.id.textView5));
-        textView8.check(matches(withText(mIsbn)));
-
-        // Verify request label
-        ViewInteraction textView9 = onView(withId(R.id.textView2));
-        textView9.check(matches(withText("Request Status")));
-        // Verify request
-        ViewInteraction textView10 = onView(withId(R.id.chip));
-        textView10.check(matches(withText("ACCEPTED")));
+        // Verify there is still a card shown
+        ViewInteraction viewGroup2 = onView(
+                allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)));
+        viewGroup2.check(matches(isDisplayed()));
 
 
-
-        // Verify request label
-        ViewInteraction textView11 = onView(withId(R.id.ownerUsername));
-        textView11.check(matches(withText("UITests2")));
-        // Verify request
-        ViewInteraction textView12 = onView(withId(R.id.ownerEmail));
-        textView12.check(matches(withText("uitests2@gmail.com")));
-
-        // Verify request
-        ViewInteraction textView13 = onView(withId(R.id. mapTitle));
-        textView13.check(matches(withText("Handoff Location")));
     }
 
 
