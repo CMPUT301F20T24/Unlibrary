@@ -34,6 +34,7 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.firebase.firestore.GeoPoint;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,11 +62,13 @@ public class LibraryMapsFragment extends Fragment implements OnMapReadyCallback 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LatLng latLng = mViewModel.getHandoffLocation().getValue();
+        GeoPoint geoPoint = mViewModel.getHandoffLocation().getValue();
+        LatLng latLng;
 
-        if (latLng == null) {
+        if (geoPoint == null) {
             latLng = new LatLng(53.5461, -113.4938);
         } else {
+            latLng = new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude());
             mMap.addMarker(new MarkerOptions().position(latLng));
         }
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));

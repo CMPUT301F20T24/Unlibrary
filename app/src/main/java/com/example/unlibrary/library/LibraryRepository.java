@@ -87,6 +87,7 @@ public class LibraryRepository {
     private ListenerRegistration mBookListenerRegistration;
     private ListenerRegistration mBooksListenerRegistration;
     private ListenerRegistration mRequestsListenerRegistration;
+    private ListenerRegistration mHandoffLocationListenerRegistration;
 
     private MutableLiveData<List<Book>> mBooks;
     private FilterMap mFilter;
@@ -107,6 +108,49 @@ public class LibraryRepository {
                 attachListener();
             }
         });
+    }
+
+    /**
+     * Attaches listener to any changes to requests related to bookRequestedID to get the handoff location
+     *
+     * @param bookRequestedID id of requested book
+     * @param listener        Callback to set the handoff location of the selected book
+     */
+    public void addHandoffLocationListener(String bookRequestedID, OnSuccessListener<GeoPoint> listener) {
+        if (mHandoffLocationListenerRegistration != null) {
+            mHandoffLocationListenerRegistration.remove();
+        }
+
+        // Query returns all requests for this book that are not archived
+        mHandoffLocationListenerRegistration = mDb.collection(REQUESTS_COLLECTION)
+                .whereEqualTo(BOOK_FIELD, bookRequestedID)
+                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error getting handoff location", error);
+                        return;
+                    }
+
+                    // If the request is not in either Accepted or Borrowed state, location is null
+                    // null location is handled in viewmodel / view (map is not initiated and location
+                    // pointer is not accessed)
+                    List<Request> requests = value.toObjects(Request.class);
+                    if (requests.size() == 0) {
+                        Log.e(TAG, "Error requests are empty", error);
+                        return;
+                    }
+
+                    listener.onSuccess(requests.get(0).getLocation());
+                });
+    }
+
+    /**
+     * Removes listener to handoff location for currently selected book
+     */
+    public void detachHandoffLocationListener() {
+        if (mHandoffLocationListenerRegistration != null) {
+            mHandoffLocationListenerRegistration.remove();
+        }
     }
 
     /**
@@ -527,31 +571,6 @@ public class LibraryRepository {
                             .update(LOCATION, new GeoPoint(handoffLocation.latitude, handoffLocation.longitude))
                             .addOnSuccessListener(onSuccessListener)
                             .addOnFailureListener(onFailureListener);
-                })
-                .addOnFailureListener(onFailureListener);
-    }
-
-    /**
-     * Fetches the handoff location for the selected book
-     *
-     * @param requestedUID      accepted requester user ID
-     * @param bookRequestedID   book ID request is associated with
-     * @param onFinished        code to call on success
-     * @param onFailureListener code to call on failure
-     */
-    public void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener) {
-        mDb.collection(REQUESTS_COLLECTION)
-                .whereEqualTo(BOOK_FIELD, bookRequestedID)
-                .whereEqualTo(REQUESTER, requestedUID)
-                .whereNotEqualTo(STATE_FIELD, ARCHIVED)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Request> requests = queryDocumentSnapshots.toObjects(Request.class);
-                    if (requests.size() != 1) {
-                        onFailureListener.onFailure(new Exception("Unexpected number of requests returned when fetching location.  " + requests.size() + " requests found."));
-                        return;
-                    }
-                    onFinished.onFinished(requests.get(0).getLocation());
                 })
                 .addOnFailureListener(onFailureListener);
     }
