@@ -49,11 +49,14 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.scopes.ActivityRetainedScoped;
+
 import static com.example.unlibrary.models.Request.State.ARCHIVED;
 
 /**
  * Manages all the database interaction for the Library ViewModel.
  */
+@ActivityRetainedScoped
 public class LibraryRepository {
     private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
@@ -97,7 +100,9 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
-        this.mFilter = new FilterMap(true);
+        mFilter = new FilterMap(true);
+
+        // Only start attaching listeners once user has logged in
         mAuth.addAuthStateListener((a) -> {
             mUser = a.getCurrentUser();
             if (mUser != null) {
