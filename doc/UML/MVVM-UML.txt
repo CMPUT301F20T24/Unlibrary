@@ -38,6 +38,7 @@ class Book {
 -String mOwner
 -String mPhoto
 -Status mStatus
+-Boolean mIsReadyForHandoff
 +Book()
 +Book(String isbn, String title, String author, String owner, String photo)
 +String getId()
@@ -54,6 +55,9 @@ class Book {
 +void setOwner(String owner)
 +String getTitle()
 +void setTitle(String title)
++Boolean getIsReadyForHandoff()
++void setIsReadyForHandoff(Boolean isReadyForHandoff)
++String asLower()
 }
 
 class Request {
@@ -62,17 +66,19 @@ class Request {
 -String mRequester
 -String mBook
 -State mState
--Pair<Double, Double> mLocation
+-GeoPoint mLocation
 +Request()
 +Request(String requester, String book)
 +String getId()
 +void setId(String id)
 +String getRequester()
++void setRequester(String requester)
 +String getBook()
++void setBook(String book)
 +State getState()
 +void setState(State state)
-+Pair<Double, Double> getLocation()
-+void setLocation(Pair<Double, Double> location)
++GeoPoint getLocation()
++void setLocation(GeoPoint location)
 }
 
 Book ..o LibraryRepository
