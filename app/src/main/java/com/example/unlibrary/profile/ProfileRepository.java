@@ -18,9 +18,12 @@ import com.google.firebase.firestore.Query;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.scopes.ActivityRetainedScoped;
+
 /**
  * Manages all the database interaction for the Profile ViewModel
  */
+@ActivityRetainedScoped
 public class ProfileRepository {
 
     private final static String USERS_COLLECTION = "users";

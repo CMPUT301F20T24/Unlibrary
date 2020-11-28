@@ -49,11 +49,14 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.scopes.ActivityRetainedScoped;
+
 import static com.example.unlibrary.models.Request.State.ARCHIVED;
 
 /**
  * Manages all the database interaction for the Library ViewModel.
  */
+@ActivityRetainedScoped
 public class LibraryRepository {
     private static final String ISBN_FETCH_TAG = "isbn fetch";
     private static final String BOOKS_COLLECTION = "books";
@@ -98,7 +101,9 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
-        this.mFilter = new FilterMap(true);
+        mFilter = new FilterMap(true);
+
+        // Only start attaching listeners once user has logged in
         mAuth.addAuthStateListener((a) -> {
             mUser = a.getCurrentUser();
             if (mUser != null) {
@@ -266,6 +271,9 @@ public class LibraryRepository {
         if (mBookListenerRegistration != null) {
             mBooksListenerRegistration.remove();
         }
+        if (mRequestsListenerRegistration != null) {
+            mRequestsListenerRegistration.remove();
+        }
     }
 
     /**
@@ -370,7 +378,8 @@ public class LibraryRepository {
     /**
      * Sets up a listener to callback to for whenever book details are updated (e.g. status)
      *
-     * @param bookId Firestore assigned bookId (use Book::getId())
+     * @param bookId   Firestore assigned bookId (use Book::getId())
+     * @param listener listener to call whenever book is updated
      */
     public void addBookListener(String bookId, OnSuccessListener<Book> listener) {
         if (mBookListenerRegistration != null) {
@@ -386,17 +395,6 @@ public class LibraryRepository {
 
                     listener.onSuccess(value.toObject(Book.class));
                 });
-    }
-
-    /**
-     * Removes the current snapshot listener for requesters
-     */
-    public void detachRequestersListener() {
-        try {
-            mRequestsListenerRegistration.remove();
-        } catch (Exception e) {
-            Log.d(TAG, "Failed to remove listener registration. Probably was null.", e);
-        }
     }
 
     /**
