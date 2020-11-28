@@ -132,6 +132,11 @@ public class LibraryRepository {
                     // null location is handled in viewmodel / view (map is not initiated and location
                     // pointer is not accessed)
                     List<Request> requests = value.toObjects(Request.class);
+                    if (requests.size() == 0) {
+                        Log.e(TAG, "Error requests are empty", error);
+                        return;
+                    }
+
                     listener.onSuccess(requests.get(0).getLocation());
                 });
     }
