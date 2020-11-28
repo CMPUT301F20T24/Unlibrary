@@ -28,8 +28,8 @@ public class FilterMap {
      */
     public FilterMap(boolean avail) {
         mFilter = new EnumMap<>(Book.Status.class);
-        mFilter.put(Book.Status.AVAILABLE, false);
-        if (avail) mFilter.put(Book.Status.REQUESTED, false);
+        if (avail) mFilter.put(Book.Status.AVAILABLE, false);
+        mFilter.put(Book.Status.REQUESTED, false);
         mFilter.put(Book.Status.ACCEPTED, false);
         mFilter.put(Book.Status.BORROWED, false);
     }
