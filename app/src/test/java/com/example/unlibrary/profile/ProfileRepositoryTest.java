@@ -72,7 +72,7 @@ public class ProfileRepositoryTest {
     private static final String mEmail = "email123@gmail.com";
     private final User mUser = new User(mUID, mUsername, mEmail);
 
-    @BeforeClass
+    @Before
     public void setup() throws InterruptedException {
         FirebaseApp.initializeApp(mContext);
 
