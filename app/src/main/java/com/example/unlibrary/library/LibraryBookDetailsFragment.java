@@ -29,8 +29,10 @@ import com.example.unlibrary.util.BarcodeScanner;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.firestore.GeoPoint;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -128,16 +130,9 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
         // Required to forward onCreate for mapView in lite mode
         mBinding.map.onCreate(savedInstanceState);
 
-        // Fetch handoff location
+        // Set up map
         mViewModel.showHandoffLocation().observe(getViewLifecycleOwner(), s -> {
             if (s) {
-                mViewModel.fetchHandoffLocation();
-            }
-        });
-
-        // Set up map
-        mViewModel.getHandoffLocation().observe(getViewLifecycleOwner(), s -> {
-            if (s != null) {
                 mBinding.map.getMapAsync(this);
             }
         });
@@ -149,6 +144,7 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
     public void onDestroyView() {
         super.onDestroyView();
         mViewModel.detachRequestersListener();
+        mViewModel.detachHandoffLocationListener();
     }
 
     /**
@@ -169,8 +165,10 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
     public void onMapReady(GoogleMap googleMap) {
         // Clears the map of any markers and moves the camera
         googleMap.clear();
-        googleMap.addMarker(new MarkerOptions().position(mViewModel.getHandoffLocation().getValue()));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mViewModel.getHandoffLocation().getValue(), ZOOM_LEVEL));
+        GeoPoint location = mViewModel.getHandoffLocation().getValue();
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        googleMap.addMarker(new MarkerOptions().position(latLng));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
 
         // Sets UI and click listener
         googleMap.getUiSettings().setMapToolbarEnabled(false);
