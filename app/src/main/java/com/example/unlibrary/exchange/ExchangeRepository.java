@@ -38,11 +38,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import dagger.hilt.android.scopes.ActivityRetainedScoped;
+
 import static com.example.unlibrary.models.Request.State.ARCHIVED;
 
 /**
  * Manages all the database interaction for the ExchangeViewModel.
  */
+@ActivityRetainedScoped
 public class ExchangeRepository {
     private static final String REQUEST_COLLECTION = "requests";
     private static final String BOOK_COLLECTION = "books";
