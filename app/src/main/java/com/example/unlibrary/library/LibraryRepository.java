@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -78,6 +79,7 @@ public class LibraryRepository {
 
     private FirebaseFirestore mDb;
     private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
 
     private ListenerRegistration mBookListenerRegistration;
     private ListenerRegistration mBooksListenerRegistration;
@@ -96,7 +98,12 @@ public class LibraryRepository {
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
         this.mFilter = new FilterMap(true);
-        attachListener();
+        mAuth.addAuthStateListener((a) -> {
+            mUser = a.getCurrentUser();
+            if (mUser != null) {
+                attachListener();
+            }
+        });
     }
 
     /**
@@ -104,7 +111,7 @@ public class LibraryRepository {
      */
     public void attachListener() {
         mDb.collection(BOOKS_COLLECTION).addSnapshotListener((value, error) -> Log.d(TAG, "onEvent: "));
-        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, mAuth.getCurrentUser().getUid());
+        Query query = mDb.collection(BOOKS_COLLECTION).whereEqualTo(OWNER_FIELD, mUser.getUid());
 
         // Filter according to status in UI if any
         List<String> statusValues = new ArrayList<>();
@@ -212,7 +219,9 @@ public class LibraryRepository {
      * Removes snapshot listeners. Should be called just before the owning ViewModel is destroyed.
      */
     public void detachListener() {
-        mBooksListenerRegistration.remove();
+        if (mBookListenerRegistration != null) {
+            mBooksListenerRegistration.remove();
+        }
     }
 
     /**
