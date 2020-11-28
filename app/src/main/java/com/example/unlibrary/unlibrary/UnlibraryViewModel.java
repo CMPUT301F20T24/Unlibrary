@@ -115,7 +115,7 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         return Transformations.map(mCurrentBook, input -> {
             if (input.getStatus() == Book.Status.ACCEPTED && input.getIsReadyForHandoff()) {
                 return true;
-            } else if (input.getStatus() == Book.Status.BORROWED) {
+            } else if (input.getStatus() == Book.Status.BORROWED && !input.getIsReadyForHandoff()) {
                 return true;
             } else {
                 return false;
