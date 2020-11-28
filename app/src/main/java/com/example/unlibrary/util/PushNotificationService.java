@@ -8,13 +8,18 @@
 
 package com.example.unlibrary.util;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.example.unlibrary.MainActivity;
@@ -24,12 +29,15 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Random;
 
+import static android.app.Notification.DEFAULT_SOUND;
+import static androidx.core.app.NotificationCompat.DEFAULT_VIBRATE;
+
 /**
  * Handles incoming message from FCM
  */
 public class PushNotificationService extends FirebaseMessagingService {
 
-    private final String ADMIN_CHANNEL_ID = "admin_channel";
+    private final String CHANNEL_ID = "admin_channel";
 
     /**
      * Handles the incoming message.
@@ -38,29 +46,52 @@ public class PushNotificationService extends FirebaseMessagingService {
      */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
-        final Intent intent = new Intent(this, MainActivity.class);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        // https://blog.usejournal.com/send-device-to-device-push-notifications-without-server-side-code-238611c143
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
         int notificationID = new Random().nextInt(3000);
 
-        // checks if the activity has exists in the stack, if it does, then pop all activities on top of it
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        // make sure the Intent can only be used once
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+         /*
+        Apps targeting SDK 26 or above (Android O) must implement notification channels and add its notifications
+        to at least one of them. Therefore, confirm if version is Oreo or higher, then setup notification channel
+      */
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            setupChannels(notificationManager);
+        }
 
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(),
                 R.drawable.ic_add);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
+
+        NotificationCompat.Builder notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_add)
-                .setLargeIcon(largeIcon)
                 .setContentTitle(remoteMessage.getData().get("title"))
                 .setContentText(remoteMessage.getData().get("message"))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
 
-        notificationManager.notify(notificationID, notificationBuilder.build());
+        notificationManager.notify(notificationID, notification.build());
+    }
+
+    /**
+     * Create notification channel
+     *
+     * @param notificationManager the notification
+     */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setupChannels(NotificationManager notificationManager){
+
+        CharSequence name = "New notification";
+        String description = "Device to device notification";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+        channel.setDescription(description);
+        channel.setShowBadge(true);
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        channel.enableVibration(true);
+
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        if (notificationManager != null) {
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }
