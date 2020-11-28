@@ -87,7 +87,9 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mViewModel.resetUserInfo();
+        if (mEditingState.isEditing.getValue() != null && mEditingState.isEditing.getValue()) {
+            mViewModel.resetUserInfo();
+        }
     }
 
     /**
