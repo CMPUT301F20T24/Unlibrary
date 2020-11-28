@@ -119,7 +119,7 @@ public class ExchangeRepository {
                         // Only show the book with AVAILABLE or REQUESTED status for exchange
                         Book book = doc.toObject(Book.class);
                         book.setStatus(Book.Status.AVAILABLE);
-                        dbBooks.add(doc.toObject(Book.class));
+                        dbBooks.add(book);
                     }
 
                     mBooks.setValue(dbBooks);
