@@ -41,10 +41,10 @@ import static org.hamcrest.Matchers.not;
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class UnlibraryFLowTest{
-    static final String TITLE = "title";
-    static final String OWNER = "owner";
-    static final String ISBN = "123456789";
-    static final String AUTHOR = "author";
+    static final String mTitle = "UnlibraryTest1";
+    static final String mIsbn = "1234567891111";
+    static final String mAuthor = "uitests2";
+    static final String mStatus = "Accepted";
     private final int SLEEP_TIME = 800; // milliseconds
 
     @Rule
@@ -64,6 +64,32 @@ public class UnlibraryFLowTest{
 
     @Test
     public void unlibraryflowtest() throws InterruptedException {
+
+        // This is a hack because we don't use idling resources on our network calls
+        Thread.sleep(SLEEP_TIME);
+
+
+        // Verify name on card
+        ViewInteraction textView = onView(
+                allOf(withId(R.id.bookTitle),
+                        withParent(withParent(allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)))),
+                        isDisplayed()));
+        textView.check(matches(withText(mTitle)));
+
+        // Verify author on card
+        ViewInteraction textView2 = onView(
+                allOf(withId(R.id.bookAuthor),
+                        withParent(withParent(allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)))),
+                        isDisplayed()));
+        textView2.check(matches(withText(mAuthor)));
+
+        // Verify book is requested on card
+        ViewInteraction view = onView(
+                allOf(withId(R.id.status), withText(mStatus),
+                        withParent(withParent(allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)))),
+                        isDisplayed()));
+        view.check(matches(isDisplayed()));
+
         // Filter button is there
         ViewInteraction imageButton = onView(
                 allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
@@ -84,7 +110,7 @@ public class UnlibraryFLowTest{
                         isDisplayed()));
         floatingActionButton2.perform(click());
 
-        // Filter by accepted
+        // Filter by requested
         DataInteraction appCompatCheckedTextView = onData(anything())
                 .inAdapterView(allOf(withId(R.id.select_dialog_listview),
                         childAtPosition(
@@ -94,25 +120,73 @@ public class UnlibraryFLowTest{
         appCompatCheckedTextView.perform(click());
 
         // Lock in filter
-        ViewInteraction materialButton3 = onView(
+        ViewInteraction materialButton = onView(
                 allOf(withId(android.R.id.button1), withText("Filter"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.buttonPanel),
                                         0),
                                 3)));
-        materialButton3.perform(scrollTo(), click());
+        materialButton.perform(scrollTo(), click());
+
+        // Verify list is empty
+        ViewInteraction emptyList = onView(withId(R.id.list));
+        emptyList.check(matches(isDisplayed()))
+                .check(matches(not(hasDescendant(any(View.class)))));
+
+        // Click filter button
+        ViewInteraction floatingActionButton = onView(
+                allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
+                        childAtPosition(
+                                allOf(withId(R.id.frameLayout),
+                                        childAtPosition(
+                                                withId(R.id.nav_host_fragment),
+                                                0)),
+                                1),
+                        isDisplayed()));
+        floatingActionButton.perform(click());
+
+        // Uncheck available
+        DataInteraction appCompatCheckedTextView1 = onData(anything())
+                .inAdapterView(allOf(withId(R.id.select_dialog_listview),
+                        childAtPosition(
+                                withId(R.id.contentPanel),
+                                0)))
+                .atPosition(0);
+        appCompatCheckedTextView1.perform(click());
+
+        // Check accepted
+        DataInteraction appCompatCheckedTextView2 = onData(anything())
+                .inAdapterView(allOf(withId(R.id.select_dialog_listview),
+                        childAtPosition(
+                                withId(R.id.contentPanel),
+                                0)))
+                .atPosition(1);
+        appCompatCheckedTextView2.perform(click());
+
+        // Lock in filter
+        ViewInteraction materialButton2= onView(
+                allOf(withId(android.R.id.button1), withText("Filter"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.buttonPanel),
+                                        0),
+                                3)));
+        materialButton2.perform(scrollTo(), click());
+
+        // This is a hack because we don't use idling resources on our network calls
+        Thread.sleep(SLEEP_TIME);
 
         // Verify there is still a card shown
         ViewInteraction viewGroup = onView(
-                allOf(childAtPosition(withId(R.id.unlibrary_book_list), 0), withId(R.id.item_card)));
+                allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)));
         viewGroup.check(matches(isDisplayed()));
 
         // Click filter button
         ViewInteraction floatingActionButton3 = onView(
                 allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
                         childAtPosition(
-                                allOf(withId(R.id.frameLayout2),
+                                allOf(withId(R.id.frameLayout),
                                         childAtPosition(
                                                 withId(R.id.nav_host_fragment),
                                                 0)),
@@ -120,23 +194,23 @@ public class UnlibraryFLowTest{
                         isDisplayed()));
         floatingActionButton3.perform(click());
 
-        // Uncheck available
-        DataInteraction appCompatCheckedTextView2 = onData(anything())
-                .inAdapterView(allOf(withId(R.id.select_dialog_listview),
-                        childAtPosition(
-                                withId(R.id.contentPanel),
-                                0)))
-                .atPosition(0);
-        appCompatCheckedTextView2.perform(click());
-
-        // Check accepted
+        // De-select accepeted option
         DataInteraction appCompatCheckedTextView3 = onData(anything())
                 .inAdapterView(allOf(withId(R.id.select_dialog_listview),
                         childAtPosition(
                                 withId(R.id.contentPanel),
                                 0)))
-                .atPosition(2);
+                .atPosition(1);
         appCompatCheckedTextView3.perform(click());
+
+        // Check borrowed
+        DataInteraction appCompatCheckedTextView4 = onData(anything())
+                .inAdapterView(allOf(withId(R.id.select_dialog_listview),
+                        childAtPosition(
+                                withId(R.id.contentPanel),
+                                0)))
+                .atPosition(2);
+        appCompatCheckedTextView4.perform(click());
 
         // Lock in filter
         ViewInteraction materialButton4 = onView(
@@ -148,11 +222,10 @@ public class UnlibraryFLowTest{
                                 3)));
         materialButton4.perform(scrollTo(), click());
 
-        // This is a hack because we don't use idling resources on our network calls
         Thread.sleep(SLEEP_TIME);
 
         // Verify list is empty
-        ViewInteraction emptyList = onView(withId(R.id.unlibrary_book_list));
+        emptyList = onView(withId(R.id.list));
         emptyList.check(matches(isDisplayed()))
                 .check(matches(not(hasDescendant(any(View.class)))));
 
@@ -160,7 +233,7 @@ public class UnlibraryFLowTest{
         ViewInteraction floatingActionButton4 = onView(
                 allOf(withId(R.id.fabFilter), withContentDescription("Filter"),
                         childAtPosition(
-                                allOf(withId(R.id.frameLayout2),
+                                allOf(withId(R.id.frameLayout),
                                         childAtPosition(
                                                 withId(R.id.nav_host_fragment),
                                                 0)),
@@ -168,14 +241,14 @@ public class UnlibraryFLowTest{
                         isDisplayed()));
         floatingActionButton4.perform(click());
 
-        // De-select accepeted option
-        DataInteraction appCompatCheckedTextView4 = onData(anything())
+        // de-checked borrowed
+        DataInteraction appCompatCheckedTextView5 = onData(anything())
                 .inAdapterView(allOf(withId(R.id.select_dialog_listview),
                         childAtPosition(
                                 withId(R.id.contentPanel),
                                 0)))
                 .atPosition(2);
-        appCompatCheckedTextView4.perform(click());
+        appCompatCheckedTextView5.perform(click());
 
         // Lock in filter
         ViewInteraction materialButton5 = onView(
@@ -192,11 +265,54 @@ public class UnlibraryFLowTest{
 
         // Click on first book card in list
         ViewInteraction recyclerView2 = onView(
-                allOf(withId(R.id.unlibrary_book_list),
+                allOf(withId(R.id.list),
                         childAtPosition(
-                                withId(R.id.library_book_list),
+                                withId(R.id.unlibrary_book_list),
                                 0)));
         recyclerView2.perform(actionOnItemAtPosition(0, click()));
+
+        Thread.sleep(SLEEP_TIME);
+
+        // Verify title label
+        ViewInteraction textView3 = onView(withId(R.id.textView6));
+        textView3.check(matches(withText("Title")));
+        // Verify title
+        ViewInteraction textView4 = onView(withId(R.id.textView7));
+        textView4.check(matches(withText(mTitle)));
+
+        // Verify author label
+        ViewInteraction textView5 = onView(withId(R.id.textView8));
+        textView5.check(matches(withText("Author")));
+        // Verify title
+        ViewInteraction textView6 = onView(withId(R.id.textView9));
+        textView6.check(matches(withText(mAuthor)));
+
+        // Verify ISBN label
+        ViewInteraction textView7 = onView(withId(R.id.textView));
+        textView7.check(matches(withText("ISBN")));
+        // Verify ISBN
+        ViewInteraction textView8 = onView(withId(R.id.textView5));
+        textView8.check(matches(withText(mIsbn)));
+
+        // Verify request label
+        ViewInteraction textView9 = onView(withId(R.id.textView2));
+        textView9.check(matches(withText("Request Status")));
+        // Verify request
+        ViewInteraction textView10 = onView(withId(R.id.chip));
+        textView10.check(matches(withText("ACCEPTED")));
+
+
+
+        // Verify request label
+        ViewInteraction textView11 = onView(withId(R.id.ownerUsername));
+        textView11.check(matches(withText("UITests2")));
+        // Verify request
+        ViewInteraction textView12 = onView(withId(R.id.ownerEmail));
+        textView12.check(matches(withText("uitests2@gmail.com")));
+
+        // Verify request
+        ViewInteraction textView13 = onView(withId(R.id. mapTitle));
+        textView13.check(matches(withText("Handoff Location")));
     }
 
 
