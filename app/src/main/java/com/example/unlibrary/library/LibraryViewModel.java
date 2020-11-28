@@ -364,7 +364,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
             return;
         }
         Book book = mBooks.getValue().get(position);
-        mCurrentBook.setValue(book);
         mLibraryRepository.addBookListener(book.getId(), mCurrentBook::setValue);
         mLibraryRepository.addBookRequestersListener(book.getId(), mCurrentBookRequesters::setValue);
         mNavigationEvent.setValue(LibraryFragmentDirections.actionLibraryFragmentToLibraryBookDetailsFragment());

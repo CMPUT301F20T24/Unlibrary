@@ -40,7 +40,7 @@ import static com.example.unlibrary.models.Request.State.ARCHIVED;
  */
 public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
-    private final static String BOOK_COLLECTION = "books";
+    private final static String BOOKS_COLLECTION = "books";
     private static final String REQUEST_COLLECTION = "requests";
     private static final String USER_COLLECTION = "users";
     private static final String REQUESTER = "requester";
@@ -53,6 +53,7 @@ public class UnlibraryRepository {
     private final MutableLiveData<List<Book>> mBooks = new MutableLiveData<>(new ArrayList<>());
     private List<Book> mAllBooks;
     private ListenerRegistration mListenerRegistration;
+    private ListenerRegistration mBookListenerRegistration;
 
     private final String mUID;
     private FilterMap mFilter;
@@ -95,7 +96,7 @@ public class UnlibraryRepository {
 
                     for (Request r : requests) {
                         addBookTasks.add(
-                                mDb.collection(BOOK_COLLECTION).document(r.getBook()).get()
+                                mDb.collection(BOOKS_COLLECTION).document(r.getBook()).get()
                                         .addOnSuccessListener(documentSnapshot -> {
                                             Book book = documentSnapshot.toObject(Book.class);
                                             mAllBooks.add(book);
@@ -145,6 +146,28 @@ public class UnlibraryRepository {
         mBooks.setValue(filtered);
     }
 
+
+    /**
+     * Sets up a listener to callback to for whenever book details are updated (e.g. status)
+     *
+     * @param bookId Firestore assigned bookId (use Book::getId())
+     */
+    public void addBookListener(String bookId, OnSuccessListener<Book> listener) {
+        if (mBookListenerRegistration != null) {
+            mBookListenerRegistration.remove();
+        }
+
+        mBookListenerRegistration = mDb.collection(BOOKS_COLLECTION).document(bookId)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error updating book details", error);
+                        return;
+                    }
+
+                    listener.onSuccess(value.toObject(Book.class));
+                });
+    }
+
     /**
      * Save new Request into the database. Assumes Request is valid.
      *
@@ -180,7 +203,7 @@ public class UnlibraryRepository {
     public void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener) {
         WriteBatch batch = mDb.batch();
         DocumentReference requestCol = mDb.collection(REQUEST_COLLECTION).document(request.getId());
-        DocumentReference bookCol = mDb.collection(BOOK_COLLECTION).document(book.getId());
+        DocumentReference bookCol = mDb.collection(BOOKS_COLLECTION).document(book.getId());
 
         requestCol.update(STATE, request.getState());
         bookCol.update(STATUS, book.getStatus());
@@ -200,7 +223,7 @@ public class UnlibraryRepository {
      * @param onFailureListener code to call on failure
      */
     public void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener) {
-        mDb.collection(BOOK_COLLECTION).document(book.getId())
+        mDb.collection(BOOKS_COLLECTION).document(book.getId())
                 .set(book)
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(onFailureListener);

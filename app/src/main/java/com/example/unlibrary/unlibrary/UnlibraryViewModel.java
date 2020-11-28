@@ -187,9 +187,9 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         Book book = mBooks.getValue().get(position);
         // Gets user to display in detailed fragment
         mUnlibraryRepository.fetchOwner(book, (mCurrentBookOwner::setValue));
+        mUnlibraryRepository.addBookListener(book.getId(), mCurrentBook::setValue);
         mUnlibraryRepository.getRequest(book,
                 r -> {
-                    mCurrentBook.setValue(book);
                     mCurrentRequest.setValue(r);
                     NavDirections direction = UnlibraryFragmentDirections.actionUnlibraryFragmentToUnlibraryBookDetailsFragment();
                     Navigation.findNavController(view).navigate(direction);
