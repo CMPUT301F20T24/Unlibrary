@@ -143,7 +143,6 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mViewModel.detachRequestersListener();
         mViewModel.detachHandoffLocationListener();
     }
 
