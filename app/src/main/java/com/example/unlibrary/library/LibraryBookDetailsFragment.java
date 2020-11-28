@@ -145,12 +145,6 @@ public class LibraryBookDetailsFragment extends BookDetailFragment implements On
         return mBinding.getRoot();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mViewModel.detachRequestersListener();
-    }
-
     /**
      * Utility to show a toast via the MainActivity.
      *

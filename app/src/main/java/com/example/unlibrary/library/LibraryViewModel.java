@@ -641,13 +641,6 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     }
 
     /**
-     * Removes the repository's snapshot listener for current book's requesters.
-     */
-    protected void detachRequestersListener() {
-        mLibraryRepository.detachRequestersListener();
-    }
-
-    /**
      * Used in the onClick method for selecting a requester from recycler view of requesters in detailed book view.
      * Sets mSelectedRequester to the right user and navigates to a fragment with their profile.
      */
