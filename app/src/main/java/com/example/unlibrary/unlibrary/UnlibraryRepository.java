@@ -33,11 +33,14 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.scopes.ActivityRetainedScoped;
+
 import static com.example.unlibrary.models.Request.State.ARCHIVED;
 
 /**
  * Manages all the database interaction for {@link UnlibraryViewModel}
  */
+@ActivityRetainedScoped
 public class UnlibraryRepository {
     private final static String TAG = UnlibraryRepository.class.getSimpleName();
     private final static String BOOKS_COLLECTION = "books";

@@ -101,7 +101,9 @@ public class LibraryRepository {
         mAuth = auth;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mAlgoliaClient = algoliaClient;
-        this.mFilter = new FilterMap(true);
+        mFilter = new FilterMap(true);
+
+        // Only start attaching listeners once user has logged in
         mAuth.addAuthStateListener((a) -> {
             mUser = a.getCurrentUser();
             if (mUser != null) {
