@@ -120,7 +120,7 @@ public class LibraryViewModel extends ViewModel implements BarcodeScanner.OnFini
     public LiveData<Boolean> showHandoffButton() {
         return Transformations.map(mCurrentBook, input -> {
             try {
-                if (input.getStatus() == Book.Status.ACCEPTED) {
+                if (input.getStatus() == Book.Status.ACCEPTED && !input.getIsReadyForHandoff()) {
                     return true;
                 } else if (input.getStatus() == Book.Status.BORROWED && input.getIsReadyForHandoff()) {
                     return true;
