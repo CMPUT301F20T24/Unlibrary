@@ -22,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -71,7 +72,7 @@ public class ProfileRepositoryTest {
     private static final String mEmail = "email123@gmail.com";
     private final User mUser = new User(mUID, mUsername, mEmail);
 
-    @Before
+    @BeforeClass
     public void setup() throws InterruptedException {
         FirebaseApp.initializeApp(mContext);
 
