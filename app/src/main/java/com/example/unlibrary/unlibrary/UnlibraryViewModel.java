@@ -185,20 +185,18 @@ public class UnlibraryViewModel extends ViewModel implements BooksSource, Barcod
         }
 
         Book book = mBooks.getValue().get(position);
-        mUnlibraryRepository.fetchOwner(book, (user -> {
-            mCurrentBookOwner.setValue(user); // Gets user to display in detailed fragment
-        }));
-        Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
-        Request request = new Request();
+        // Gets user to display in detailed fragment
+        mUnlibraryRepository.fetchOwner(book, (mCurrentBookOwner::setValue));
+        mUnlibraryRepository.addBookListener(book.getId(), mCurrentBook::setValue);
         mUnlibraryRepository.getRequest(book,
                 r -> {
-                    mCurrentBook.setValue(book);
                     mCurrentRequest.setValue(r);
                     NavDirections direction = UnlibraryFragmentDirections.actionUnlibraryFragmentToUnlibraryBookDetailsFragment();
                     Navigation.findNavController(view).navigate(direction);
                 },
 
                 () -> {
+                    Toast toast = Toast.makeText(view.getContext(), "Failed to get request", Toast.LENGTH_SHORT);
                     toast.show();
                     Log.e(TAG, "Failed to get request.");
                 });
