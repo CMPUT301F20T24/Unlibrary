@@ -73,7 +73,7 @@ public class ExchangeRepository {
      */
     @Inject
     public ExchangeRepository(FirebaseFirestore db, Client algoliaClient) {
-        Db = db;
+        mDb = db;
         mAlgoliaClient = algoliaClient;
         mBooks = new MutableLiveData<>(new ArrayList<>());
         mCurrentBookOwner = new MutableLiveData<>(new User());
