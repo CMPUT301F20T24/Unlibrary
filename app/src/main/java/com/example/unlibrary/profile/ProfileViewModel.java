@@ -163,8 +163,14 @@ public class ProfileViewModel extends ViewModel {
             mPassword.setValue("");
             if (isLoggedIn) {
                 mProfileRepository.updateUserProfile(mUser.getValue(),
-                        () -> mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, "Invalid Email")),
-                        () -> mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.USERNAME, "Username taken")),
+                        () -> {
+                            mProfileUpdateEvent.setValue(false);
+                            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.EMAIL, "Invalid Email"));
+                        },
+                        () -> {
+                            mProfileUpdateEvent.setValue(false);
+                            mInvalidInputEvent.setValue(new Pair<>(AuthUtil.InputKey.USERNAME, "Username taken"));
+                        },
                         (isProfileUpdated) -> mProfileUpdateEvent.setValue(isProfileUpdated)
                 );
 
