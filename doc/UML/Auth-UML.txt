@@ -74,6 +74,7 @@ class AuthRepository {
 
 class AuthUtil{
 +enum InputKey
+
 +String validateEmail(String email)
 +String validatePassword(String password)
 +String validateUsername(String username)

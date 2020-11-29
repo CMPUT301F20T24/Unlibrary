@@ -324,6 +324,69 @@ class FilterMap {
 +boolean[] itemBooleans()
 }
 
+class BookDetailFragment {
+-Animator currentAnimator
+-int shortAnimationDuration
+
++void onCreate(Bundle savedInstanceState)
+#void zoomImageFromThumb(final FrameLayout frame, final ImageButton thumbView, final ImageView fullImageView)
+}
+
+class LibraryMapsFragment{
+-String TAG
+-Float ZOOM_LEVEL
+-GoogleMap mMap
+-FragmentMapsBinding mBinding
+-LibraryViewModel mViewModel
+-LatLng mLatLng
+-PushNotificationSender mSender
++void onMapReady(GoogleMap googleMap)
++View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState)
++void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+}
+
+class LibraryRequesterProfileFragment{
+-FragmentLibraryRequesterProfileBinding mBinding
+-LibraryViewModel mViewModel
++View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+}
+
+class RequestersRecyclerViewAdapter{
+#List<User> mRequesters
+-RequestersRecyclerViewAdapter.OnItemClickListener mOnItemClickListener
+
++RequestersRecyclerViewAdapter(List<User> requesters, RequestersRecyclerViewAdapter.OnItemClickListener onItemClickListener)
++void setData(List<User> newRequesters)
++RequestersRecyclerViewAdapter.RequesterViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
++void onBindViewHolder(final RequestersRecyclerViewAdapter.RequesterViewHolder holder, int position)
++int getItemCount()
+}
+
+class RequesterViewHolder{
+-FragmentLibraryRequesterItemBinding mBinding
+
++RequesterViewHolder(FragmentLibraryRequesterItemBinding binding)
++void bind(User requester)	
+}
+
+class UnlibraryMapsFragment{
+-Float ZOOM_LEVEL
+-GoogleMap mMap
+-FragmentMapsBinding mBinding
+-UnlibraryViewModel mViewModel
+
++void onMapReady(GoogleMap googleMap)
++View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState)
++void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+}
+
+RequesterViewHolder <|-- RequestersRecyclerViewAdapter: <<extends>>
+RequestersRecyclerViewAdapter <.. LibraryBookDetailsFragment: <<uses>>
+
 LibraryRepository <.. LibraryViewModel: <<uses>>
 UnlibraryRepository <.. UnlibraryViewModel: <<uses>>
 ExchangeRepository <.. ExchangeViewModel: <<uses>>
@@ -335,6 +398,15 @@ ExchangeViewModel <.. ExchangeFragment: <<uses>>
 FilterMap <.. LibraryViewModel: <<uses>>
 FilterMap <.. LibraryRepository: <<uses>>
 
+BookDetailFragment <|-- LibraryBookDetailsFragment: <<extends>>
+BookDetailFragment <|-- ExchangeBookDetailsFragment: <<extends>>
+BookDetailFragment <|-- UnlibraryBookDetailsFragment: <<extends>>
+
+LibraryMapsFragment <.. LibraryBookDetailsFragment: <<uses>>
+UnlibraryMapsFragment <.. UnlibraryBookDetailsFragment: <<uses>>
+
+LibraryRequesterProfileFragment <.. LibraryBookDetailsFragment: <<uses>>
+
 LibraryViewModel <.. LibraryBookDetailsFragment: <<uses>>
 LibraryViewModel <.. LibraryEditBookFragment: <<uses>>
 ExchangeViewModel <.. ExchangeBookDetailsFragment: <<uses>>
@@ -343,7 +415,7 @@ UnlibraryViewModel <.. UnlibraryBookDetailsFragment: <<uses>>
 
 '------------------- Utils -------------------------------
 class BarcodeScanner{
-+void scanBarcode(Context context, Uri uri, OnFinishedScanListener onFinished)
++void scanBarcode(Context context, Uri uri, String tag, OnFinishedScanListener onFinished)
 }
 
 class FailedToScan{
@@ -354,6 +426,79 @@ class CustomImageBinding{
 +void loadImage(ImageView imageView, String path, Uri uri)
 }
 
+class AlgoliaClientModule{
++Client provideAlgoliaClient()
+}
+
+class FirebaseAuthModule{
++FirebaseAuth provideFirebaseAuth()
+}
+
+class FirebaseFirestoreModule{
++FirebaseFirestore provideFirebaseFirestore()	
+}
+
+class PushNotificationSender{
+-String TAG
+-String FCM_API
+-String SERVER_KEY
+-String CONTENT_TYPE
+-String TOPIC
++void generateNotification(View view, String target, String title, String body)
++void sendNotification(JSONObject notification, View view)
+}
+
+class PushNotificationService{
+-String ADMIN_CHANNEL_ID
++void onMessageReceived(RemoteMessage remoteMessage)
+}
+
+interface SendNotificationInterface{
++void send(String target, String title, String body)
+	
+}
+
+class SingleLiveEvent<T>{
+-String TAG
+-AtomicBoolean pending
+
++void observe(@NonNull final LifecycleOwner owner, @NonNull final Observer<? super T> observer)
++void setValue(@Nullable final T t)
++void call()
+}
+
+class SingletonQueue{
+-SingletonQueue mInstance
+-RequestQueue mRequestQueue
+-Context mCtx
+
++SingletonQueue(Context context)
++SingletonQueue getInstance(Context context)
++RequestQueue getRequestQueue()
++void addToRequestQueue(Request<T> req)
+}
+
+class MainApplication{
+}
+
+ExchangeBookDetailsFragment ..> PushNotificationSender: <<uses>>
+
+MainApplication ..> AlgoliaClientModule: <<uses>>
+MainApplication ..> FirebaseAuthModule: <<uses>>
+MainApplication ..> FirebaseFirestoreModule: <<uses>>
+
+ExchangeBookDetailsFragment ..> SendNotificationInterface: <<uses>>
+LibraryMapsFragment ..> SendNotificationInterface: <<uses>>
+ExchangeViewModel ..> SendNotificationInterface: <<uses>>
+ExchangeBookDetailsFragment ..> SendNotificationInterface: <<uses>>
+LibraryViewModel ..> SendNotificationInterface: <<uses>>
+
+PushNotificationSender ..> SingletonQueue: <<uses>>
+
+AuthViewModel ..> SingleLiveEvent<T>: <<uses>>
+ExchangeViewModel ..> SingleLiveEvent<T>: <<uses>>
+LibraryViewModel ..> SingleLiveEvent<T>: <<uses>>
+UnlibraryViewModel ..> SingleLiveEvent<T>: <<uses>>
 
 LibraryEditBookFragment ..> BarcodeScanner: <<uses>>
 LibraryEditBookFragment ..> FailedToScan: <<uses>>
