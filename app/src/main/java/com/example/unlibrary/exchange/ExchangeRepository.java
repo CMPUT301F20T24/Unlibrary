@@ -72,7 +72,7 @@ public class ExchangeRepository {
      * Constructor for the Exchange Repository.
      */
     @Inject
-    public ExchangeRepository(FirebaseFirestore db, FirebaseAuth auth, Client algoliaClient) {
+    public ExchangeRepository(FirebaseFirestore db, Client algoliaClient) {
         mDb = db;
         mAlgoliaClient = algoliaClient;
         mBooks = new MutableLiveData<>(new ArrayList<>());
@@ -82,7 +82,7 @@ public class ExchangeRepository {
         mAllowedStatus = Arrays.asList(Book.Status.AVAILABLE, Book.Status.REQUESTED);
 
         // TODO: make sure user is authenticated
-        mUID = auth.getUid();
+        mUID = FirebaseAuth.getInstance().getUid();
         attachListener();
     }
 
