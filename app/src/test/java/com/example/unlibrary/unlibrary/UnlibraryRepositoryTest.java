@@ -2,24 +2,29 @@ package com.example.unlibrary.unlibrary;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.test.core.app.ApplicationProvider;
 
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.Index;
-import com.example.unlibrary.exchange.ExchangeBookDetailsFragmentDirections;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.example.unlibrary.exchange.ExchangeRepository;
 import com.example.unlibrary.library.LibraryRepository;
 import com.example.unlibrary.models.Book;
 import com.example.unlibrary.models.Request;
 import com.example.unlibrary.util.FilterMap;
-import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,13 +33,18 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.LooperMode;
 
+import java.io.IOException;
 import java.util.List;
 
 import static android.os.Looper.getMainLooper;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
@@ -65,6 +75,7 @@ public class UnlibraryRepositoryTest {
         mDb.useEmulator("127.0.0.1", 8080);
         // TODO: Get auth emulator working
         mAuth = mock(FirebaseAuth.class);
+        mLibraryAuth = mock(FirebaseAuth.class);
         when(mLibraryAuth.getCurrentUser()).thenReturn(mock(FirebaseUser.class));
         when(mLibraryAuth.getCurrentUser().getUid()).thenReturn("CvLZ5c6lYqeyriVnwNpGurcBZl5R");
 
@@ -73,26 +84,40 @@ public class UnlibraryRepositoryTest {
 
         mAlgoliaClient = mock(Client.class);
         when(mAlgoliaClient.getIndex(anyString())).thenReturn(mock(Index.class));
-        mLibaryRepository = new LibraryRepository(mDb, mAuth, mAlgoliaClient);
-        mExchangeRepository = new ExchangeRepository(mDb, mAlgoliaClient);
+        mLibaryRepository = new LibraryRepository(mDb, mLibraryAuth, mAlgoliaClient);
+        mExchangeRepository = new ExchangeRepository(mDb, mAuth, mAlgoliaClient);
 
         Book book1 = new Book("9780221016025", "Accepted", "Jane", "CvLZ5c6lYqeyriVnwNpGurcBZl5R", null);
         book1.setStatus(Book.Status.REQUESTED);
         Book book2 = new Book("9780221016323", "Requested", "Doe", "CvLZ5c6lYqeyriVnwNpGurcBZl5R", null);
         book2.setStatus(Book.Status.ACCEPTED);
+
+
         mLibaryRepository.createBook(book1, documentReference -> {
         }, e -> fail("Unable to create book 1: " + e.getMessage()));
+        Thread.sleep(SLEEP_TIME_MILLIS);
+        shadowOf(getMainLooper()).idle();
+        await().atMost(SLEEP_TIME, SECONDS).until(() -> book1.getId() != null);
+
         mLibaryRepository.createBook(book2, documentReference -> {
         }, e -> fail("Unable to create book 2: " + e.getMessage()));
         Thread.sleep(SLEEP_TIME_MILLIS);
         shadowOf(getMainLooper()).idle();
+        await().atMost(SLEEP_TIME, SECONDS).until(() -> book2.getId() != null);
+
+
+
+        List<Book> books = mUnlibraryRepository.getBooks().getValue();
+        if (books == null) {
+            fail("Books is null");
+        }
 
         Request request1 = new Request("F8naw3e", book1.getOwner());
         Request request2 = new Request("F8naw3e", book2.getOwner());
-        mExchangeRepository.sendRequest(request1, book1, aVoid -> {}, e -> {
+        mExchangeRepository.sendRequest(request1, books.get(0), aVoid -> {}, e -> {
             fail("unable to get request");
         });
-        mExchangeRepository.sendRequest(request2, book2, aVoid -> {}, e -> {
+        mExchangeRepository.sendRequest(request2, books.get(1), aVoid -> {}, e -> {
             fail("unable to get request");
         });
         Thread.sleep(SLEEP_TIME_MILLIS);
@@ -195,8 +220,8 @@ public class UnlibraryRepositoryTest {
         }
         Book book = books.get(0);
         book.setIsReadyForHandoff(true);
-        mUnlibraryRepository.getRequest(books.get(0), request -> {
-            mUnlibraryRepository.completeExchange(request, book, avoid -> {}, fVoid -> fail("Could not complete exchange"))}, fvoid -> fail("Could not get request");
+        mUnlibraryRepository.getRequest(books.get(0), request ->
+            mUnlibraryRepository.completeExchange(request, book, avoid -> {}, fVoid -> fail("Could not complete exchange")), fvoid -> fail("Could not get request"));
     }
 }
 
