@@ -9,6 +9,7 @@ import androidx.test.espresso.DataInteraction;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
 
 import org.hamcrest.Description;
@@ -40,15 +41,18 @@ import static org.hamcrest.Matchers.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class UnlibraryFLowTest extends MockLogin{
+public class UnlibraryFlowTest extends MockLogin {
     static final String mTitle = "UnlibraryTest1";
     static final String mIsbn = "1234567891111";
     static final String mAuthor = "uitests2";
     static final String mStatus = "Accepted";
     private final int SLEEP_TIME = 2000; // milliseconds
 
+    @Rule
+    public ActivityScenarioRule<MainActivity> mainActivityActivityScenarioRule = new ActivityScenarioRule<>(MainActivity.class);
+
     @Before
-    public void setup() throws InterruptedException {
+    public void before() throws InterruptedException {
         onView(
                 allOf(
                         withText("Unlibrary"),
@@ -66,30 +70,30 @@ public class UnlibraryFLowTest extends MockLogin{
         // Verify name on card
         ViewInteraction textView = onView(
                 allOf(withId(R.id.bookTitle),
-                        withParent(withParent(allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)))),
+                        withParent(withParent(allOf(childAtPosition(withId(R.id.book_list_container), 0), withId(R.id.item_card)))),
                         isDisplayed()));
         textView.check(matches(withText(mTitle)));
 
         // Verify author on card
         ViewInteraction textView2 = onView(
                 allOf(withId(R.id.bookAuthor),
-                        withParent(withParent(allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)))),
+                        withParent(withParent(allOf(childAtPosition(withId(R.id.book_list_container), 0), withId(R.id.item_card)))),
                         isDisplayed()));
         textView2.check(matches(withText(mAuthor)));
 
         // Verify book is requested on card
         ViewInteraction view = onView(
                 allOf(withId(R.id.status), withText(mStatus),
-                        withParent(withParent(allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)))),
+                        withParent(withParent(allOf(childAtPosition(withId(R.id.book_list_container), 0), withId(R.id.item_card)))),
                         isDisplayed()));
         view.check(matches(isDisplayed()));
     }
 
     @Test
     public void unlibraryDetailedBookViewTest() throws InterruptedException {
-        // Click on first book card in list
+        // Click on first book card in book_list_container
         ViewInteraction recyclerView2 = onView(
-                allOf(withId(R.id.list),
+                allOf(withId(R.id.book_list_container),
                         childAtPosition(
                                 withId(R.id.unlibrary_book_list),
                                 0)));
@@ -180,9 +184,9 @@ public class UnlibraryFLowTest extends MockLogin{
                                 3)));
         materialButton.perform(scrollTo(), click());
 
-        // Verify list is empty
-        ViewInteraction emptyList = onView(withId(R.id.list));
-        emptyList.check(matches(isDisplayed()))
+        // Verify book_list_container is empty
+        ViewInteraction emptybook_list_container = onView(withId(R.id.book_list_container));
+        emptybook_list_container.check(matches(isDisplayed()))
                 .check(matches(not(hasDescendant(any(View.class)))));
 
         // Click filter button
@@ -230,7 +234,7 @@ public class UnlibraryFLowTest extends MockLogin{
 
         // Verify there is still a card shown
         ViewInteraction viewGroup = onView(
-                allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)));
+                allOf(childAtPosition(withId(R.id.book_list_container), 0), withId(R.id.item_card)));
         viewGroup.check(matches(isDisplayed()));
 
         // Click filter button
@@ -275,9 +279,9 @@ public class UnlibraryFLowTest extends MockLogin{
 
         Thread.sleep(SLEEP_TIME);
 
-        // Verify list is empty
-        emptyList = onView(withId(R.id.list));
-        emptyList.check(matches(isDisplayed()))
+        // Verify book_list_container is empty
+        emptybook_list_container = onView(withId(R.id.book_list_container));
+        emptybook_list_container.check(matches(isDisplayed()))
                 .check(matches(not(hasDescendant(any(View.class)))));
 
         // Click filter button
@@ -316,7 +320,7 @@ public class UnlibraryFLowTest extends MockLogin{
 
         // Verify there is still a card shown
         ViewInteraction viewGroup2 = onView(
-                allOf(childAtPosition(withId(R.id.list), 0), withId(R.id.item_card)));
+                allOf(childAtPosition(withId(R.id.book_list_container), 0), withId(R.id.item_card)));
         viewGroup2.check(matches(isDisplayed()));
 
 

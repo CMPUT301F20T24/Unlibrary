@@ -1,18 +1,23 @@
 package com.example.unlibrary;
 
 
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import androidx.test.espresso.DataInteraction;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -46,6 +51,9 @@ public class LibraryFlowTest extends MockLogin {
     private final String mIsbn1 = "1234567890123";
     private final String mIsbn2 = "1234567890129";
     private final int SLEEP_TIME = 800; // milliseconds
+
+    @Rule
+    public ActivityScenarioRule<MainActivity> mainActivityActivityScenarioRule = new ActivityScenarioRule<>(MainActivity.class);
 
     @Test
     public void libraryFlowTest() throws InterruptedException {
