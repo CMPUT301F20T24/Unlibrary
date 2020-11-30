@@ -5,12 +5,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -27,7 +29,10 @@ import static org.hamcrest.Matchers.allOf;
 
 
 @RunWith(AndroidJUnit4.class)
-public class BottomNavigationTest extends MockLogin {
+public class BottomNavigationTest extends MockLogin{
+
+    @Rule
+    public ActivityScenarioRule<MainActivity> mainActivityActivityScenarioRule = new ActivityScenarioRule<>(MainActivity.class);
 
     private static Map<Integer, String> mNavBarItems = Map.of(
             R.id.libraryFragment, "Library",
