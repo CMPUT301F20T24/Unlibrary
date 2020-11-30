@@ -6,6 +6,7 @@ Unlibrary is an app that allows people to borrow books amongst their community i
 * [Installation](#installation)
 * [Testing](#testing)
 * [Documentation](#documentation)
+* [Troubleshooting](#troubleshooting)
 * [Maintainers](#maintainers)
 
 ## Installation
@@ -53,9 +54,19 @@ npm run test
 ### Running UI/instrumented tests
 With the project open in Android Studio, right click on `androidTest` directory in *Project View* and click `Run`
 
+> :warning: **UI tests failing on physical device** read [Troubleshooting](#troubleshooting) below
+
 ## Documentation
 - Wiki page [here](https://github.com/CMPUT301F20T24/Unlibrary/wiki)
 - Generated Javadoc can be found in ./doc/javadoc
+
+## Troubleshooting
+
+- Failing UI tests
+  
+  Error message along the lines of: Unable to find view in hierarchy
+  
+  Fix: Use the emulator to run UI tests instead of a physical device, and disable animations from Developer options inside the emulator. We found that UI indices can change when running on physical device. Since our UI checks are done in Firebase Test Labs which uses the emulator, we fixed our tests to that environment.
 
 ## Maintainers
 - Armianto Sumitro
