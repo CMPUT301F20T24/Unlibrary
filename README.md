@@ -41,7 +41,7 @@ npm run test
     ```
 
 2. Open the Unlibrary project in Android Studio
-3. Right click on the test directory (not `androidTest`) in *Project View*, and click `Run`
+3. Right click on the `test` directory (not `androidTest`) in *Project View*, and click `Run`
 
 ### Running UI/instrumented tests
 With the project open in Android Studio, right click on `androidTest` directory in *Project View* and click `Run`
