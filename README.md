@@ -3,12 +3,20 @@
 
 Unlibrary is an app that allows people to borrow books amongst their community instead of using the library.
 
+* [Installation](#installation)
+* [Testing](#testing)
+* [Documentation](#documentation)
+* [Troubleshooting](#troubleshooting)
+* [Maintainers](#maintainers)
+
 ## Installation
 Clone this repository and import it into Android Studio.
 
 ```
 git clone https://github.com/CMPUT301F20T24/Unlibrary.git
 ```
+## Compatible Device
+- Google Pixel XL
 
 ## Testing
 
@@ -25,6 +33,8 @@ npm install  # Install firebase CLI
 ```
 
 ### Running unit tests
+
+> :warning: **Why are some tests commented out?** We implemented Hilt/DI quite late in the project and missed some refactorings and in order to test some of the modules, we needed to refactor production code. Given the amount of time we have left, we decided not to finish some of the unit tests.
 
 #### From CLI
 ```bash
@@ -46,9 +56,19 @@ npm run test
 ### Running UI/instrumented tests
 With the project open in Android Studio, right click on `androidTest` directory in *Project View* and click `Run`
 
+> :warning: **UI tests may fail when run on physical device** read [Troubleshooting](#troubleshooting) below
+
 ## Documentation
 - Wiki page [here](https://github.com/CMPUT301F20T24/Unlibrary/wiki)
 - Generated Javadoc can be found in ./doc/javadoc
+
+## Troubleshooting
+
+- Failing UI tests
+  
+  Error message along the lines of: Unable to find view in hierarchy
+  
+  Fix: Use the emulator to run UI tests instead of a physical device, and disable animations from Developer options inside the emulator. We found that UI indices can change when running on physical device. Since our UI checks are done in Firebase Test Labs which uses the emulator, we fixed our tests to that environment.
 
 ## Maintainers
 - Armianto Sumitro
