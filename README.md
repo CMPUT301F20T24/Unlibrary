@@ -46,9 +46,9 @@ npm run test
 With the project open in Android Studio, right click on `androidTest` directory in *Project View* and click `Run`
 
 ## Maintainers
-Armianto Sumitro
-Cyrus Diego
-Taranjot Singh
-Golnoush H
-Daniel Rojas
-Caleb Schoepp
+- Armianto Sumitro
+- Cyrus Diego
+- Taranjot Singh
+- Golnoush Hassanzadeh
+- Daniel Rojas
+- Caleb Schoepp
