@@ -498,6 +498,11 @@ class PushNotificationService{
 +void onMessageReceived(RemoteMessage remoteMessage)
 }
 
+note right of PushNotificationService
+  This is registered in the AndroidManifest.xml
+  and is automatically used by the OS to help us receive notifications.
+end note
+
 interface SendNotificationInterface{
 +void send(String target, String title, String body)
 	
