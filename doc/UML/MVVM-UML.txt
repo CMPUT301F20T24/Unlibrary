@@ -243,38 +243,41 @@ class LibraryRepository {
 -ListenerRegistration mRequestsListenerRegistration
 -MutableLiveData<List<Book>> mBooks
 -FilterMap mFilter
-
 +LibraryRepository()
 +void attachListener()
 +void createBook(Book book,
-		 OnSuccessListener<DocumentReference> onSuccessListener,
-		  OnFailureListener onFailureListener)
+OnSuccessListener<DocumentReference> onSuccessListener,
+OnFailureListener onFailureListener)
 +void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener,
-		 OnFailureListener onFailureListener)
+OnFailureListener onFailureListener)
 +void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener,
-		 OnFailureListener onFailureListener)
+OnFailureListener onFailureListener)
 +void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener)
 +void detachListener()
 +LiveData<List<Book>> getBooks()
 +void setFilter(FilterMap filter)
 +void addAlgoliaIndex(Book book)
-+void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener)
++void addBookRequestersListener(String bookId,
+OnSuccessListener<List<User>> listener)
 +void addBookListener(String bookId, OnSuccessListener<Book> listener)
 +void detachRequestersListener()
-+void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener,
-		 OnFailureListener onFailureListener)
-+void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener,
-		 OnFailureListener onFailureListener)
++void getBorrowedRequest(Book book,
+OnSuccessListener<? super QuerySnapshot> onSuccessListener,
+OnFailureListener onFailureListener)
++void completeExchange(Request request, Book book,
+OnSuccessListener<Void> onSuccessListener,
+OnFailureListener onFailureListener)
 +void declineRequester(String requestedUID, String bookRequestedID,
-		 OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure,
-		  Runnable onRequestNotFoundInDB)
+OnSuccessListener<? super Void> onDeclineSuccess,
+OnFailureListener onDeclineFailure,
+Runnable onRequestNotFoundInDB)
 +void acceptRequester(String requestedUID, String bookRequestedID,
-		 LatLng handoffLocation, OnSuccessListener onSuccessListener,
-		 OnFailureListener onFailureListener)
+LatLng handoffLocation, OnSuccessListener onSuccessListener,
+OnFailureListener onFailureListener)
 +void updateHandoffLocation(String requestedUID, String bookRequestedID,
-		 LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
+LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
 +void fetchHandoffLocation(String requestedUID, String bookRequestedID,
-		 OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
+OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
 }
 
 class UnlibraryRepository {
@@ -293,23 +296,23 @@ class UnlibraryRepository {
 -ListenerRegistration mListenerRegistration
 -String mUID;
 -FilterMap mFilter;
-
 +UnlibraryRepository(FirebaseFirestore db)
 +void attachListeners()
 +void setFilter(FilterMap filter)
 +void filter()
 +void getRequest(Book book, OnFinishedListener onFinished, OnErrorListener onErrorListener)
 +void completeExchange(Request request, Book book,
-	 OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
+OnSuccessListener<Void> onSuccessListener,
+OnFailureListener onFailureListener)
 +void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener,
-	 OnFailureListener onFailureListener)
+OnFailureListener onFailureListener)
 +MutableLiveData<List<Book>> getBooks()
 +void detachListeners()
 +void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener,
-	 OnFailureListener onFailureListener)
+OnFailureListener onFailureListener)
 +void fetchHandoffLocation(String bookRequestedID,
-	 LibraryRepository.OnFinishedHandoffLocationListener onFinished,
-	  OnFailureListener onFailureListener)
+LibraryRepository.OnFinishedHandoffLocationListener onFinished,
+OnFailureListener onFailureListener)
 }
 
 class UnlibraryViewModel {
@@ -368,7 +371,8 @@ class BooksFragment {
 +BooksFragment()
 +void setBooksSource(BooksSource booksSource)
 +void setOnItemClickListener(BooksRecyclerViewAdapter.OnItemClickListener onItemClickListener)
-+View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++View onCreateView(@NonNull LayoutInflater inflater,
+ViewGroup container, Bundle savedInstanceState)
 }
 
 class BooksRecyclerViewAdapter {
