@@ -46,6 +46,10 @@ npm run test
 ### Running UI/instrumented tests
 With the project open in Android Studio, right click on `androidTest` directory in *Project View* and click `Run`
 
+## Documentation
+- Wiki page [here](https://github.com/CMPUT301F20T24/Unlibrary/wiki)
+- Generated Javadoc can be found in ./doc/javadoc
+
 ## Maintainers
 - Armianto Sumitro
 - Cyrus Diego
