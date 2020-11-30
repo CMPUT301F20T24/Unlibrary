@@ -80,13 +80,13 @@ class Request {
 +GeoPoint getLocation()
 +void setLocation(GeoPoint location)
 }
+	
+Book --o LibraryRepository
+Book --o UnlibraryRepository
+Book --o ExchangeRepository
 
-Book ..o LibraryRepository
-Book ..o UnlibraryRepository
-Book ..o ExchangeRepository
-
-Request ..o ExchangeRepository
-Request ..o UnlibraryRepository
+Request --o ExchangeRepository
+Request --o UnlibraryRepository
 
 '------------------- ViewModel and Repositories  -------------------------------
 class ExchangeViewModel{
@@ -398,15 +398,15 @@ interface BooksSource {
 LiveData<List<Book>> getBooks()
 }
 
-LibraryFragment *.. BooksFragment
-UnlibraryFragment *.. BooksFragment
-ExchangeFragment *.. BooksFragment
+LibraryFragment *-- BooksFragment
+UnlibraryFragment *-- BooksFragment
+ExchangeFragment *-- BooksFragment
 
 BooksSource <|.. ExchangeViewModel: <<implements>>
 BooksSource <|.. LibraryViewModel: <<implements>>
 BooksSource <|.. UnlibraryViewModel: <<implements>>
-BooksSource ..o BooksFragment
+BooksSource --o BooksFragment
 
-BooksRecyclerViewAdapter *.. BookViewHolder
-BooksFragment *.. BooksRecyclerViewAdapter
+BooksRecyclerViewAdapter *-- BookViewHolder
+BooksFragment *-- BooksRecyclerViewAdapter
 @enduml

@@ -32,8 +32,8 @@ class AuthenticatedActivity {
 
 MainActivity --|> AuthenticatedActivity: <<extends>>
 AuthActivity <.. AuthenticatedActivity: <<launches>>
-LoginFragment ..* AuthActivity
-RegisterFragment ..* AuthActivity
+LoginFragment --* AuthActivity
+RegisterFragment --* AuthActivity
 
 '------------------- ViewModel and Repositories (Login / Register)  -------------------------------
 class AuthViewModel {
