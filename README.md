@@ -51,5 +51,5 @@ With the project open in Android Studio, right click on `androidTest` directory 
 - Cyrus Diego
 - Taranjot Singh
 - Golnoush Hassanzadeh
-- Daniel Rojas
+- Daniel Rojas-Cardona
 - Caleb Schoepp
