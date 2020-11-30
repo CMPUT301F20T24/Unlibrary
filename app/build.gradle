@@ -174,7 +174,4 @@ dependencies {
 
     // Asynchronous JUnit testing
     testImplementation 'org.awaitility:awaitility:4.0.3'
-
-    // Asynchronous checks in instrumented tests
-    androidTestImplementation 'org.awaitility:awaitility:3.0.0'
 }
