@@ -54,7 +54,7 @@ npm run test
 ### Running UI/instrumented tests
 With the project open in Android Studio, right click on `androidTest` directory in *Project View* and click `Run`
 
-> :warning: **UI tests failing on physical device** read [Troubleshooting](#troubleshooting) below
+> :warning: **UI tests may fail when run on physical device** read [Troubleshooting](#troubleshooting) below
 
 ## Documentation
 - Wiki page [here](https://github.com/CMPUT301F20T24/Unlibrary/wiki)
