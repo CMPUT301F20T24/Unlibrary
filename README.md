@@ -3,6 +3,11 @@
 
 Unlibrary is an app that allows people to borrow books amongst their community instead of using the library.
 
+* [Installation](#installation)
+* [Testing](#testing)
+* [Documentation](#documentation)
+* [Maintainers](#maintainers)
+
 ## Installation
 Clone this repository and import it into Android Studio.
 
@@ -25,6 +30,8 @@ npm install  # Install firebase CLI
 ```
 
 ### Running unit tests
+
+> :warning: **Why are some tests commented out?**: We implemented Hilt/DI quite late in the project and missed some refactorings and in order to test some of the modules, we needed to refactor production code. Given the amount of time we have left, we decided not to finish some of the unit tests.
 
 #### From CLI
 ```bash
