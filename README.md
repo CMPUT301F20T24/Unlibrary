@@ -1,4 +1,5 @@
 # Unlibrary
+![CI badge](https://github.com/CMPUT301F20T24/Unlibrary/workflows/Android/badge.svg)
 
 Unlibrary is an app that allows people to borrow books amongst their community instead of using the library.
 
