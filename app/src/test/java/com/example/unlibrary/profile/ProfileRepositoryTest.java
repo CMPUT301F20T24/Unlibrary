@@ -9,7 +9,6 @@ package com.example.unlibrary.profile;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.test.core.app.ApplicationProvider;
 
@@ -70,11 +69,8 @@ public class ProfileRepositoryTest {
         FirebaseApp.initializeApp(mContext);
 
         mDb = FirebaseFirestore.getInstance();
-        try {
-            mDb.useEmulator("127.0.0.1", 8080);
-        } catch (IllegalStateException e) {
-            Log.e("Emulator already running", e.toString());
-        }
+        mDb.useEmulator("127.0.0.1", 8080);
+
         AtomicBoolean setDocument = new AtomicBoolean(false);
         mDb.collection(USERS_COLLECTION).document(mUID).set(mUser).addOnCompleteListener(task -> {
             setDocument.set(task.isSuccessful());

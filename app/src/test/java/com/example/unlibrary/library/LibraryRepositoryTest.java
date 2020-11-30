@@ -68,11 +68,7 @@ public class LibraryRepositoryTest {
         FirebaseApp.initializeApp(mContext);
 
         mDb = FirebaseFirestore.getInstance();
-        try {
-            mDb.useEmulator("127.0.0.1", 8080);
-        } catch (IllegalStateException e) {
-            Log.e("Emulator already running", e.toString());
-        }
+        mDb.useEmulator("127.0.0.1", 8080);
 
         // TODO: Get auth emulator working
         mAuth = mock(FirebaseAuth.class);
