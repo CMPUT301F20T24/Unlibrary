@@ -140,7 +140,9 @@ class ExchangeRepository{
 +ExchangeRepository()
 +String getUid()
 +void attachListener()
-+void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
++void createRequest(Request request,
+OnSuccessListener<DocumentReference> onSuccessListener,
+OnFailureListener onFailureListener)
 +LiveData<List<Book>> getBooks()
 +void detachListener()
 +void search(String keywords)
@@ -148,7 +150,9 @@ class ExchangeRepository{
 +void fetchOwnerForCurrentBook(String currentBookOwnerID)
 +LiveData<Request> getCurrentRequest()
 +void fetchCurrentRequest(Book book)
-+void sendRequest(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
++void sendRequest(Request request, Book book,
+OnSuccessListener<Void> onSuccessListener,
+OnFailureListener onFailureListener)
 }
 
 
@@ -242,9 +246,13 @@ class LibraryRepository {
 
 +LibraryRepository()
 +void attachListener()
-+void createBook(Book book, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
-+void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
-+void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void createBook(Book book,
+		 OnSuccessListener<DocumentReference> onSuccessListener,
+		  OnFailureListener onFailureListener)
++void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener,
+		 OnFailureListener onFailureListener)
++void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener,
+		 OnFailureListener onFailureListener)
 +void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener)
 +void detachListener()
 +LiveData<List<Book>> getBooks()
@@ -253,12 +261,20 @@ class LibraryRepository {
 +void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener)
 +void addBookListener(String bookId, OnSuccessListener<Book> listener)
 +void detachRequestersListener()
-+void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener)
-+void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
-+void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, Runnable onRequestNotFoundInDB)
-+void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
-+void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
-+void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
++void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener,
+		 OnFailureListener onFailureListener)
++void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener,
+		 OnFailureListener onFailureListener)
++void declineRequester(String requestedUID, String bookRequestedID,
+		 OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure,
+		  Runnable onRequestNotFoundInDB)
++void acceptRequester(String requestedUID, String bookRequestedID,
+		 LatLng handoffLocation, OnSuccessListener onSuccessListener,
+		 OnFailureListener onFailureListener)
++void updateHandoffLocation(String requestedUID, String bookRequestedID,
+		 LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
++void fetchHandoffLocation(String requestedUID, String bookRequestedID,
+		 OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
 }
 
 class UnlibraryRepository {
@@ -283,12 +299,17 @@ class UnlibraryRepository {
 +void setFilter(FilterMap filter)
 +void filter()
 +void getRequest(Book book, OnFinishedListener onFinished, OnErrorListener onErrorListener)
-+void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
-+void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void completeExchange(Request request, Book book,
+	 OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
++void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener,
+	 OnFailureListener onFailureListener)
 +MutableLiveData<List<Book>> getBooks()
 +void detachListeners()
-+void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
-+void fetchHandoffLocation(String bookRequestedID, LibraryRepository.OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
++void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener,
+	 OnFailureListener onFailureListener)
++void fetchHandoffLocation(String bookRequestedID,
+	 LibraryRepository.OnFinishedHandoffLocationListener onFinished,
+	  OnFailureListener onFailureListener)
 }
 
 class UnlibraryViewModel {

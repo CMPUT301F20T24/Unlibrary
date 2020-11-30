@@ -6,7 +6,8 @@ class LibraryFragment {
 -FilterMap mUpdateFilter
 
 +void onCreate(@Nullable Bundle savedInstanceState)
-+View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++View onCreateView(LayoutInflater inflater,
+ViewGroup container, Bundle savedInstanceState)
 }
 
 class UnlibraryFragment {
@@ -15,8 +16,9 @@ class UnlibraryFragment {
 -FilterMap mUpdateFilter
 
 +void onCreate(@Nullable Bundle savedInstanceState)
-+View onCreateView(LayoutInflater inflater, ViewGroup container,
-                          Bundle savedInstanceState)
++View onCreateView(LayoutInflater inflater,
+ViewGroup container,
+Bundle savedInstanceState)
 }
 
 class ExchangeFragment {
@@ -24,14 +26,16 @@ class ExchangeFragment {
 -FragmentExchangeBinding mBinding
 
 void onCreate(@Nullable Bundle savedInstanceState)
-View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+View onCreateView(LayoutInflater inflater,
+ViewGroup container, Bundle savedInstanceState)
 }
 
 class ExchangeBookDetailsFragment {
 -FragmentExchangeBookDetailsBinding mBinding
 -PushNotificationSender mSender
 
-+View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++View onCreateView(@NotNull LayoutInflater inflater,
+ViewGroup container, Bundle savedInstanceState)
 }
 
 class LibraryBookDetailsFragment {
@@ -40,7 +44,8 @@ class LibraryBookDetailsFragment {
 -Uri mHandoffIsbnUri
 -ActivityResultLauncher<Uri> mScanBarcodeContract
 
-+View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++View onCreateView(@NotNull LayoutInflater inflater,
+ViewGroup container, Bundle savedInstanceState)
 +void onDestroyView()
 +void showToast(String msg)
 +void onMapReady(GoogleMap googleMap)
@@ -54,7 +59,8 @@ class UnlibraryBookDetailsFragment {
 -Uri mHandoffIsbnUri
 -ActivityResultLauncher<Uri> mScanBarcodeContract
 
-+View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++View onCreateView(@NotNull LayoutInflater inflater,
+ViewGroup container, Bundle savedInstanceState)
 +void onMapReady(GoogleMap googleMap)
 +void onResume()
 +void onPause()
@@ -68,7 +74,8 @@ class LibraryEditBookFragment {
 -ActivityResultLauncher<Uri> mScanBarcodeContract;
 -ActivityResultLauncher<Uri> mTakePhotoContract;
 
-+View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++View onCreateView(@NotNull LayoutInflater inflater,
+ViewGroup container, Bundle savedInstanceState)
 -void showToast(String msg)
 }
 
@@ -130,7 +137,9 @@ class ExchangeRepository{
 +ExchangeRepository()
 +String getUid()
 +void attachListener()
-+void createRequest(Request request, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
++void createRequest(Request request,
+OnSuccessListener<DocumentReference> onSuccessListener,
+OnFailureListener onFailureListener)
 +LiveData<List<Book>> getBooks()
 +void detachListener()
 +void search(String keywords)
@@ -138,7 +147,9 @@ class ExchangeRepository{
 +void fetchOwnerForCurrentBook(String currentBookOwnerID)
 +LiveData<Request> getCurrentRequest()
 +void fetchCurrentRequest(Book book)
-+void sendRequest(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
++void sendRequest(Request request, Book book,
+OnSuccessListener<Void> onSuccessListener,
+OnFailureListener onFailureListener)
 }
 
 
@@ -199,7 +210,8 @@ class LibraryViewModel {
 +void selectRequester(View v, int position)
 +void initMapsFragment()
 +void declineSelectedRequester()
-+void acceptSelectedRequester(LatLng latLng, SendNotificationInterface notification)
++void acceptSelectedRequester(LatLng latLng,
+SendNotificationInterface notification)
 +void updateHandoffLocation(LatLng latLng)
 +void fetchHandoffLocation()
 }
@@ -232,23 +244,48 @@ class LibraryRepository {
 
 +LibraryRepository()
 +void attachListener()
-+void createBook(Book book, OnSuccessListener<DocumentReference> onSuccessListener, OnFailureListener onFailureListener)
-+void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
-+void deleteBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
-+void fetchBookDataFromIsbn(String isbn, JSONObjectRequestListener listener)
++void createBook(Book book,
+OnSuccessListener<DocumentReference> onSuccessListener,
+OnFailureListener onFailureListener)
++void updateBook(Book book,
+OnSuccessListener<? super Void> onSuccessListener,
+OnFailureListener onFailureListener)
++void deleteBook(Book book,
+OnSuccessListener<? super Void> onSuccessListener,
+OnFailureListener onFailureListener)
++void fetchBookDataFromIsbn(String isbn,
+JSONObjectRequestListener listener)
 +void detachListener()
 +LiveData<List<Book>> getBooks()
 +void setFilter(FilterMap filter)
 +void addAlgoliaIndex(Book book)
-+void addBookRequestersListener(String bookId, OnSuccessListener<List<User>> listener)
-+void addBookListener(String bookId, OnSuccessListener<Book> listener)
++void addBookRequestersListener(String bookId,
+OnSuccessListener<List<User>> listener)
++void addBookListener(String bookId,
+OnSuccessListener<Book> listener)
 +void detachRequestersListener()
-+void getBorrowedRequest(Book book, OnSuccessListener<? super QuerySnapshot> onSuccessListener, OnFailureListener onFailureListener)
-+void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
-+void declineRequester(String requestedUID, String bookRequestedID, OnSuccessListener<? super Void> onDeclineSuccess, OnFailureListener onDeclineFailure, Runnable onRequestNotFoundInDB)
-+void acceptRequester(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
-+void updateHandoffLocation(String requestedUID, String bookRequestedID, LatLng handoffLocation, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener)
-+void fetchHandoffLocation(String requestedUID, String bookRequestedID, OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
++void getBorrowedRequest(Book book,
+OnSuccessListener<? super QuerySnapshot> onSuccessListener,
+OnFailureListener onFailureListener)
++void completeExchange(Request request,
+Book book, OnSuccessListener<Void> onSuccessListener,
+OnFailureListener onFailureListener)
++void declineRequester(String requestedUID,
+String bookRequestedID,
+OnSuccessListener<? super Void> onDeclineSuccess,
+OnFailureListener onDeclineFailure, Runnable onRequestNotFoundInDB)
++void acceptRequester(String requestedUID,
+String bookRequestedID, LatLng handoffLocation,
+OnSuccessListener onSuccessListener,
+OnFailureListener onFailureListener)
++void updateHandoffLocation(String requestedUID,
+String bookRequestedID,
+LatLng handoffLocation, OnSuccessListener onSuccessListener,
+OnFailureListener onFailureListener)
++void fetchHandoffLocation(String requestedUID,
+String bookRequestedID,
+OnFinishedHandoffLocationListener onFinished,
+OnFailureListener onFailureListener)
 }
 
 class UnlibraryRepository {
@@ -272,13 +309,22 @@ class UnlibraryRepository {
 +void attachListeners()
 +void setFilter(FilterMap filter)
 +void filter()
-+void getRequest(Book book, OnFinishedListener onFinished, OnErrorListener onErrorListener)
-+void completeExchange(Request request, Book book, OnSuccessListener<Void> onSuccessListener, OnFailureListener onFailureListener)
-+void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
++void getRequest(Book book, OnFinishedListener onFinished,
+OnErrorListener onErrorListener)
++void completeExchange(Request request, Book book,
+OnSuccessListener<Void> onSuccessListener,
+OnFailureListener onFailureListener)
++void updateBook(Book book,
+OnSuccessListener<? super Void> onSuccessListener,
+OnFailureListener onFailureListener)
 +MutableLiveData<List<Book>> getBooks()
 +void detachListeners()
-+void updateBook(Book book, OnSuccessListener<? super Void> onSuccessListener, OnFailureListener onFailureListener)
-+void fetchHandoffLocation(String bookRequestedID, LibraryRepository.OnFinishedHandoffLocationListener onFinished, OnFailureListener onFailureListener)
++void updateBook(Book book,
+OnSuccessListener<? super Void> onSuccessListener,
+OnFailureListener onFailureListener)
++void fetchHandoffLocation(String bookRequestedID,
+LibraryRepository.OnFinishedHandoffLocationListener onFinished,
+OnFailureListener onFailureListener)
 }
 
 class UnlibraryViewModel {
@@ -329,7 +375,8 @@ class BookDetailFragment {
 -int shortAnimationDuration
 
 +void onCreate(Bundle savedInstanceState)
-#void zoomImageFromThumb(final FrameLayout frame, final ImageButton thumbView, final ImageView fullImageView)
+#void zoomImageFromThumb(final FrameLayout frame,
+final ImageButton thumbView, final ImageView fullImageView)
 }
 
 class LibraryMapsFragment{
@@ -342,25 +389,30 @@ class LibraryMapsFragment{
 -PushNotificationSender mSender
 +void onMapReady(GoogleMap googleMap)
 +View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState)
-+void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+@Nullable ViewGroup container,
+@Nullable Bundle savedInstanceState)
++void onViewCreated(@NonNull View view,
+@Nullable Bundle savedInstanceState)
 }
 
 class LibraryRequesterProfileFragment{
 -FragmentLibraryRequesterProfileBinding mBinding
 -LibraryViewModel mViewModel
-+View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
++View onCreateView(@NotNull LayoutInflater inflater,
+ViewGroup container, Bundle savedInstanceState)
 }
 
 class RequestersRecyclerViewAdapter{
 #List<User> mRequesters
 -RequestersRecyclerViewAdapter.OnItemClickListener mOnItemClickListener
 
-+RequestersRecyclerViewAdapter(List<User> requesters, RequestersRecyclerViewAdapter.OnItemClickListener onItemClickListener)
++RequestersRecyclerViewAdapter(List<User> requesters,
+RequestersRecyclerViewAdapter.OnItemClickListener onItemClickListener)
 +void setData(List<User> newRequesters)
-+RequestersRecyclerViewAdapter.RequesterViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-+void onBindViewHolder(final RequestersRecyclerViewAdapter.RequesterViewHolder holder, int position)
++RequestersRecyclerViewAdapter.RequesterViewHolder onCreateViewHolder(ViewGroup parent,
+int viewType)
++void onBindViewHolder(final RequestersRecyclerViewAdapter.RequesterViewHolder holder,
+int position)
 +int getItemCount()
 }
 
@@ -379,9 +431,10 @@ class UnlibraryMapsFragment{
 
 +void onMapReady(GoogleMap googleMap)
 +View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState)
-+void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+@Nullable ViewGroup container,
+@Nullable Bundle savedInstanceState)
++void onViewCreated(@NonNull View view,
+@Nullable Bundle savedInstanceState)
 }
 
 RequesterViewHolder <|-- RequestersRecyclerViewAdapter: <<extends>>
@@ -415,7 +468,8 @@ UnlibraryViewModel <.. UnlibraryBookDetailsFragment: <<uses>>
 
 '------------------- Utils -------------------------------
 class BarcodeScanner{
-+void scanBarcode(Context context, Uri uri, String tag, OnFinishedScanListener onFinished)
++void scanBarcode(Context context, Uri uri,
+String tag, OnFinishedScanListener onFinished)
 }
 
 class FailedToScan{
@@ -426,17 +480,6 @@ class CustomImageBinding{
 +void loadImage(ImageView imageView, String path, Uri uri)
 }
 
-class AlgoliaClientModule{
-+Client provideAlgoliaClient()
-}
-
-class FirebaseAuthModule{
-+FirebaseAuth provideFirebaseAuth()
-}
-
-class FirebaseFirestoreModule{
-+FirebaseFirestore provideFirebaseFirestore()	
-}
 
 class PushNotificationSender{
 -String TAG
@@ -444,8 +487,10 @@ class PushNotificationSender{
 -String SERVER_KEY
 -String CONTENT_TYPE
 -String TOPIC
-+void generateNotification(View view, String target, String title, String body)
-+void sendNotification(JSONObject notification, View view)
++void generateNotification(View view,
+String target, String title, String body)
++void sendNotification(JSONObject notification,
+View view)
 }
 
 class PushNotificationService{
@@ -456,15 +501,6 @@ class PushNotificationService{
 interface SendNotificationInterface{
 +void send(String target, String title, String body)
 	
-}
-
-class SingleLiveEvent<T>{
--String TAG
--AtomicBoolean pending
-
-+void observe(@NonNull final LifecycleOwner owner, @NonNull final Observer<? super T> observer)
-+void setValue(@Nullable final T t)
-+void call()
 }
 
 class SingletonQueue{
@@ -478,14 +514,21 @@ class SingletonQueue{
 +void addToRequestQueue(Request<T> req)
 }
 
-class MainApplication{
+class SingleLiveEvent{
+-String TAG
+-AtomicBoolean pending
++void observe(@NonNull final LifecycleOwner owner,
+@NonNull final Observer<? super T> observer)
++void setValue(@Nullable final T t)
++void call()
 }
 
 ExchangeBookDetailsFragment ..> PushNotificationSender: <<uses>>
 
-MainApplication ..> AlgoliaClientModule: <<uses>>
-MainApplication ..> FirebaseAuthModule: <<uses>>
-MainApplication ..> FirebaseFirestoreModule: <<uses>>
+LibraryViewModel <.. SingleLiveEvent: <<uses>>
+UnlibraryViewModel <.. SingleLiveEvent: <<uses>>
+ExchangeViewModel <.. SingleLiveEvent: <<uses>>
+
 
 ExchangeBookDetailsFragment ..> SendNotificationInterface: <<uses>>
 LibraryMapsFragment ..> SendNotificationInterface: <<uses>>
@@ -494,11 +537,6 @@ ExchangeBookDetailsFragment ..> SendNotificationInterface: <<uses>>
 LibraryViewModel ..> SendNotificationInterface: <<uses>>
 
 PushNotificationSender ..> SingletonQueue: <<uses>>
-
-AuthViewModel ..> SingleLiveEvent<T>: <<uses>>
-ExchangeViewModel ..> SingleLiveEvent<T>: <<uses>>
-LibraryViewModel ..> SingleLiveEvent<T>: <<uses>>
-UnlibraryViewModel ..> SingleLiveEvent<T>: <<uses>>
 
 LibraryEditBookFragment ..> BarcodeScanner: <<uses>>
 LibraryEditBookFragment ..> FailedToScan: <<uses>>

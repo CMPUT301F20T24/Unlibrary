@@ -1,0 +1,20 @@
+@startuml
+'------------------- Services -------------------------------
+class AlgoliaClientModule{
++Client provideAlgoliaClient()
+}
+
+class FirebaseAuthModule{
++FirebaseAuth provideFirebaseAuth()
+}
+
+class FirebaseFirestoreModule{
++FirebaseFirestore provideFirebaseFirestore()	
+}
+class MainApplication{
+}
+
+MainApplication ..> AlgoliaClientModule: <<uses>>
+MainApplication ..> FirebaseAuthModule: <<uses>>
+MainApplication ..> FirebaseFirestoreModule: <<uses>>
+@enduml
