@@ -51,7 +51,7 @@ public class ProfileRepository {
      * @param onFinished callback to notify completed query
      */
     public void fetchCurrentUser(OnFinishedFetchListener onFinished) {
-        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mUser = mAuth.getCurrentUser();
         mUID = mUser.getUid();
         mDB.collection(USERS_COLLECTION)
                 .document(mUID)

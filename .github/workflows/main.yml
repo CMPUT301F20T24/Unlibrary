@@ -59,6 +59,7 @@ jobs:
 
       # Upload test results as artifacts
       - name: Archive test results
+        if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
           name: test-results

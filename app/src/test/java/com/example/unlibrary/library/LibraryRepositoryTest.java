@@ -31,7 +31,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.LooperMode;
 
-import java.io.IOException;
 import java.util.List;
 
 import static android.os.Looper.getMainLooper;
@@ -87,7 +86,7 @@ public class LibraryRepositoryTest {
     }
 
     @After
-    public void cleanup() throws IOException {
+    public void cleanup() {
         mDb.terminate();
     }
 
