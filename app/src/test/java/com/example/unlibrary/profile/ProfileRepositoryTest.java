@@ -14,16 +14,13 @@ import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 
 import com.example.unlibrary.models.User;
-import com.google.android.play.core.tasks.OnCompleteListener;
-import com.google.android.play.core.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.junit.Assert;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -37,11 +34,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.AdditionalMatchers.eq;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
@@ -100,6 +92,11 @@ public class ProfileRepositoryTest {
         when(mAuth.getCurrentUser()).thenReturn(mockUser);
 
         mRepository = new ProfileRepository(mDb, mAuth);
+    }
+
+    @After
+    public void cleanup() {
+        mDb.terminate();
     }
 
     @Test
