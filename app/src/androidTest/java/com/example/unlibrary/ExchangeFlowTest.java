@@ -1,3 +1,10 @@
+/*
+ * ExchangeFlowTest
+ *
+ * November 29, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary;
 
 
@@ -8,7 +15,6 @@ import android.view.ViewParent;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
 
 import com.example.unlibrary.models.Book;
@@ -41,9 +47,12 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 
+/**
+ * UI test for exchange page flow
+ */
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class ExchangeFlowTest extends MockLogin{
+public class ExchangeFlowTest extends MockLogin {
     private final int SLEEP_TIME = 5000; // milliseconds
 
     @Rule

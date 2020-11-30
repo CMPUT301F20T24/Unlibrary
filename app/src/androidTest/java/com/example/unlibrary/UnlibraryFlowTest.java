@@ -1,3 +1,10 @@
+/*
+ * UnlibraryFlowTest
+ *
+ * November 29, 2020
+ *
+ * Copyright (c) Team 24, Fall2020, CMPUT301, University of Alberta
+ */
 package com.example.unlibrary;
 
 
@@ -9,7 +16,6 @@ import androidx.test.espresso.DataInteraction;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.FlakyTest;
 import androidx.test.filters.LargeTest;
 
 import org.hamcrest.Description;
@@ -38,7 +44,9 @@ import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.not;
 
-
+/**
+ * UI tests for unlibrary page flow
+ */
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class UnlibraryFlowTest extends MockLogin {
@@ -130,7 +138,6 @@ public class UnlibraryFlowTest extends MockLogin {
         textView10.check(matches(withText("ACCEPTED")));
 
 
-
         // Verify request label
         ViewInteraction textView11 = onView(withId(R.id.ownerUsername));
         textView11.check(matches(withText("UITests2")));
@@ -139,7 +146,7 @@ public class UnlibraryFlowTest extends MockLogin {
         textView12.check(matches(withText("uitests2@gmail.com")));
 
         // Verify request
-        ViewInteraction textView13 = onView(withId(R.id. mapTitle));
+        ViewInteraction textView13 = onView(withId(R.id.mapTitle));
         textView13.check(matches(withText("Handoff Location")));
     }
 
@@ -220,7 +227,7 @@ public class UnlibraryFlowTest extends MockLogin {
         appCompatCheckedTextView2.perform(click());
 
         // Lock in filter
-        ViewInteraction materialButton2= onView(
+        ViewInteraction materialButton2 = onView(
                 allOf(withId(android.R.id.button1), withText("Filter"),
                         childAtPosition(
                                 childAtPosition(
