@@ -6,14 +6,23 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import androidx.test.espresso.ViewInteraction;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+
+import com.example.unlibrary.models.Book;
+import com.example.unlibrary.models.Request;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.List;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -22,27 +31,17 @@ import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
-import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.not;
 
+@LargeTest
+@RunWith(AndroidJUnit4.class)
 public class ExchangeTest extends MockLogin {
-    private static MainActivity mActivity;
     private final int SLEEP_TIME = 5000; // milliseconds
-
-    @ClassRule
-    public static ActivityScenarioRule<MainActivity> rule = new ActivityScenarioRule<>(MainActivity.class);
-
-    @BeforeClass
-    public static void setupActivity() {
-        // Get activity from scenario rule
-        rule.getScenario().onActivity(activity -> mActivity = activity);
-    }
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {
@@ -75,10 +74,11 @@ public class ExchangeTest extends MockLogin {
         // Search for hit refresh book
         ViewInteraction searchBar = onView(withId(R.id.search_exchange_book));
         searchBar.perform(replaceText("hit refresh"), pressImeActionButton(), closeSoftKeyboard());
+        Thread.sleep(SLEEP_TIME);
 
         // Click on first match
         ViewInteraction bookMatch = onView(
-                allOf(withId(R.id.list),
+                allOf(withId(R.id.book_list_container),
                         childAtPosition(
                                 withId(R.id.exchange_book_list),
                                 0)));
@@ -88,7 +88,7 @@ public class ExchangeTest extends MockLogin {
         Thread.sleep(SLEEP_TIME);
 
         // Ensure book is there
-        ViewInteraction bookTitle = onView(allOf(withId(R.id.textView6), withText("Hit Refresh")));
+        ViewInteraction bookTitle = onView(allOf(withId(R.id.textView7), withText("Hit Refresh")));
         bookTitle.check(matches(isDisplayed()));
     }
 
@@ -101,9 +101,13 @@ public class ExchangeTest extends MockLogin {
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
 
+        ViewInteraction searchBar = onView(withId(R.id.search_exchange_book));
+        searchBar.perform(replaceText("exchangeuitest"), pressImeActionButton(), closeSoftKeyboard());
+        Thread.sleep(SLEEP_TIME);
+
         // Click on first book
         ViewInteraction recyclerView = onView(
-                allOf(withId(R.id.list),
+                allOf(withId(R.id.book_list_container),
                         childAtPosition(
                                 withId(R.id.exchange_book_list),
                                 0)));
@@ -118,11 +122,33 @@ public class ExchangeTest extends MockLogin {
                         isDescendantOfA(withId(R.id.exchange_book_frame)),
                         isDisplayed()));
         requestButton.perform(click());
+    }
 
-        // Ensure request successfully sent message is sent
-        // https://stackoverflow.com/questions/28390574/checking-toast-message-in-android-espresso
-        ViewInteraction successToast = onView(withText("Request successfully sent"))
-                .inRoot(withDecorView(not(mActivity.getWindow().getDecorView())));
-        successToast.check(matches(isDisplayed()));
+    @After
+    public void resetRequest() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("books")
+                .document("fD92L0B71VzVmJrSX7UR")
+                .update("status", Book.Status.AVAILABLE.toString());
+
+
+        db.collection("requests")
+                .whereEqualTo("book", "fD92L0B71VzVmJrSX7UR")
+                .whereNotEqualTo("state", Request.State.ARCHIVED)
+                .get()
+                .addOnSuccessListener(task -> {
+                    db.runTransaction(transaction -> {
+                        List<DocumentSnapshot> docs = task.getDocuments();
+                        if (docs.size() == 0) {
+                            return null;
+                        }
+
+                        final DocumentReference requestDocument = db.collection("requests").document(docs.get(0).getId());
+                        transaction.update(requestDocument, "state", Request.State.ARCHIVED.toString());
+
+                        return null;
+                    });
+                });
+
     }
 }
