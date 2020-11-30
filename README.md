@@ -15,6 +15,8 @@ Clone this repository and import it into Android Studio.
 ```
 git clone https://github.com/CMPUT301F20T24/Unlibrary.git
 ```
+## Compatible Device
+- Samsung Pixel XL
 
 ## Testing
 
