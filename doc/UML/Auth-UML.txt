@@ -26,13 +26,14 @@ class MainActivity {
 class AuthenticatedActivity {
 -FirebaseUser mUser
 #void onCreate()
++void goToAuth() 
 #FirebaseUser getUser()
 }
 
 MainActivity --|> AuthenticatedActivity: <<extends>>
 AuthActivity <.. AuthenticatedActivity: <<launches>>
-LoginFragment ..* AuthActivity
-RegisterFragment ..* AuthActivity
+LoginFragment --* AuthActivity
+RegisterFragment --* AuthActivity
 
 '------------------- ViewModel and Repositories (Login / Register)  -------------------------------
 class AuthViewModel {
@@ -73,6 +74,7 @@ class AuthRepository {
 
 class AuthUtil{
 +enum InputKey
+
 +String validateEmail(String email)
 +String validatePassword(String password)
 +String validateUsername(String username)

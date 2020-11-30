@@ -22,7 +22,7 @@ class EditingState {
 +void confirmUpdate()
 }
 
-EditingState ..* ProfileFragment
+EditingState --* ProfileFragment
 
 '------------------- ViewModel  -------------------------------
 class ProfileViewModel {
@@ -63,9 +63,10 @@ class User {
 +void setUsername(String username)
 +String getEmail()
 +void setEmail(String email)
++boolean equals(Object obj)
 }
 
-User ..o ProfileRepository
+User --o ProfileRepository
 Firestore <.. ProfileRepository: <<accesses>>
 
 '------------------- Repositories   -------------------------------
