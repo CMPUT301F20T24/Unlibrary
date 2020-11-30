@@ -60,7 +60,7 @@ With the project open in Android Studio, right click on `androidTest` directory 
 
 ## Documentation
 - Wiki page [here](https://github.com/CMPUT301F20T24/Unlibrary/wiki)
-- Generated Javadoc can be found in ./doc/javadoc
+- Generated Javadoc can be found in ./doc/javadoc or [Javadoc - Overview](https://cmput301f20t24.github.io/Unlibrary/)
 
 ## Troubleshooting
 
